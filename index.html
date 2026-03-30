@@ -2386,13 +2386,7 @@ function showEchangeDeCorps(player) {
     '</div>' +
     '<button class="btn btn-back" onclick="closeActionOverlay()">Annuler</button>';
   openActionOverlay(html);
-}
-
-function swapPlayerPayload(a, b, key) {
-  var tmp = a[key];
-  a[key] = b[key];
-  b[key] = tmp;
-}
+} 
 
 function confirmEchangeDeCorps(targetId) {
   var player = turnOrder[currentTurnIdx];
@@ -2404,17 +2398,22 @@ function confirmEchangeDeCorps(targetId) {
     return;
   }
 
-  // Swap "everything important" except identity (id/name/color)
-  ['picks','hand','rerollsLeft','banned','secondLookArmed','secondLookUsed','doublePiocheArmed','curatedPoolIds','goodBoost','pendingSabotageBan','frozenTurns'].forEach(function(k) {
-    swapPlayerPayload(player, target, k);
-  });
+  // Only swap identities (pseudo + color). Nothing else changes.
+  var tmpName = player.name;
+  player.name = target.name;
+  target.name = tmpName;
+  var tmpColor = player.color;
+  player.color = target.color;
+  target.color = tmpColor;
 
-  showToast('🧬 Échange de corps : vous avez tout échangé !', 'success');
+  showToast('🧬 Échange de corps : pseudos inversés !', 'success');
   closeActionOverlay();
   renderSidebar();
   renderTurnCenter(player);
   renderInventory(player);
   renderTurnCards(player);
+  // Force handoff since "it's now the other player's turn" (same index, different identity)
+  showHandoff(player);
 }
 
 /* ── Vol de main ── */
