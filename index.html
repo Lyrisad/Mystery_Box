@@ -1,0 +1,2944 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Boîte Mystère</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0f0f1a;
+      --surface: #1a1a2e;
+      --surface-2: #22223a;
+      --accent: #7c3aed;
+      --accent-light: #a78bfa;
+      --accent-glow: rgba(124,58,237,.4);
+      --gold: #f59e0b;
+      --gold-glow: rgba(245,158,11,.4);
+      --text: #e2e8f0;
+      --text-dim: #94a3b8;
+      --danger: #ef4444;
+      --danger-glow: rgba(239,68,68,.3);
+      --success: #10b981;
+      --success-glow: rgba(16,185,129,.3);
+      --radius: 16px;
+    }
+
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+
+    /* Hide scrollbars (keep scrolling functional) */
+    html, body { scrollbar-width: none; -ms-overflow-style: none; }
+    html::-webkit-scrollbar, body::-webkit-scrollbar { width: 0; height: 0; }
+
+    /* ── Particles ── */
+    .bg-particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .bg-particles span { position: absolute; width: 4px; height: 4px; background: var(--accent-light); border-radius: 50%; opacity: 0; animation: floatP linear infinite; }
+    @keyframes floatP {
+      0%   { opacity: 0; transform: translateY(100vh) scale(0); }
+      10%  { opacity: .5; }
+      90%  { opacity: .5; }
+      100% { opacity: 0; transform: translateY(-10vh) scale(1); }
+    }
+
+    /* ── Screens ── */
+    .screen { display: none; min-height: 100vh; }
+    .screen.active { display: block; animation: screenIn .4s ease-out; }
+    @keyframes screenIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ── Layout ── */
+    .app { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+    header { text-align: center; margin-bottom: 2.5rem; }
+    header h1 { font-size: 2.5rem; font-weight: 900; background: linear-gradient(135deg, var(--accent-light), var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: -1px; }
+    header p { color: var(--text-dim); margin-top: .4rem; font-size: .95rem; }
+
+    /* ── Section card ── */
+    .section { background: var(--surface); border: 1px solid rgba(255,255,255,.06); border-radius: var(--radius); padding: 1.6rem; margin-bottom: 1.2rem; }
+    .section-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: .5rem; }
+    .section-title .icon { width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; font-size: .9rem; flex-shrink: 0; }
+    .counter-badge { margin-left: auto; background: var(--surface-2); padding: .2rem .6rem; border-radius: 20px; font-size: .75rem; color: var(--text-dim); font-weight: 600; }
+
+    /* ── Forms ── */
+    .add-form { display: flex; gap: .6rem; flex-wrap: wrap; }
+    input[type="text"] { flex: 1; min-width: 130px; padding: .65rem .9rem; background: var(--surface-2); border: 1.5px solid rgba(255,255,255,.08); border-radius: 10px; color: var(--text); font-size: .88rem; font-family: inherit; outline: none; transition: border-color .2s; }
+    input[type="text"]:focus { border-color: var(--accent); }
+    input[type="text"]::placeholder { color: var(--text-dim); }
+    .file-label { display: flex; align-items: center; gap: .4rem; padding: .65rem .85rem; background: var(--surface-2); border: 1.5px dashed rgba(255,255,255,.12); border-radius: 10px; cursor: pointer; font-size: .8rem; color: var(--text-dim); transition: border-color .2s; white-space: nowrap; }
+    .file-label:hover { border-color: var(--accent-light); }
+    .file-label.has-file { border-color: var(--success); color: var(--success); }
+    .file-label input { display: none; }
+
+    /* ── Buttons ── */
+    .btn { padding: .65rem 1.2rem; border: none; border-radius: 10px; font-weight: 600; font-size: .88rem; font-family: inherit; cursor: pointer; transition: transform .15s, box-shadow .2s, opacity .2s; white-space: nowrap; }
+    .btn:active { transform: scale(.96); }
+    .btn-accent { background: linear-gradient(135deg, var(--accent), #6d28d9); color: #fff; box-shadow: 0 4px 14px var(--accent-glow); }
+    .btn-gold { background: linear-gradient(135deg, var(--gold), #d97706); color: #fff; box-shadow: 0 4px 14px var(--gold-glow); font-size: .95rem; padding: .85rem 1.8rem; }
+    .btn-gold:disabled { opacity: .4; cursor: not-allowed; box-shadow: none; }
+    .btn-danger-fill { background: linear-gradient(135deg, var(--danger), #b91c1c); color: #fff; box-shadow: 0 4px 14px var(--danger-glow); }
+    .btn-chaos-fill { background: linear-gradient(135deg, var(--success), #059669); color: #fff; box-shadow: 0 4px 14px var(--success-glow); }
+    .btn-sm { padding: .25rem .5rem; font-size: .7rem; border-radius: 6px; background: rgba(239,68,68,.15); color: var(--danger); border: none; cursor: pointer; font-family: inherit; }
+    .btn-sm:hover { background: rgba(239,68,68,.3); }
+    .btn-back { background: none; border: none; color: var(--text-dim); cursor: pointer; font-size: .88rem; font-family: inherit; font-weight: 600; transition: color .2s; padding: .4rem 0; }
+    .btn-back:hover { color: var(--text); }
+
+    /* ── Mode Badge ── */
+    .mode-badge { display: inline-flex; align-items: center; gap: .35rem; padding: .3rem .75rem; border-radius: 20px; font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+    .mode-badge-normal { background: rgba(124,58,237,.2); color: var(--accent-light); }
+    .mode-badge-chaos { background: rgba(239,68,68,.2); color: var(--danger); }
+
+    /* ── Category pills ── */
+    .cat-pills { display: flex; gap: .35rem; flex-wrap: wrap; margin-bottom: .6rem; }
+    .cat-pill { padding: .3rem .65rem; border-radius: 20px; font-size: .72rem; font-weight: 600; font-family: inherit; border: 1.5px solid rgba(255,255,255,.1); background: transparent; color: var(--text-dim); cursor: pointer; transition: all .2s; display: inline-flex; align-items: center; gap: .3rem; }
+    .cat-pill:hover { border-color: rgba(255,255,255,.25); color: var(--text); }
+    .cat-pill.active { border-color: var(--accent); background: rgba(124,58,237,.15); color: var(--accent-light); }
+    .img-status { font-size: .72rem; color: var(--text-dim); margin-top: .3rem; min-height: 1.1em; display: flex; align-items: center; gap: .4rem; }
+    .img-status .spinner { width: 12px; height: 12px; border: 2px solid rgba(255,255,255,.15); border-top-color: var(--accent-light); border-radius: 50%; animation: spin .6s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Entity cards ── */
+    .entities-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)); gap: .5rem; margin-top: .7rem; }
+    .entity-card { background: var(--surface-2); border: 1.5px solid rgba(255,255,255,.06); border-radius: 10px; padding: .55rem; text-align: center; position: relative; animation: popIn .3s ease-out; }
+    .entity-card:hover { border-color: var(--accent); }
+    @keyframes popIn { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: scale(1); } }
+    .entity-card .thumb { width: 48px; height: 48px; border-radius: 8px; margin: 0 auto .35rem; overflow: hidden; background: rgba(255,255,255,.05); display: grid; place-items: center; font-size: 1.2rem; color: var(--text-dim); }
+    .entity-card .thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .entity-card .name { font-size: .75rem; font-weight: 600; word-break: break-word; }
+    .entity-card .cat-tag { font-size: .6rem; color: var(--text-dim); margin-top: .15rem; }
+    .entity-card .remove-btn { position: absolute; top: 3px; right: 3px; }
+    .empty-state { text-align: center; padding: 1.2rem; color: var(--text-dim); font-size: .82rem; }
+
+    /* ── Toast ── */
+    .toast { position: fixed; top: 1.2rem; left: 50%; transform: translateX(-50%) translateY(-20px); padding: .65rem 1.3rem; border-radius: 10px; font-weight: 600; font-size: .82rem; z-index: 200; opacity: 0; transition: opacity .3s, transform .3s; pointer-events: none; }
+    .toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast-danger { background: rgba(239,68,68,.95); color: #fff; }
+    .toast-success { background: rgba(16,185,129,.95); color: #fff; }
+
+    /* ── LANDING ── */
+    .mode-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; max-width: 580px; margin: 0 auto; }
+    .mode-card { background: var(--surface); border: 2px solid rgba(255,255,255,.06); border-radius: 20px; padding: 2.5rem 1.5rem; text-align: center; cursor: pointer; transition: transform .2s, border-color .3s, box-shadow .3s; font-family: inherit; color: var(--text); }
+    .mode-card:hover { transform: translateY(-4px); }
+    .mc-normal:hover { border-color: var(--accent); box-shadow: 0 8px 40px var(--accent-glow); }
+    .mc-chaos:hover { border-color: var(--danger); box-shadow: 0 8px 40px var(--danger-glow); }
+    .mode-icon { font-size: 3rem; margin-bottom: .8rem; }
+    .mode-card h2 { font-size: 1.35rem; font-weight: 800; margin-bottom: .5rem; }
+    .mode-card p { color: var(--text-dim); font-size: .8rem; line-height: 1.5; }
+
+    /* ── SETUP ── */
+    .setup-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+    .setup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+    .players-list { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .7rem; }
+    .player-chip { display: inline-flex; align-items: center; gap: .35rem; padding: .3rem .65rem .3rem .45rem; background: var(--surface-2); border-radius: 20px; font-size: .8rem; font-weight: 600; animation: popIn .3s ease-out; }
+    .player-chip .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .player-chip .btn-sm { margin-left: .15rem; }
+    .start-area { text-align: center; margin-top: 1.5rem; }
+    .start-hint { color: var(--text-dim); font-size: .78rem; margin-top: .4rem; min-height: 1.2em; }
+
+    /* ── TURN ORDER ── */
+    .order-cards { display: flex; gap: .9rem; justify-content: center; flex-wrap: wrap; margin-bottom: 2rem; }
+    .order-card { background: var(--surface); border: 2px solid rgba(255,255,255,.08); border-radius: 16px; padding: 1.1rem 1.3rem; text-align: center; min-width: 105px; transition: border-color .3s, transform .3s; }
+    .order-card.rolled { border-color: var(--success); }
+    .oc-name { font-weight: 700; font-size: .85rem; margin-bottom: .5rem; display: flex; align-items: center; gap: .35rem; justify-content: center; }
+    .oc-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .oc-roll { font-size: 2rem; font-weight: 900; color: var(--text-dim); min-height: 2.5rem; display: grid; place-items: center; }
+    .order-card.rolled .oc-roll { color: var(--gold); }
+    .oc-roll.rolling { animation: diceShake .1s infinite; color: var(--gold) !important; }
+    .order-actions { text-align: center; margin-bottom: 2rem; }
+    .final-order { text-align: center; animation: popIn .4s ease-out; }
+    .final-order h3 { font-size: 1.05rem; margin-bottom: 1rem; color: var(--gold); }
+    .fo-item { display: inline-flex; align-items: center; gap: .45rem; background: var(--surface); border-radius: 12px; padding: .55rem .9rem; margin: .25rem; font-weight: 700; font-size: .85rem; animation: popIn .3s ease-out; }
+    .fo-rank { color: var(--gold); font-size: .72rem; font-weight: 800; }
+    .fo-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+    /* ── GAME ── */
+    .game-topbar { background: var(--surface); border-bottom: 1px solid rgba(255,255,255,.06); padding: .65rem 1.5rem; display: flex; align-items: center; gap: .7rem; position: sticky; top: 0; z-index: 10; flex-wrap: wrap; }
+    .topbar-players { display: flex; gap: .35rem; flex: 1; }
+    .topbar-pip { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-size: .72rem; font-weight: 800; color: #fff; opacity: .3; transition: opacity .3s, transform .3s; }
+    .topbar-pip.active { opacity: 1; transform: scale(1.15); box-shadow: 0 0 10px rgba(255,255,255,.2); }
+    .topbar-pip.done { opacity: .5; }
+    .topbar-box { font-size: .78rem; font-weight: 600; color: var(--text-dim); white-space: nowrap; }
+    .game-layout { display: grid; grid-template-columns: 240px 1fr; gap: 1.2rem; align-items: start; min-height: calc(100vh - 120px); }
+    .game-sidebar { display: flex; flex-direction: column; gap: .7rem; position: sticky; top: 60px; max-height: calc(100vh - 80px); overflow-y: auto; padding-right: .3rem; }
+    .game-sidebar::-webkit-scrollbar { width: 4px; }
+    .game-sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 2px; }
+    .sidebar-player { background: var(--surface); border: 1.5px solid rgba(255,255,255,.06); border-radius: 12px; padding: .8rem; transition: border-color .3s, box-shadow .3s; }
+    .sidebar-player.is-current { border-color: var(--gold); box-shadow: 0 0 16px rgba(245,158,11,.15); }
+    .sidebar-player.is-done { opacity: .6; }
+    .sb-header { display: flex; align-items: center; gap: .4rem; margin-bottom: .4rem; }
+    .sb-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .sb-name { font-size: .8rem; font-weight: 700; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sb-badge { font-size: .65rem; color: var(--text-dim); background: var(--surface-2); padding: .1rem .4rem; border-radius: 10px; }
+    .sb-cards { display: flex; flex-direction: column; gap: .3rem; margin-top: .3rem; }
+    .sb-card { display: flex; align-items: center; gap: .3rem; font-size: .72rem; font-weight: 600; }
+    .sb-card-thumb { width: 22px; height: 22px; border-radius: 4px; overflow: hidden; background: rgba(255,255,255,.05); display: grid; place-items: center; font-size: .6rem; color: var(--text-dim); flex-shrink: 0; }
+    .sb-card-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .sb-empty { font-size: .7rem; color: var(--text-dim); font-style: italic; }
+    .game-main { min-width: 0; display: flex; flex-direction: column; justify-content: center; }
+    .game-center { text-align: center; padding: 2rem 0; min-height: 340px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .9rem; }
+    .turn-announce { display: flex; align-items: center; gap: .5rem; justify-content: center; margin-bottom: .3rem; }
+    .turn-dot { width: 13px; height: 13px; border-radius: 50%; flex-shrink: 0; }
+    .turn-announce h2 { font-size: 1.25rem; }
+    .dice-display { width: 105px; height: 105px; background: var(--surface-2); border: 2px solid rgba(255,255,255,.08); border-radius: 18px; display: grid; place-items: center; font-size: 2.6rem; font-weight: 900; color: var(--gold); user-select: none; }
+    .dice-display.rolling { animation: diceShake .1s infinite; }
+    @keyframes diceShake {
+      0%   { transform: rotate(0) scale(1); }
+      25%  { transform: rotate(-8deg) scale(1.04); }
+      50%  { transform: rotate(8deg) scale(.96); }
+      75%  { transform: rotate(-4deg) scale(1.02); }
+      100% { transform: rotate(0) scale(1); }
+    }
+    .range-info { color: var(--text-dim); font-size: .8rem; }
+    .reroll-status { color: var(--gold); font-size: .82rem; font-weight: 600; }
+
+    /* ── INVENTORY ── */
+    .inv-grid { display: flex; gap: .4rem; flex-wrap: wrap; margin-top: .4rem; }
+    .inv-item { display: flex; align-items: center; gap: .35rem; background: var(--surface-2); border-radius: 8px; padding: .3rem .55rem; font-size: .75rem; font-weight: 600; animation: popIn .3s; }
+    .inv-thumb { width: 24px; height: 24px; border-radius: 5px; overflow: hidden; background: rgba(255,255,255,.05); display: grid; place-items: center; font-size: .65rem; flex-shrink: 0; }
+    .inv-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* ── OVERLAY ── */
+    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.75); backdrop-filter: blur(8px); z-index: 100; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .3s; }
+    .overlay.visible { opacity: 1; pointer-events: all; }
+    .round-card { background: var(--surface); border: 2px solid var(--accent); border-radius: 20px; padding: 2.5rem 2rem; text-align: center; max-width: 380px; width: 90%; transform: scale(.8); transition: transform .4s cubic-bezier(.34,1.56,.64,1); box-shadow: 0 0 60px var(--accent-glow); }
+    .overlay.visible .round-card { transform: scale(1); }
+    .reveal-card { background: var(--surface); border: 2px solid var(--gold); border-radius: 20px; padding: 2rem 1.6rem; text-align: center; max-width: 370px; width: 90%; transform: scale(.8) translateY(30px); transition: transform .4s cubic-bezier(.34,1.56,.64,1); box-shadow: 0 0 60px var(--gold-glow); }
+    .overlay.visible .reveal-card { transform: scale(1) translateY(0); }
+    .reveal-label { font-size: .78rem; color: var(--gold); text-transform: uppercase; letter-spacing: 2px; font-weight: 700; margin-bottom: .7rem; }
+    .reveal-thumb { width: 100px; height: 100px; border-radius: 14px; margin: 0 auto .7rem; overflow: hidden; background: rgba(255,255,255,.05); display: grid; place-items: center; font-size: 2.8rem; color: var(--text-dim); }
+    .reveal-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .reveal-name { font-size: 1.4rem; font-weight: 800; margin-bottom: 1.1rem; background: linear-gradient(135deg, #fff, var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .reveal-actions { display: flex; gap: .7rem; justify-content: center; flex-wrap: wrap; }
+
+    /* ── SUMMARY ── */
+    .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1.2rem; }
+    .summary-player { background: var(--surface); border-radius: 16px; padding: 1.3rem; border-top: 3px solid; }
+    .sp-name { font-size: 1rem; font-weight: 700; margin-bottom: .2rem; display: flex; align-items: center; gap: .4rem; }
+    .sp-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .sp-count { font-size: .75rem; color: var(--text-dim); margin-bottom: .8rem; }
+    .sp-cards { display: flex; flex-direction: column; gap: .4rem; }
+    .sp-card { display: flex; align-items: center; gap: .45rem; background: var(--surface-2); border-radius: 8px; padding: .45rem .6rem; }
+    .sp-card-thumb { width: 32px; height: 32px; border-radius: 6px; overflow: hidden; background: rgba(255,255,255,.05); display: grid; place-items: center; font-size: .9rem; color: var(--text-dim); flex-shrink: 0; }
+    .sp-card-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .sp-card-name { font-size: .82rem; font-weight: 600; }
+    .sp-round-label { font-size: .7rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: .5px; margin-top: .5rem; margin-bottom: .2rem; }
+    .sp-round-label:first-child { margin-top: 0; }
+    .sp-empty { color: var(--text-dim); font-size: .8rem; font-style: italic; }
+
+    /* ── Good/Bad Toggle ── */
+    .goodbad-toggle { display: flex; gap: .35rem; margin-bottom: .6rem; }
+    .gb-pill { padding: .3rem .65rem; border-radius: 20px; font-size: .72rem; font-weight: 600; font-family: inherit; border: 1.5px solid rgba(255,255,255,.1); background: transparent; color: var(--text-dim); cursor: pointer; transition: all .2s; }
+    .gb-pill:hover { border-color: rgba(255,255,255,.25); color: var(--text); }
+    .gb-pill.gb-good.active { border-color: var(--success); background: rgba(16,185,129,.15); color: #6ee7b7; }
+    .gb-pill.gb-bad.active { border-color: var(--danger); background: rgba(239,68,68,.15); color: #fca5a5; }
+    .gb-tag { font-size: .55rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; margin-top: .15rem; padding: .05rem .35rem; border-radius: 6px; display: inline-block; }
+    .gb-tag-good { background: rgba(16,185,129,.15); color: #6ee7b7; }
+    .gb-tag-bad { background: rgba(239,68,68,.15); color: #fca5a5; }
+
+    /* ── Turn Handoff ── */
+    .handoff-card { background: var(--surface); border: 2px solid var(--accent); border-radius: 24px; padding: 2.5rem 2rem; text-align: center; max-width: 380px; width: 90%; transform: scale(.6); transition: transform .5s cubic-bezier(.34,1.56,.64,1); box-shadow: 0 0 80px var(--accent-glow); }
+    .overlay.visible .handoff-card { transform: scale(1); }
+    .ho-emoji { font-size: 3.5rem; margin-bottom: .3rem; animation: hoBounce 1.2s ease-in-out infinite; }
+    @keyframes hoBounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+    .ho-label { font-size: .75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 3px; font-weight: 700; margin-bottom: .4rem; }
+    .ho-name { font-size: 2rem; font-weight: 900; margin-bottom: .3rem; }
+    .ho-round { font-size: .8rem; color: var(--text-dim); margin-bottom: 1.5rem; }
+    .ho-btn { font-size: 1rem; padding: 1rem 2.5rem; }
+    .ho-hint { font-size: .7rem; color: var(--text-dim); margin-top: .8rem; opacity: .6; }
+
+    /* ── Card Flip ── */
+    .cd-scene { perspective: 800px; width: 260px; height: 380px; }
+    .cd-flipper { width: 100%; height: 100%; position: relative; transition: transform .7s cubic-bezier(.4,.2,.2,1); transform-style: preserve-3d; cursor: pointer; }
+    .cd-flipper.flipped { transform: rotateY(180deg); cursor: default; }
+    .cd-face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; }
+    .cd-front { background: linear-gradient(145deg, #1e1e3a, #2a2a4a); border: 2px solid rgba(124,58,237,.4); box-shadow: 0 0 40px rgba(124,58,237,.15); }
+    .cd-front-deco { font-size: 5rem; margin-bottom: .5rem; animation: cdPulse 2s ease-in-out infinite; }
+    @keyframes cdPulse { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.08); opacity: .8; } }
+    .cd-front-title { font-size: 1.1rem; font-weight: 800; color: var(--accent-light); margin-bottom: .3rem; }
+    .cd-front-hint { font-size: .75rem; color: var(--text-dim); animation: cdBlink 1.5s ease-in-out infinite; }
+    @keyframes cdBlink { 0%,100% { opacity: .5; } 50% { opacity: 1; } }
+    .cd-back { transform: rotateY(180deg); background: radial-gradient(120% 120% at 30% 0%, rgba(124,58,237,.25), transparent 55%), radial-gradient(120% 120% at 70% 0%, rgba(245,158,11,.22), transparent 55%), var(--surface); text-align: center; box-shadow: inset 0 0 0 2px rgba(255,255,255,.06), inset 0 0 0 7px rgba(0,0,0,.25); }
+
+    /* ── Playable Cards ── */
+    .dc-rarity { font-size: .62rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; margin-bottom: .6rem; background: rgba(0,0,0,.35); padding: .25rem .6rem; border-radius: 999px; border: 1px solid rgba(255,255,255,.12); }
+    .dc-emoji { font-size: 3.4rem; margin-bottom: .4rem; filter: drop-shadow(0 8px 18px rgba(0,0,0,.35)); }
+    .dc-name { font-size: 1.25rem; font-weight: 900; margin-bottom: .45rem; padding: .35rem .7rem; border-radius: 12px; background: rgba(0,0,0,.28); border: 1px solid rgba(255,255,255,.1); }
+    .dc-desc { font-size: .82rem; color: var(--text-dim); margin-bottom: 1.2rem; line-height: 1.4; }
+    .dc-actions { display: flex; gap: .7rem; justify-content: center; flex-wrap: wrap; }
+    .cd-back.rarity-common { border: 2px solid #94a3b8; }
+    .rarity-common .dc-rarity { color: #94a3b8; }
+    .cd-back.rarity-rare { border: 2px solid #3b82f6; box-shadow: 0 0 30px rgba(59,130,246,.25); }
+    .rarity-rare .dc-rarity { color: #3b82f6; }
+    .cd-back.rarity-epic { border: 2px solid #a855f7; box-shadow: 0 0 30px rgba(168,85,247,.25); }
+    .rarity-epic .dc-rarity { color: #a855f7; }
+    .cd-back.rarity-legendary { border: 2px solid var(--gold); box-shadow: 0 0 40px var(--gold-glow); animation: legendaryPulse 2s ease-in-out infinite; }
+    .rarity-legendary .dc-rarity { color: var(--gold); }
+    @keyframes legendaryPulse { 0%,100% { box-shadow: 0 0 30px var(--gold-glow); } 50% { box-shadow: 0 0 60px var(--gold-glow); } }
+    .cd-back.rarity-passive { border: 2px solid #6ee7b7; box-shadow: 0 0 30px rgba(110,231,183,.2); }
+    .rarity-passive .dc-rarity { color: #6ee7b7; }
+
+    /* ── Hand cards in sidebar ── */
+    .sb-hand { display: flex; gap: .25rem; flex-wrap: wrap; margin-top: .35rem; }
+    .sb-hand-card { width: 30px; height: 40px; border-radius: 6px; display: grid; place-items: center; font-size: .72rem; }
+    .sb-hand-facedown { background: linear-gradient(135deg, #2d2d4a, #1a1a2e); border: 1px solid rgba(255,255,255,.1); }
+    .sb-hand-faceup { border: 1px solid rgba(255,255,255,.15); background: var(--surface-2); cursor: pointer; transition: transform .15s, border-color .2s; }
+    .sb-hand-faceup:hover { transform: translateY(-2px); border-color: var(--gold); }
+    .sb-passive-badges { display: flex; gap: .2rem; flex-wrap: wrap; margin-top: .2rem; }
+    .sb-passive-badge { font-size: .55rem; padding: .1rem .3rem; border-radius: 6px; background: rgba(110,231,183,.12); color: #6ee7b7; font-weight: 600; }
+
+    /* ── Hand panel in game center ── */
+    .hand-panel { margin-top: .5rem; display: flex; gap: .5rem; flex-wrap: wrap; justify-content: center; }
+    .hand-card-btn { background: var(--surface-2); border: 1.5px solid rgba(255,255,255,.1); border-radius: 10px; padding: .4rem .7rem; cursor: pointer; font-family: inherit; color: var(--text); font-size: .75rem; font-weight: 600; display: flex; align-items: center; gap: .3rem; transition: border-color .2s, transform .15s; }
+    .hand-card-btn:hover { border-color: var(--gold); transform: translateY(-2px); }
+
+    /* ── Eliminate overlay ── */
+    .elim-card { background: var(--surface); border: 2px solid var(--danger); border-radius: 20px; padding: 1.5rem; text-align: center; max-width: 500px; width: 95%; max-height: 85vh; overflow-y: auto; transform: scale(.8); transition: transform .4s cubic-bezier(.34,1.56,.64,1); }
+    .overlay.visible .elim-card { transform: scale(1); }
+    .elim-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: .4rem; margin: 1rem 0; }
+    .elim-item { background: var(--surface-2); border: 2px solid rgba(255,255,255,.06); border-radius: 8px; padding: .4rem; text-align: center; cursor: pointer; transition: all .2s; font-size: .7rem; font-weight: 600; }
+    .elim-item:hover { border-color: rgba(255,255,255,.2); }
+    .elim-item.selected { border-color: var(--danger); background: rgba(239,68,68,.1); }
+    .elim-item .ei-emoji { font-size: 1.3rem; }
+    .elim-item .ei-thumb { width: 36px; height: 36px; border-radius: 6px; margin: 0 auto .2rem; overflow: hidden; background: rgba(255,255,255,.05); display: grid; place-items: center; }
+    .elim-item .ei-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* ── Exchange overlay ── */
+    .exchange-card { background: var(--surface); border: 2px solid #a855f7; border-radius: 20px; padding: 1.5rem; text-align: center; max-width: 450px; width: 95%; transform: scale(.8); transition: transform .4s cubic-bezier(.34,1.56,.64,1); }
+    .overlay.visible .exchange-card { transform: scale(1); }
+    .exch-players { display: flex; gap: .5rem; flex-wrap: wrap; justify-content: center; margin: 1rem 0; }
+    .exch-player-btn { background: var(--surface-2); border: 2px solid rgba(255,255,255,.08); border-radius: 12px; padding: .6rem .9rem; cursor: pointer; font-family: inherit; color: var(--text); font-size: .8rem; font-weight: 600; display: flex; align-items: center; gap: .35rem; transition: all .2s; }
+    .exch-player-btn:hover { border-color: #a855f7; }
+    .exch-player-btn.selected { border-color: #a855f7; background: rgba(168,85,247,.1); }
+    .exch-player-btn.shielded { opacity: .35; pointer-events: none; }
+    .exch-picks { display: flex; gap: .4rem; flex-wrap: wrap; justify-content: center; margin: .8rem 0; }
+    .exch-pick-btn { background: var(--surface-2); border: 2px solid rgba(255,255,255,.08); border-radius: 8px; padding: .4rem .6rem; cursor: pointer; font-family: inherit; color: var(--text); font-size: .72rem; font-weight: 600; transition: all .2s; }
+    .exch-pick-btn:hover { border-color: #a855f7; }
+    .exch-pick-btn.selected { border-color: #a855f7; background: rgba(168,85,247,.1); }
+    .exch-duel { display: flex; align-items: center; justify-content: center; gap: 1.5rem; margin: 1rem 0; }
+    .exch-duel-side { text-align: center; }
+    .exch-duel-dice { width: 70px; height: 70px; background: var(--surface-2); border: 2px solid rgba(255,255,255,.08); border-radius: 14px; display: grid; place-items: center; font-size: 2rem; font-weight: 900; color: var(--gold); margin: .3rem auto; }
+    .exch-duel-dice.rolling { animation: diceShake .1s infinite; }
+    .exch-vs { font-size: 1.5rem; font-weight: 900; color: var(--text-dim); }
+
+    /* ── Generic Action/Choice overlay ── */
+    .action-card { background: var(--surface); border: 2px solid rgba(255,255,255,.08); border-radius: 24px; padding: 1.8rem 1.7rem; text-align: center; max-width: 860px; width: min(920px, 96vw); transform: scale(.8); transition: transform .4s cubic-bezier(.34,1.56,.64,1); max-height: 88vh; overflow-y: auto; }
+    .overlay.visible .action-card { transform: scale(1); }
+    .choice-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: .75rem; margin-top: .9rem; }
+    .choice-grid { margin-bottom: .9rem; }
+    .choice-grid.is-two { grid-template-columns: repeat(2, minmax(280px, 1fr)); max-width: 720px; margin-left: auto; margin-right: auto; justify-content: center; }
+
+    /* ── Better tooltip (floating, not clipped) ── */
+    .tip-float {
+      position: fixed;
+      z-index: 9999;
+      max-width: min(320px, 78vw);
+      background: rgba(15,15,26,.96);
+      border: 1px solid rgba(255,255,255,.14);
+      color: var(--text);
+      padding: .55rem .7rem;
+      border-radius: 12px;
+      font-size: .72rem;
+      line-height: 1.35;
+      box-shadow: 0 14px 50px rgba(0,0,0,.55);
+      pointer-events: none;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity .12s ease, transform .12s ease;
+      white-space: normal;
+      text-align: left;
+    }
+    .tip-float.visible { opacity: 1; transform: translateY(0); }
+    .choice-btn { background: var(--surface-2); border: 2px solid rgba(255,255,255,.08); border-radius: 18px; padding: 1rem .95rem; cursor: pointer; font-family: inherit; color: var(--text); text-align: left; transition: transform .15s, border-color .2s, box-shadow .2s; }
+    .choice-btn:hover { transform: translateY(-2px); border-color: rgba(245,158,11,.55); }
+    .choice-btn.selected { border-color: var(--gold); box-shadow: 0 0 20px rgba(245,158,11,.12); }
+    .choice-title { font-weight: 900; font-size: .95rem; display: flex; align-items: center; gap: .45rem; margin-bottom: .45rem; }
+    .choice-desc { color: var(--text-dim); font-size: .8rem; line-height: 1.4; }
+    .pill { display: inline-flex; align-items: center; gap: .25rem; border-radius: 999px; padding: .15rem .5rem; font-size: .62rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; border: 1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.22); }
+    .pill-good { color: #6ee7b7; border-color: rgba(16,185,129,.35); }
+    .pill-bad { color: #fca5a5; border-color: rgba(239,68,68,.35); }
+
+    /* ── Combo tags in summary ── */
+    .sp-combo { font-size: .7rem; font-weight: 700; padding: .2rem .6rem; border-radius: 10px; margin-bottom: .6rem; display: inline-block; }
+    .sp-combo-good { background: rgba(16,185,129,.15); color: #6ee7b7; }
+    .sp-combo-bad { background: rgba(239,68,68,.15); color: #fca5a5; }
+    .sp-combo-mixed { background: rgba(245,158,11,.15); color: #fbbf24; }
+
+    /* ── Turn cards log ── */
+    .tc-list { display: flex; flex-direction: column; gap: .4rem; margin-top: .4rem; }
+    .tc-item { display: flex; align-items: flex-start; gap: .45rem; background: var(--surface-2); border: 1px solid rgba(255,255,255,.06); border-radius: 12px; padding: .55rem .65rem; }
+    .tc-emoji { width: 28px; height: 28px; border-radius: 10px; display: grid; place-items: center; font-size: 1rem; background: rgba(255,255,255,.06); flex-shrink: 0; }
+    .tc-meta { min-width: 0; }
+    .tc-name { font-weight: 900; font-size: .82rem; line-height: 1.1; }
+    .tc-desc { color: var(--text-dim); font-size: .72rem; margin-top: .15rem; line-height: 1.25; }
+    .tc-tag { margin-left: auto; font-size: .62rem; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; opacity: .85; padding: .15rem .5rem; border-radius: 999px; border: 1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.22); }
+
+    /* ── Confetti ── */
+    .confetti-piece { position: fixed; z-index: 101; pointer-events: none; animation: confettiFall linear forwards; }
+    @keyframes confettiFall { 0% { opacity: 1; transform: translateY(0) rotate(0deg); } 100% { opacity: 0; transform: translateY(100vh) rotate(720deg); } }
+
+    /* ── Responsive ── */
+    @media (max-width: 840px) {
+      .game-layout { grid-template-columns: 1fr; }
+      .game-sidebar { position: static; max-height: none; flex-direction: row; overflow-x: auto; overflow-y: visible; padding-right: 0; padding-bottom: .3rem; gap: .5rem; }
+      .game-sidebar::-webkit-scrollbar { height: 4px; width: 0; }
+      .sidebar-player { min-width: 160px; flex-shrink: 0; }
+    }
+    @media (max-width: 640px) {
+      header h1 { font-size: 1.7rem; }
+      .app { padding: 1.2rem 1rem 3rem; }
+      .section { padding: 1.1rem; }
+      .mode-cards { grid-template-columns: 1fr; max-width: 300px; }
+      .setup-grid { grid-template-columns: 1fr; }
+      .entities-grid { grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); }
+      .order-card { min-width: 85px; padding: .8rem; }
+      .game-topbar { padding: .5rem .7rem; gap: .5rem; }
+      .dice-display { width: 90px; height: 90px; font-size: 2.2rem; }
+      .sidebar-player { min-width: 140px; }
+      .cd-scene { width: 220px; height: 320px; }
+      .cd-front-deco { font-size: 3.5rem; }
+      .ho-name { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg-particles" id="particles"></div>
+
+<!-- ═══ SCREEN: Landing ═══ -->
+<div class="screen active" id="screenLanding">
+  <div class="app">
+    <header>
+      <h1>Boîte Mystère</h1>
+      <p>Choisis ton mode de jeu</p>
+    </header>
+    <div class="mode-cards">
+      <button class="mode-card mc-normal" onclick="selectMode('normal')">
+        <div class="mode-icon">🎲</div>
+        <h2>Normal</h2>
+        <p>Lance le dé. Pas content ? Relance, mais l'entité est éliminée pour tout le monde.</p>
+      </button>
+      <button class="mode-card mc-chaos" onclick="selectMode('chaos')">
+        <div class="mode-icon">🔥</div>
+        <h2>Chaos</h2>
+        <p>Lance le dé. Tu relances ? Tu gardes les deux ! Plus de cartes, plus de folie.</p>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN: Setup ═══ -->
+<div class="screen" id="screenSetup">
+  <div class="app">
+    <div class="setup-header">
+      <button class="btn-back" onclick="goBack()">← Retour</button>
+      <span class="mode-badge" id="modeBadge"></span>
+      <button class="btn btn-accent" type="button" onclick="showCardsLibrary()">🃏 Gérer les cartes</button>
+    </div>
+    <div class="setup-grid">
+      <div class="section">
+        <div class="section-title">
+          <span class="icon" style="background:rgba(124,58,237,.2)">👥</span>
+          Joueurs
+          <span class="counter-badge" id="playerCounter">0 / 5</span>
+        </div>
+        <form class="add-form" id="playerForm">
+          <input type="text" id="playerNameInput" placeholder="Nom du joueur…" maxlength="20" autocomplete="off" />
+          <button type="submit" class="btn btn-accent">Ajouter</button>
+        </form>
+        <div class="players-list" id="playersList"></div>
+      </div>
+      <div class="section">
+        <div class="section-title">
+          <span class="icon" style="background:rgba(245,158,11,.2)">📦</span>
+          Entités
+          <span class="counter-badge" id="entityCounter">0</span>
+        </div>
+        <div class="cat-pills" id="catPills">
+          <button type="button" class="cat-pill active" data-cat="celebrite" onclick="selectCat('celebrite')">⭐ Célébrité</button>
+          <button type="button" class="cat-pill" data-cat="animal" onclick="selectCat('animal')">🐾 Animal</button>
+          <button type="button" class="cat-pill" data-cat="objet" onclick="selectCat('objet')">🔧 Objet</button>
+          <button type="button" class="cat-pill" data-cat="autre" onclick="selectCat('autre')">🏷️ Autre</button>
+        </div>
+        <div class="goodbad-toggle" id="goodbadToggle">
+          <button type="button" class="gb-pill gb-good active" data-gb="true" onclick="selectGoodBad(true)">Good Choice</button>
+          <button type="button" class="gb-pill gb-bad" data-gb="false" onclick="selectGoodBad(false)">Bad Choice</button>
+        </div>
+        <form class="add-form" id="entityForm">
+          <input type="text" id="entityNameInput" placeholder="Nom de la célébrité…" autocomplete="off" />
+          <label class="file-label" id="fileLabel">
+            <span id="fileLabelText">📷 Perso</span>
+            <input type="file" id="entityImageInput" accept="image/*" />
+          </label>
+          <button type="submit" class="btn btn-accent">Ajouter</button>
+        </form>
+        <div class="img-status" id="imgStatus"></div>
+        <div class="entities-grid" id="entitiesGrid"></div>
+      </div>
+    </div>
+    <div class="start-area">
+      <button class="btn btn-gold" id="startBtn" disabled onclick="goToTurnOrder()">🚀 Lancer la partie</button>
+      <p class="start-hint" id="startHint">Ajoute au moins 1 joueur et 1 entité</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN: Turn Order ═══ -->
+<div class="screen" id="screenTurnOrder">
+  <div class="app">
+    <header>
+      <h1>Qui commence ?</h1>
+      <p>Chaque joueur lance le dé pour déterminer l'ordre de passage</p>
+    </header>
+    <div class="order-cards" id="orderCards"></div>
+    <div class="order-actions" id="orderActions">
+      <button class="btn btn-gold" id="orderRollBtn" onclick="rollForOrder()">🎲 Lancer</button>
+    </div>
+    <div id="finalOrder" style="display:none"></div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN: Game ═══ -->
+<div class="screen" id="screenGame">
+  <div class="game-topbar" id="gameTopbar"></div>
+  <div class="app">
+    <div class="game-layout">
+      <div class="game-sidebar" id="gameSidebar"></div>
+      <div class="game-main">
+        <div class="game-center" id="gameCenter">
+          <div class="turn-announce">
+            <span class="turn-dot" id="turnDot"></span>
+            <h2 id="turnText"></h2>
+          </div>
+          <div class="dice-display" id="gameDice">?</div>
+          <p class="range-info" id="gameRange"></p>
+          <button class="btn btn-gold" id="gameRollBtn" onclick="rollGameDice()">🎲 Lancer le dé</button>
+          <p class="reroll-status" id="rerollStatus" style="display:none"></p>
+        </div>
+        <div class="section" id="gameInventory">
+          <div class="section-title">
+            <span class="icon" style="background:rgba(124,58,237,.2)">🎒</span>
+            <span id="invTitle">Inventaire</span>
+          </div>
+          <div id="invContent"><p class="empty-state">Aucune carte pour l'instant</p></div>
+        </div>
+        <div class="section" id="gameTurnCards">
+          <div class="section-title">
+            <span class="icon" style="background:rgba(245,158,11,.18)">🪄</span>
+            Cartes ce tour
+          </div>
+          <div id="turnCardsContent"><p class="empty-state">Aucune carte jouée</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN: Summary ═══ -->
+<div class="screen" id="screenSummary">
+  <div class="app">
+    <header>
+      <h1>Récapitulatif</h1>
+      <p id="summarySubtitle">Voici ce que chacun a obtenu</p>
+    </header>
+    <div class="summary-grid" id="summaryGrid"></div>
+    <div style="text-align:center;margin-top:2rem;">
+      <button class="btn btn-gold" onclick="newGame()">🔄 Nouvelle partie</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ Round Transition Overlay ═══ -->
+<div class="overlay" id="roundOverlay">
+  <div class="round-card">
+    <div id="roundEmoji" style="font-size:4rem;margin-bottom:.4rem"></div>
+    <div id="roundNum" style="font-size:.75rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:2px;font-weight:700;margin-bottom:.3rem"></div>
+    <h2 id="roundTitle" style="font-size:1.7rem;font-weight:900;margin-bottom:.4rem"></h2>
+    <p id="roundDesc" style="color:var(--text-dim);font-size:.88rem"></p>
+  </div>
+</div>
+
+<!-- ═══ Turn Handoff Overlay ═══ -->
+<div class="overlay" id="handoffOverlay">
+  <div class="handoff-card" id="handoffCard">
+    <div class="ho-emoji">🎮</div>
+    <div class="ho-label">C'est à toi !</div>
+    <div class="ho-name" id="hoName"></div>
+    <div class="ho-round" id="hoRound"></div>
+    <button class="btn btn-gold ho-btn" onclick="dismissHandoff()">Je suis prêt !</button>
+    <p class="ho-hint">Passe le téléphone au joueur</p>
+  </div>
+</div>
+
+<!-- ═══ Reveal Overlay ═══ -->
+<div class="overlay" id="revealOverlay">
+  <div class="reveal-card">
+    <div class="reveal-label" id="revealLabel">Tu as pioché</div>
+    <div class="reveal-thumb" id="revealThumb"></div>
+    <div class="reveal-name" id="revealName"></div>
+    <div class="reveal-actions" id="revealActions"></div>
+  </div>
+</div>
+
+<!-- ═══ Card Draw Overlay ═══ -->
+<div class="overlay" id="cardDrawOverlay">
+  <div class="cd-scene" id="cdScene">
+    <div class="cd-flipper" id="cdFlipper">
+      <div class="cd-face cd-front">
+        <div class="cd-front-deco">🃏</div>
+        <div class="cd-front-title">Carte jouable</div>
+        <div class="cd-front-hint">Appuie pour révéler</div>
+      </div>
+      <div class="cd-face cd-back" id="cdBack">
+        <div class="dc-rarity" id="dcRarity"></div>
+        <div class="dc-emoji" id="dcEmoji"></div>
+        <div class="dc-name" id="dcName"></div>
+        <div class="dc-desc" id="dcDesc"></div>
+        <div class="dc-actions" id="dcActions"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ Eliminate Overlay ═══ -->
+<div class="overlay" id="eliminateOverlay">
+  <div class="elim-card">
+    <h3 style="margin-bottom:.3rem" id="elimTitle">Élimine 3 éléments</h3>
+    <p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.5rem" id="elimSubtitle">Sélectionne 3 éléments à retirer de la boîte</p>
+    <div class="elim-grid" id="elimGrid"></div>
+    <div style="margin-top:.5rem">
+      <span id="elimCount" style="font-size:.8rem;color:var(--text-dim)">0 / 3 sélectionnés</span>
+    </div>
+    <button class="btn btn-danger-fill" id="elimConfirmBtn" disabled onclick="confirmEliminate()">Confirmer</button>
+  </div>
+</div>
+
+<!-- ═══ Exchange Overlay ═══ -->
+<div class="overlay" id="exchangeOverlay">
+  <div class="exchange-card">
+    <div id="exchangeContent"></div>
+  </div>
+</div>
+
+<!-- ═══ Action / Choice Overlay (generic) ═══ -->
+<div class="overlay" id="actionOverlay">
+  <div class="action-card">
+    <div id="actionContent"></div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════
+   Constants & State
+   ═══════════════════════════════════════ */
+const COLORS = ['#7c3aed','#f59e0b','#10b981','#ef4444','#3b82f6'];
+
+const ACTIONS = [
+  { name: 'Baiser follement', emoji: '🔥', good: true },
+  { name: 'La personne s\'équipe d\'un gode ceinture', emoji: '🍆', good: false },
+  { name: 'Balade simple', emoji: '🚶', good: true },
+  { name: 'Restaurant', emoji: '🍽️', good: true },
+  { name: 'Massage avec finition', emoji: '💆', good: true },
+  { name: 'Combat de boxe', emoji: '🥊', good: false },
+  { name: 'Embrasser', emoji: '💋', good: true },
+  { name: 'Faire l\'amour', emoji: '❤️', good: true },
+  { name: 'La personne te fait une fellation incroyable', emoji: '🤯', good: true },
+  { name: 'La personne t\'allonge et te chie dessus', emoji: '💩', good: false },
+  { name: 'Tu la/le baises devant tes potes et ta famille', emoji: '😱', good: false },
+  { name: 'Elle/Lui te mord le sexe', emoji: '🦷', good: false },
+  { name: 'Menotté 24h avec la personne', emoji: '⛓️', good: false },
+  { name: 'Only anal', emoji: '🍑', good: false },
+  { name: 'La personne te fait un facesitting pendant 1h', emoji: '🪑', good: false },
+  { name: '69 jusqu\'à ce que quelqu\'un abandonne', emoji: '🔄', good: false },
+  { name: 'La personne te pisse dessus', emoji: '🚿', good: false },
+  { name: 'Marathon de sexe de 24h non-stop', emoji: '⏱️', good: false },
+  { name: 'Tu la/le baises contre la vitre', emoji: '🪟', good: false },
+  { name: 'La personne t\'attache et fait ce qu\'elle veut de toi', emoji: '🪢', good: false },
+  { name: 'Nuit douce aux chandelles et câlins', emoji: '🕯️', good: true },
+  { name: 'Tu dois lécher la personne de la tête aux pieds', emoji: '👅', good: false },
+  { name: 'La personne s\'assoit sur ta face pendant 1h', emoji: '😵', good: false },
+  { name: 'Sexe non-stop jusqu\'à l\'épuisement total', emoji: '💀', good: false },
+  { name: 'Le temps se met en pause tu as 5 min pour faire ce que tu veux', emoji: '⏸️', good: true },
+  { name: 'Tu lui bouffes le cul pendant des heures (elle a pas lavé son cul depuis 48h)', emoji: '🍽️', good: false },
+  { name: 'La personne te crache dessus et te domine', emoji: '👠', good: false },
+  { name: 'Fist intégral (tu reçois)', emoji: '✊', good: false },
+  { name: 'Threesome avec la personne + la prochaine carte', emoji: '👥', good: true },
+  { name: 'La personne te chevauche jusqu\'à ce que tu supplies', emoji: '🐎', good: false }
+];
+
+const LOCATIONS = [
+  { name: 'Chambre d\'hôtel de luxe', emoji: '🏨', good: true },
+  { name: 'Ma chambre', emoji: '🛏️', good: true },
+  { name: 'Toilettes publiques d\'aire d\'autoroute', emoji: '🚻', good: false },
+  { name: 'Jacuzzi privé', emoji: '🫧', good: true },
+  { name: 'Suite présidentielle', emoji: '👑', good: true },
+  { name: 'Plage déserte au coucher du soleil', emoji: '🌅', good: true },
+  { name: 'Sur un yacht de luxe', emoji: '🛥️', good: true },
+  { name: 'Devant la cheminée', emoji: '🔥', good: true },
+  { name: 'Lit king size avec pétales de rose', emoji: '🌹', good: true },
+  { name: 'Villa avec piscine à débordement', emoji: '🏖️', good: true },
+  { name: 'Dans un McDonald\'s bondé', emoji: '🍟', good: false },
+  { name: 'Dans le salon chez tes parents', emoji: '🛋️', good: false },
+  { name: 'Sur le capot au parking Leclerc', emoji: '🚗', good: false },
+  { name: 'Dans un Sanisette dégueulasse', emoji: '🤮', good: false },
+  { name: 'Dans le lit de tes parents pendant qu\'ils dorment à côté', emoji: '😰', good: false },
+  { name: 'Dans une ruelle sombre à 4h du mat', emoji: '🌑', good: false },
+  { name: 'Sur le canapé de ta grand-mère', emoji: '👵', good: false },
+  { name: 'Dans les toilettes portables d\'un festival', emoji: '🚽', good: false },
+  { name: 'Dans la voiture devant le commissariat', emoji: '🚔', good: false },
+  { name: 'Aux chiottes d\'une boîte de nuit collantes de vodka', emoji: '🪩', good: false },
+  { name: 'Sur le bureau de ton patron', emoji: '💼', good: false },
+  { name: 'Dans le local poubelle de l\'immeuble en plein été', emoji: '🗑️', good: false },
+  { name: 'Au fond du bus de nuit devant tout le monde', emoji: '🚌', good: false },
+  { name: 'Dans la cave humide de tes parents', emoji: '🍷', good: false },
+  { name: 'Dans un bain de boue', emoji: '🐷', good: false },
+  { name: 'Dans un confessionnal d\'église un dimanche', emoji: '⛪', good: false },
+  { name: 'Sur le toit d\'un immeuble', emoji: '🏙️', good: true },
+  { name: 'Dans une benne à ordures', emoji: '♻️', good: false },
+  { name: 'Dans un donjon BDSM privé', emoji: '⛓️', good: true },
+  { name: 'Dans un ascenseur en panne entre deux étages', emoji: '🛗', good: false }
+];
+
+const ROUND_META = [
+  { name: 'La Personne', emoji: '👤', desc: 'Qui sera ton destin ?', invTitle: 'Personnes piochées', revealLabel: 'Tu as pioché' },
+  { name: 'L\'Action', emoji: '⚡', desc: 'Que vas-tu devoir faire ?', invTitle: 'Actions piochées', revealLabel: 'Tu devras' },
+  { name: 'Le Lieu', emoji: '📍', desc: 'Où ça se passera ?', invTitle: 'Lieux piochés', revealLabel: 'Ça se passera' }
+];
+
+const PLAYABLE_CARDS = [
+  { id: 'eliminate3', name: 'Élagage', emoji: '🗑️', rarity: 'common', type: 'active', desc: 'Avant de lancer le dé, élimine jusqu’à 3 éléments de TA boîte (personnel). Idéal pour virer des choix que tu ne veux jamais voir.' },
+  { id: 'second_regard', name: 'Second regard', emoji: '👀', rarity: 'common', type: 'active', desc: 'Après ton premier loot, tu peux en révéler un 2e (sans éliminer). Tu choisis ensuite lequel garder.' },
+  { id: 'petit_sabotage', name: 'Petit sabotage', emoji: '🧨', rarity: 'common', type: 'active', desc: 'Choisis un joueur : ce round, 1 élément est retiré de SA boîte (personnel, au hasard).' },
+  { id: 'pioche_sacree', name: 'Pioche sacrée', emoji: '🙏', rarity: 'common', type: 'active', desc: 'Lance 1d100 : >20 Commune, >40 Commune/Rare, >60 Commune/Rare/Épique, >80 N’importe quoi. Puis choisis une carte et elle arrive dans ta main (prête à être jouée).' },
+  { id: 'above_average', name: 'Above average', emoji: '📈', rarity: 'common', type: 'active', desc: 'Lance 1d100 : si ≥ 50, choisis une carte Commune ou Rare et elle arrive dans ta main (prête à être jouée).' },
+  { id: 'reroll_back', name: 'Deuxième souffle', emoji: '🎲', rarity: 'rare', type: 'active', desc: 'Récupère des relances : si tu n’as pas encore relancé, tu passes à 2. Sinon tu reviens à 1.' },
+  { id: 'double_pioche', name: 'Double pioche', emoji: '🎴', rarity: 'rare', type: 'active', desc: 'Ce tour, tu lances 2 fois (sans éliminer) et tu choisis le meilleur résultat à garder.' },
+  { id: 'fifty', name: '50%', emoji: '⚖️', rarity: 'rare', type: 'active', desc: 'Choisis 3 Good et 3 Bad. Ton prochain loot de ce tour sera forcément dans ces 6 cartes.' },
+  { id: 'chance_forcee', name: 'Chance forcée', emoji: '🍀', rarity: 'rare', type: 'active', desc: 'Ce tour, tu as +30% de chances d’obtenir un résultat favorable (selon la Personne Good/Bad), si possible.' },
+  { id: 'jackpot', name: 'Jackpot', emoji: '🎰', rarity: 'rare', type: 'active', desc: 'Pioche 2 cartes jouables bonus tout de suite. Condition : tu dois les jouer ce tour, sinon elles sont perdues.' },
+  { id: 'nostalgie', name: 'Nostalgie', emoji: '🕰️', rarity: 'rare', type: 'active', desc: 'Force un joueur (toi inclus) à remplacer UNE de ses cartes déjà obtenues par une nouvelle pioche dans la boîte correspondante (Personne/Action/Lieu).' },
+  { id: 'exchange', name: 'Deal du destin', emoji: '🔄', rarity: 'epic', type: 'active', desc: 'Choisis un adversaire et risque une de tes cartes. Duel de dés (1–6) : si tu fais plus, vous échangez une carte du même round.' },
+  { id: 'vol_main', name: 'Vol de main', emoji: '🃏', rarity: 'epic', type: 'active', desc: 'Choisis un joueur : vole au hasard 1 carte jouable de sa main (si il en a).' },
+  { id: 'gel', name: 'Gel', emoji: '🧊', rarity: 'epic', type: 'active', desc: 'Choisis un joueur : lors de son prochain tour, il ne peut pas jouer de cartes jouables.' },
+  { id: 'partage', name: 'Partage ?', emoji: '🤝', rarity: 'epic', type: 'active', desc: 'Copie l’effet d’une carte d’un adversaire et devient sa réplique (prête à être jouée ce tour). Si personne n’a de carte, devient une carte aléatoire.' },
+  { id: 'infinite_reroll', name: 'Boucle temporelle', emoji: '♾️', rarity: 'legendary', type: 'active', desc: 'Relances illimitées ce tour. Les cartes relancées NE sont pas éliminées : elles retournent dans la boîte.' },
+  { id: 'couronne', name: 'Couronne', emoji: '👑', rarity: 'legendary', type: 'active', desc: 'Ce tour, tu choisis ton loot parmi 3 résultats tirés au hasard.' },
+  { id: 'miroir', name: 'Miroir', emoji: '🪞', rarity: 'legendary', type: 'active', desc: 'Copie la dernière carte active jouée ce round (sauf Miroir).' },
+  { id: 'echange_de_corps', name: 'Échange de corps', emoji: '🧬', rarity: 'legendary', type: 'active', desc: 'Choisis un joueur : vous échangez complètement vos “places” (inventaires, main, relances…). Bouclier protège aussi de ça.' },
+  { id: 'blinded', name: 'Blinded', emoji: '🕶️', rarity: 'legendary', type: 'active', desc: 'Ce round, tous les joueurs (sauf protégés) ne voient pas leurs résultats de loot. Tout reste caché jusqu’au prochain round.' },
+  { id: 'bad_luck', name: 'Malédiction', emoji: '🌑', rarity: 'passive', type: 'passive', desc: 'Ce tour, 25% de chance que ton résultat devienne défavorable (inversé selon ta Personne Good/Bad).', effect: 'force_bad' },
+  { id: 'good_luck', name: 'Bénédiction', emoji: '✨', rarity: 'passive', type: 'passive', desc: 'Ce tour, 25% de chance que ton résultat devienne favorable (inversé selon ta Personne Good/Bad).', effect: 'force_good' },
+  { id: 'shield', name: 'Bouclier', emoji: '🛡️', rarity: 'passive', type: 'passive', desc: 'Protection jusqu’à la fin du round : tu es immunisé contre Échange, Blinded et Échange de corps.', effect: 'shield' }
+];
+
+const RARITY_WEIGHTS = [
+  { rarity: 'common', weight: 40 },
+  { rarity: 'rare', weight: 25 },
+  { rarity: 'passive', weight: 20 },
+  { rarity: 'epic', weight: 10 },
+  { rarity: 'legendary', weight: 5 }
+];
+
+function drawCard() {
+  var roll = Math.random() * 100;
+  var cum = 0;
+  var rarity = 'common';
+  for (var i = 0; i < RARITY_WEIGHTS.length; i++) {
+    cum += RARITY_WEIGHTS[i].weight;
+    if (roll < cum) { rarity = RARITY_WEIGHTS[i].rarity; break; }
+  }
+  var pool = PLAYABLE_CARDS.filter(function(c) { return c.rarity === rarity; });
+  return Object.assign({}, pool[Math.floor(Math.random() * pool.length)]);
+}
+
+const RARITY_META = {
+  common:    { label: 'Commune',    color: '#94a3b8' },
+  rare:      { label: 'Rare',       color: '#3b82f6' },
+  epic:      { label: 'Épique',     color: '#a855f7' },
+  legendary: { label: 'Légendaire', color: '#f59e0b' },
+  passive:   { label: 'Passive',    color: '#6ee7b7' }
+};
+
+let mode = null;
+let players = [];
+let entities = [];
+let box = [];
+let turnOrder = [];
+let currentTurnIdx = 0;
+let currentRound = 0;
+let currentEntity = null;
+let firstEntity = null;
+let hasRerolled = false;
+let isAnimating = false;
+let orderPhaseIdx = 0;
+let cardDrawPending = false;
+let blindedRound = null;
+let blindedBy = null;
+let lastActiveCardId = null;
+let lastActiveCardPlayerId = null;
+
+/* ═══════════════════════════════════════
+   Utilities
+   ═══════════════════════════════════════ */
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function initial(s) { return s.charAt(0).toUpperCase(); }
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function showToast(msg, type) {
+  const t = document.createElement('div');
+  t.className = 'toast toast-' + type;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  requestAnimationFrame(() => requestAnimationFrame(() => t.classList.add('visible')));
+  setTimeout(() => { t.classList.remove('visible'); setTimeout(() => t.remove(), 300); }, 1800);
+}
+
+function spawnConfetti() {
+  const cols = ['#7c3aed','#f59e0b','#ef4444','#10b981','#3b82f6','#ec4899'];
+  for (let i = 0; i < 50; i++) {
+    const p = document.createElement('div');
+    p.className = 'confetti-piece';
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.top = '-10px';
+    p.style.background = cols[Math.floor(Math.random() * cols.length)];
+    p.style.borderRadius = Math.random() > .5 ? '50%' : '2px';
+    const sz = 6 + Math.random() * 8;
+    p.style.width = sz + 'px';
+    p.style.height = sz + 'px';
+    p.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+    p.style.animationDelay = (Math.random() * .4) + 's';
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 4000);
+  }
+}
+
+function getPlayerBox(player) {
+  var b = box;
+  if (player && player.banned && player.banned.length > 0) {
+    b = b.filter(function(e) { return player.banned.indexOf(e.id) < 0; });
+  }
+  if (player && player.curatedPoolIds && player.curatedPoolIds.length > 0) {
+    b = b.filter(function(e) { return player.curatedPoolIds.indexOf(e.id) >= 0; });
+  }
+  return b;
+}
+
+function thumbHtml(entity) {
+  if (entity.image) return '<img src="' + entity.image + '" alt="">';
+  if (entity.emoji) return entity.emoji;
+  return initial(entity.name);
+}
+
+/* ═══════════════════════════════════════
+   LANDING
+   ═══════════════════════════════════════ */
+function selectMode(m) {
+  mode = m;
+  const badge = document.getElementById('modeBadge');
+  badge.className = 'mode-badge mode-badge-' + m;
+  badge.textContent = m === 'normal' ? '🎲 Normal' : '🔥 Chaos';
+  showScreen('screenSetup');
+  renderSetup();
+  document.getElementById('playerNameInput').focus();
+}
+
+function goBack() {
+  mode = null;
+  players = [];
+  showScreen('screenLanding');
+}
+
+/* ═══════════════════════════════════════
+   SETUP
+   ═══════════════════════════════════════ */
+var CAT_META = {
+  celebrite: { icon: '⭐', label: 'Célébrité', placeholder: 'Nom de la célébrité…' },
+  animal:    { icon: '🐾', label: 'Animal',    placeholder: 'Nom de l\'animal…' },
+  objet:     { icon: '🔧', label: 'Objet',     placeholder: 'Nom de l\'objet…' },
+  autre:     { icon: '🏷️', label: 'Autre',     placeholder: 'Nom de l\'entité…' }
+};
+var selectedCat = 'celebrite';
+var selectedGood = true;
+
+function selectGoodBad(val) {
+  selectedGood = val;
+  document.querySelectorAll('.gb-pill').forEach(function(b) { b.classList.toggle('active', String(b.dataset.gb) === String(val)); });
+}
+
+function selectCat(cat) {
+  selectedCat = cat;
+  document.querySelectorAll('.cat-pill').forEach(function(b) {
+    b.classList.toggle('active', b.getAttribute('data-cat') === cat);
+  });
+  var inp = document.getElementById('entityNameInput');
+  inp.placeholder = CAT_META[cat].placeholder;
+  inp.focus();
+  document.getElementById('imgStatus').innerHTML = '';
+}
+
+function fetchWikiImage(query, lang) {
+  var url = 'https://' + lang + '.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(query);
+  return fetch(url).then(function(r) {
+    if (!r.ok) throw new Error('not found');
+    return r.json();
+  }).then(function(data) {
+    if (data.thumbnail && data.thumbnail.source) return data.thumbnail.source;
+    if (data.originalimage && data.originalimage.source) return data.originalimage.source;
+    throw new Error('no image');
+  });
+}
+
+function autoFetchImage(name) {
+  var status = document.getElementById('imgStatus');
+  status.innerHTML = '<span class="spinner"></span> Recherche d\'image…';
+
+  return fetchWikiImage(name, 'fr')
+    .catch(function() { return fetchWikiImage(name, 'en'); })
+    .then(function(url) {
+      status.innerHTML = '✅ Image trouvée';
+      setTimeout(function() { status.innerHTML = ''; }, 2000);
+      return url;
+    })
+    .catch(function() {
+      status.innerHTML = '⚠️ Aucune image trouvée — ajouté sans image';
+      setTimeout(function() { status.innerHTML = ''; }, 2500);
+      return null;
+    });
+}
+
+document.getElementById('playerForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  var inp = document.getElementById('playerNameInput');
+  var name = inp.value.trim();
+  if (!name || players.length >= 5) return;
+  players.push({
+    id: Date.now(),
+    name: name,
+    color: COLORS[players.length],
+    picks: [[], [], []],
+    rerollsLeft: 1,
+    hand: [],
+    drawnCard: null,
+    activePassives: [],
+    shieldedRound: false,
+    infiniteReroll: false,
+    banned: [],
+    secondLookArmed: false,
+    secondLookUsed: false,
+    doublePiocheArmed: false,
+    curatedPoolIds: null,
+    goodBoost: 0,
+    turnLog: [],
+    pendingSabotageBan: 0,
+    frozenTurns: 0,
+    rollRaw: 0,
+    rollDisplay: 0
+  });
+  inp.value = '';
+  renderSetup();
+  inp.focus();
+});
+
+document.getElementById('entityForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  var inp = document.getElementById('entityNameInput');
+  var fileInp = document.getElementById('entityImageInput');
+  var name = inp.value.trim();
+  if (!name) return;
+
+  var cat = selectedCat;
+  var entity = { id: Date.now(), name: name, image: null, category: cat, good: selectedGood };
+
+  var submitBtn = e.target.querySelector('button[type="submit"]');
+  submitBtn.disabled = true;
+  inp.value = '';
+
+  if (fileInp.files.length > 0) {
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      entity.image = ev.target.result;
+      entities.push(entity);
+      renderSetup();
+      submitBtn.disabled = false;
+    };
+    reader.readAsDataURL(fileInp.files[0]);
+    fileInp.value = '';
+    document.getElementById('fileLabelText').textContent = '📷 Perso';
+    document.getElementById('fileLabel').classList.remove('has-file');
+    inp.focus();
+  } else if (cat !== 'autre') {
+    autoFetchImage(name).then(function(url) {
+      entity.image = url;
+      entities.push(entity);
+      renderSetup();
+      submitBtn.disabled = false;
+      inp.focus();
+    });
+    fileInp.value = '';
+    document.getElementById('fileLabelText').textContent = '📷 Perso';
+    document.getElementById('fileLabel').classList.remove('has-file');
+  } else {
+    entities.push(entity);
+    renderSetup();
+    submitBtn.disabled = false;
+    fileInp.value = '';
+    document.getElementById('fileLabelText').textContent = '📷 Perso';
+    document.getElementById('fileLabel').classList.remove('has-file');
+    inp.focus();
+  }
+});
+
+document.getElementById('entityImageInput').addEventListener('change', function() {
+  var lbl = document.getElementById('fileLabelText');
+  var wrap = document.getElementById('fileLabel');
+  if (this.files.length > 0) {
+    lbl.textContent = '✅ ' + this.files[0].name.slice(0, 14);
+    wrap.classList.add('has-file');
+  } else {
+    lbl.textContent = '📷 Perso';
+    wrap.classList.remove('has-file');
+  }
+});
+
+function removePlayer(id) {
+  const idx = players.findIndex(function(p) { return p.id === id; });
+  if (idx !== -1) {
+    players.splice(idx, 1);
+    players.forEach(function(p, i) { p.color = COLORS[i]; });
+  }
+  renderSetup();
+}
+
+function removeEntity(id) {
+  const idx = entities.findIndex(function(e) { return e.id === id; });
+  if (idx !== -1) entities.splice(idx, 1);
+  renderSetup();
+}
+
+function renderSetup() {
+  document.getElementById('playerCounter').textContent = players.length + ' / 5';
+  document.getElementById('playersList').innerHTML = players.map(function(p) {
+    return '<span class="player-chip">' +
+      '<span class="dot" style="background:' + p.color + '"></span>' +
+      esc(p.name) +
+      '<button class="btn-sm" onclick="removePlayer(' + p.id + ')">✕</button>' +
+    '</span>';
+  }).join('');
+
+  document.getElementById('entityCounter').textContent = entities.length;
+  document.getElementById('entitiesGrid').innerHTML = entities.map(function(e) {
+    var cm = CAT_META[e.category] || CAT_META.autre;
+    return '<div class="entity-card">' +
+      '<button class="btn-sm remove-btn" onclick="removeEntity(' + e.id + ')">✕</button>' +
+      '<div class="thumb">' + thumbHtml(e) + '</div>' +
+      '<div class="name">' + esc(e.name) + '</div>' +
+      '<div class="cat-tag">' + cm.icon + ' ' + cm.label + '</div>' +
+      '<div class="gb-tag ' + (e.good ? 'gb-tag-good' : 'gb-tag-bad') + '">' + (e.good ? 'Good' : 'Bad') + '</div>' +
+    '</div>';
+  }).join('');
+
+  var ok = players.length >= 1 && entities.length >= 1;
+  document.getElementById('startBtn').disabled = !ok;
+  document.getElementById('startHint').textContent = ok ? '' : 'Ajoute au moins 1 joueur et 1 entité';
+}
+
+/* ═══════════════════════════════════════
+   TURN ORDER
+   ═══════════════════════════════════════ */
+function goToTurnOrder() {
+  players.forEach(function(p) {
+    p.picks = [[],[],[]]; p.rerollsLeft = 1; p.rollRaw = 0; p.rollDisplay = 0;
+    p.hand = []; p.drawnCard = null; p.activePassives = [];
+    p.shieldedRound = false; p.infiniteReroll = false; p.banned = [];
+    p.secondLookArmed = false; p.secondLookUsed = false; p.doublePiocheArmed = false;
+    p.curatedPoolIds = null; p.goodBoost = 0; p.frozenTurns = 0; p.pendingSabotageBan = 0;
+  });
+
+  if (players.length <= 1) {
+    turnOrder = [players[0]];
+    startGame();
+    return;
+  }
+
+  orderPhaseIdx = 0;
+  showScreen('screenTurnOrder');
+  document.getElementById('finalOrder').style.display = 'none';
+  document.getElementById('orderActions').style.display = '';
+  renderOrderCards();
+  updateOrderBtn();
+}
+
+function renderOrderCards() {
+  document.getElementById('orderCards').innerHTML = players.map(function(p) {
+    var rolled = p.rollDisplay > 0;
+    return '<div class="order-card' + (rolled ? ' rolled' : '') + '" id="oc_' + p.id + '">' +
+      '<div class="oc-name"><span class="oc-dot" style="background:' + p.color + '"></span>' + esc(p.name) + '</div>' +
+      '<div class="oc-roll" id="ocRoll_' + p.id + '">' + (rolled ? p.rollDisplay : '—') + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function updateOrderBtn() {
+  var btn = document.getElementById('orderRollBtn');
+  if (orderPhaseIdx < players.length) {
+    btn.textContent = '🎲 Lancer pour ' + players[orderPhaseIdx].name;
+    btn.disabled = false;
+  }
+}
+
+function rollForOrder() {
+  if (isAnimating || orderPhaseIdx >= players.length) return;
+  isAnimating = true;
+  var player = players[orderPhaseIdx];
+  var rollEl = document.getElementById('ocRoll_' + player.id);
+  rollEl.classList.add('rolling');
+  document.getElementById('orderRollBtn').disabled = true;
+
+  var ticks = 0;
+  var total = 14 + Math.floor(Math.random() * 8);
+  var iv = setInterval(function() {
+    rollEl.textContent = Math.floor(Math.random() * 100) + 1;
+    ticks++;
+    if (ticks >= total) {
+      clearInterval(iv);
+      var raw = Math.random();
+      var display = Math.floor(raw * 100) + 1;
+      player.rollRaw = raw;
+      player.rollDisplay = display;
+      rollEl.textContent = display;
+      rollEl.classList.remove('rolling');
+      document.getElementById('oc_' + player.id).classList.add('rolled');
+      isAnimating = false;
+      orderPhaseIdx++;
+
+      if (orderPhaseIdx >= players.length) {
+        document.getElementById('orderActions').style.display = 'none';
+        setTimeout(showFinalOrder, 600);
+      } else {
+        updateOrderBtn();
+      }
+    }
+  }, 55);
+}
+
+function showFinalOrder() {
+  turnOrder = players.slice().sort(function(a, b) { return b.rollRaw - a.rollRaw; });
+  var el = document.getElementById('finalOrder');
+  el.style.display = '';
+  el.className = 'final-order';
+  el.innerHTML =
+    '<h3>Ordre de passage</h3>' +
+    '<div style="margin-bottom:1.5rem">' +
+    turnOrder.map(function(p, i) {
+      return '<div class="fo-item" style="animation-delay:' + (i * .1) + 's">' +
+        '<span class="fo-rank">#' + (i + 1) + '</span>' +
+        '<span class="fo-dot" style="background:' + p.color + '"></span>' +
+        esc(p.name) +
+        '<span style="color:var(--text-dim);font-size:.72rem">(' + p.rollDisplay + ')</span>' +
+      '</div>';
+    }).join('') +
+    '</div>' +
+    '<button class="btn btn-gold" onclick="startGame()">⚔️ Commencer !</button>';
+  spawnConfetti();
+}
+
+/* ═══════════════════════════════════════
+   GAME
+   ═══════════════════════════════════════ */
+function startGame() {
+  currentRound = 0;
+  hasRerolled = false;
+  currentEntity = null;
+  firstEntity = null;
+  showScreen('screenGame');
+  showRoundTransition();
+}
+
+function initRoundBox() {
+  if (currentRound === 0) {
+    box = entities.map(function(e) { return { id: e.id, name: e.name, image: e.image, emoji: null, category: e.category, good: e.good }; });
+  } else if (currentRound === 1) {
+    box = ACTIONS.map(function(a, i) { return { id: 1000 + i, name: a.name, image: null, emoji: a.emoji, category: 'action', good: a.good }; });
+  } else {
+    box = LOCATIONS.map(function(l, i) { return { id: 2000 + i, name: l.name, image: null, emoji: l.emoji, category: 'lieu', good: l.good }; });
+  }
+}
+
+function showRoundTransition() {
+  var meta = ROUND_META[currentRound];
+  document.getElementById('roundEmoji').textContent = meta.emoji;
+  document.getElementById('roundNum').textContent = 'Round ' + (currentRound + 1) + ' / 3';
+  document.getElementById('roundTitle').textContent = meta.name;
+  document.getElementById('roundDesc').textContent = meta.desc;
+  document.getElementById('roundOverlay').classList.add('visible');
+  renderTopbar();
+  renderSidebar();
+  spawnConfetti();
+  setTimeout(function() {
+    document.getElementById('roundOverlay').classList.remove('visible');
+    setTimeout(function() {
+      initRoundBox();
+      turnOrder.forEach(function(p) { p.banned = []; });
+      // Apply pending sabotage bans for this new round (personal boxes)
+      turnOrder.forEach(function(p) {
+        if (!p.pendingSabotageBan) return;
+        var pBox = getPlayerBox(p);
+        for (var k = 0; k < p.pendingSabotageBan; k++) {
+          if (pBox.length === 0) break;
+          var victim = pBox[Math.floor(Math.random() * pBox.length)];
+          p.banned.push(victim.id);
+          pBox = getPlayerBox(p);
+        }
+        p.pendingSabotageBan = 0;
+      });
+      turnOrder.forEach(function(p) { p.shieldedRound = false; });
+      blindedRound = null;
+      blindedBy = null;
+      currentTurnIdx = 0;
+      beginTurn();
+    }, 300);
+  }, 2500);
+}
+
+function advanceRound() {
+  currentRound++;
+  if (currentRound > 2) {
+    endGame();
+  } else {
+    showRoundTransition();
+  }
+}
+
+function beginTurn() {
+  var player = turnOrder[currentTurnIdx];
+  hasRerolled = false;
+  currentEntity = null;
+  firstEntity = null;
+  player.infiniteReroll = false;
+  player.activePassives = [];
+  player.drawnCard = null;
+  player.secondLookArmed = false;
+  player.secondLookUsed = false;
+  player.doublePiocheArmed = false;
+  player.curatedPoolIds = null;
+  player.goodBoost = 0;
+  player.turnLog = [];
+  if (player.frozenTurns && player.frozenTurns > 0) player.frozenTurns--;
+
+  renderTopbar();
+  renderSidebar();
+
+  showHandoff(player);
+}
+
+function showHandoff(player) {
+  var rm = ROUND_META[currentRound];
+  document.getElementById('hoName').innerHTML = '<span style="color:' + player.color + '">' + esc(player.name) + '</span>';
+  document.getElementById('hoRound').textContent = rm.emoji + ' ' + rm.name + ' — Round ' + (currentRound + 1) + '/3';
+  document.getElementById('handoffOverlay').classList.add('visible');
+}
+
+function dismissHandoff() {
+  document.getElementById('handoffOverlay').classList.remove('visible');
+  var player = turnOrder[currentTurnIdx];
+
+  setTimeout(function() {
+    renderTurnCenter(player);
+    renderInventory(player);
+    renderTurnCards(player);
+
+    // You can draw a playable card from the very first turn (Round 1 included)
+    var card = drawCard();
+    player.drawnCard = card;
+    cardDrawPending = true;
+    showCardDraw(player, card);
+  }, 300);
+}
+
+function addTurnLog(player, card, kind) {
+  if (!player.turnLog) player.turnLog = [];
+  player.turnLog.unshift({
+    id: card.id,
+    name: card.name,
+    emoji: card.emoji,
+    desc: card.desc,
+    rarity: card.rarity,
+    kind: kind // 'played' | 'activated'
+  });
+  if (player.turnLog.length > 6) player.turnLog.length = 6;
+}
+
+function renderTurnCards(player) {
+  var cont = document.getElementById('turnCardsContent');
+  if (!cont) return;
+  if (!player.turnLog || player.turnLog.length === 0) {
+    cont.innerHTML = '<p class="empty-state">Aucune carte jouée</p>';
+    return;
+  }
+  cont.innerHTML = '<div class="tc-list">' + player.turnLog.map(function(x) {
+    var tag = x.kind === 'activated' ? 'Activé' : 'Joué';
+    return '<div class="tc-item" data-tip="' + esc(x.desc) + '">' +
+      '<div class="tc-emoji">' + x.emoji + '</div>' +
+      '<div class="tc-meta">' +
+        '<div class="tc-name">' + esc(x.name) + '</div>' +
+        '<div class="tc-desc">' + esc(x.desc) + '</div>' +
+      '</div>' +
+      '<div class="tc-tag">' + tag + '</div>' +
+    '</div>';
+  }).join('') + '</div>';
+}
+
+function showCardDraw(player, card) {
+  var flipper = document.getElementById('cdFlipper');
+  var back = document.getElementById('cdBack');
+  flipper.classList.remove('flipped');
+
+  var rm = RARITY_META[card.rarity];
+  back.className = 'cd-face cd-back rarity-' + card.rarity;
+  document.getElementById('dcRarity').textContent = rm.label;
+  document.getElementById('dcEmoji').textContent = card.emoji;
+  document.getElementById('dcName').textContent = card.name;
+  document.getElementById('dcDesc').textContent = card.desc;
+
+  var actionsEl = document.getElementById('dcActions');
+  if (card.type === 'passive') {
+    actionsEl.innerHTML = '<div style="font-size:.8rem;color:var(--text-dim);font-weight:700">Passive — s’active automatiquement ce tour</div>';
+  } else {
+    if (player.frozenTurns && player.frozenTurns > 0) {
+      actionsEl.innerHTML = '<div style="font-size:.8rem;color:var(--text-dim);font-weight:700">🧊 Gel — tu ne peux pas jouer de cartes ce tour</div>' +
+        '<button class="btn btn-back" onclick="saveDrawnCard()">Garder pour plus tard</button>';
+    } else {
+    actionsEl.innerHTML =
+      '<button class="btn btn-gold" onclick="playDrawnCard()">Jouer maintenant</button>' +
+      '<button class="btn btn-back" onclick="saveDrawnCard()">Garder pour plus tard</button>';
+    }
+  }
+
+  document.getElementById('cardDrawOverlay').classList.add('visible');
+
+  var flipHandler = function() {
+    flipper.classList.add('flipped');
+    spawnConfetti();
+    flipper.removeEventListener('click', flipHandler);
+
+    // Passive cards auto-apply this round (no choice)
+    if (card.type === 'passive') {
+      setTimeout(function() {
+        applyPassiveCard(player, card);
+        // Auto-close after showing it briefly
+        setTimeout(function() {
+          document.getElementById('cardDrawOverlay').classList.remove('visible');
+          cardDrawPending = false;
+        }, 900);
+      }, 250);
+    }
+  };
+  setTimeout(function() {
+    flipper.addEventListener('click', flipHandler);
+  }, 400);
+}
+
+function applyPassiveCard(player, card) {
+  addTurnLog(player, card, 'activated');
+  if (card.effect === 'force_bad') {
+    player.activePassives.push('force_bad');
+    showToast(card.emoji + ' Malédiction activée !', 'danger');
+  } else if (card.effect === 'force_good') {
+    player.activePassives.push('force_good');
+    showToast(card.emoji + ' Bénédiction activée !', 'success');
+  } else if (card.effect === 'shield') {
+    player.shieldedRound = true;
+    player.activePassives.push('shield');
+    showToast(card.emoji + ' Bouclier activé !', 'success');
+  }
+  // If it was the freshly drawn card, clear it.
+  if (player.drawnCard && player.drawnCard.id === card.id) player.drawnCard = null;
+  renderSidebar();
+  renderTurnCards(player);
+}
+
+function saveDrawnCard() {
+  var player = turnOrder[currentTurnIdx];
+  player.hand.push(player.drawnCard);
+  player.drawnCard = null;
+  document.getElementById('cardDrawOverlay').classList.remove('visible');
+  cardDrawPending = false;
+  showToast('Carte gardée en main !', 'success');
+  renderSidebar();
+  renderTurnCenter(player);
+}
+
+function playDrawnCard() {
+  var player = turnOrder[currentTurnIdx];
+  if (player.frozenTurns && player.frozenTurns > 0) {
+    showToast('🧊 Gel : impossible de jouer des cartes ce tour', 'danger');
+    return;
+  }
+  var card = player.drawnCard;
+  player.drawnCard = null;
+  document.getElementById('cardDrawOverlay').classList.remove('visible');
+  cardDrawPending = false;
+  executeCard(player, card);
+}
+
+function executeCard(player, card) {
+  // Track last active (for Miroir)
+  if (card.type === 'active' && card.id !== 'miroir') {
+    lastActiveCardId = card.id;
+    lastActiveCardPlayerId = player.id;
+  }
+
+  addTurnLog(player, card, 'played');
+
+  if (card.id === 'eliminate3') {
+    showEliminate();
+  } else if (card.id === 'second_regard') {
+    player.secondLookArmed = true;
+    player.secondLookUsed = false;
+    showToast(card.emoji + ' Second regard armé !', 'success');
+    renderTurnCenter(player);
+  } else if (card.id === 'petit_sabotage') {
+    showPetitSabotage(player);
+  } else if (card.id === 'pioche_sacree') {
+    showPiocheSacree(player);
+  } else if (card.id === 'above_average') {
+    showAboveAverage(player);
+  } else if (card.id === 'reroll_back') {
+    // If you haven't used any reroll yet, you go to 2. If you've already used it, you go back to 1.
+    player.rerollsLeft = (player.rerollsLeft >= 1) ? 2 : 1;
+    showToast(card.emoji + ' Relance récupérée ! (' + player.rerollsLeft + ')', 'success');
+    renderTurnCenter(player);
+  } else if (card.id === 'double_pioche') {
+    player.doublePiocheArmed = true;
+    showToast(card.emoji + ' Double pioche prête !', 'success');
+    renderTurnCenter(player);
+  } else if (card.id === 'fifty') {
+    showFiftyPicker(player);
+  } else if (card.id === 'chance_forcee') {
+    player.goodBoost = Math.max(player.goodBoost || 0, 0.30);
+    showToast(card.emoji + ' Chance forcée : +30% favorable', 'success');
+    renderTurnCenter(player);
+  } else if (card.id === 'nostalgie') {
+    showNostalgie(player);
+  } else if (card.id === 'jackpot') {
+    applyJackpot(player);
+  } else if (card.id === 'exchange') {
+    showExchange(player);
+  } else if (card.id === 'vol_main') {
+    showVolDeMain(player);
+  } else if (card.id === 'gel') {
+    showGel(player);
+  } else if (card.id === 'partage') {
+    showPartage(player);
+  } else if (card.id === 'infinite_reroll') {
+    player.infiniteReroll = true;
+    showToast(card.emoji + ' Relance infinie activée !', 'success');
+    renderTurnCenter(player);
+  } else if (card.id === 'couronne') {
+    showCouronne(player);
+  } else if (card.id === 'miroir') {
+    if (!lastActiveCardId) {
+      showToast(card.emoji + ' Rien à copier…', 'danger');
+    } else if (lastActiveCardId === 'miroir') {
+      showToast(card.emoji + ' Impossible de copier Miroir.', 'danger');
+    } else {
+      var copied = PLAYABLE_CARDS.find(function(c) { return c.id === lastActiveCardId; });
+      if (!copied) {
+        showToast(card.emoji + ' Copie impossible.', 'danger');
+      } else {
+        showToast(card.emoji + ' Copie : ' + copied.name, 'success');
+        // Execute copied effect (do not re-track as last card here; executeCard will track it, that's fine)
+        executeCard(player, copied);
+        return; // executeCard already re-rendered
+      }
+    }
+  } else if (card.id === 'echange_de_corps') {
+    showEchangeDeCorps(player);
+  } else if (card.id === 'blinded') {
+    blindedRound = currentRound;
+    blindedBy = player.name;
+    showToast(card.emoji + ' Blinded ! Loot caché jusqu’au prochain round.', 'danger');
+    renderTurnCenter(player);
+  }
+  renderSidebar();
+  renderTurnCards(player);
+}
+
+function playHandCard(idx) {
+  var player = turnOrder[currentTurnIdx];
+  if (idx < 0 || idx >= player.hand.length) return;
+  var card = player.hand.splice(idx, 1)[0];
+  executeCard(player, card);
+}
+
+function previewHandCard(idx) {
+  var player = turnOrder[currentTurnIdx];
+  if (idx < 0 || idx >= player.hand.length) return;
+  if (player.frozenTurns && player.frozenTurns > 0) {
+    showToast('🧊 Gel : impossible de jouer des cartes ce tour', 'danger');
+    return;
+  }
+  showCardPreview(player.hand[idx], {
+    title: 'Carte en main',
+    primaryLabel: 'Jouer maintenant',
+    onPrimary: function() { playHandCard(idx); closeCardPreview(); },
+    secondaryLabel: 'Jouer plus tard',
+    onSecondary: function() { closeCardPreview(); }
+  });
+}
+
+function showCardPreview(card, opts) {
+  var flipper = document.getElementById('cdFlipper');
+  var back = document.getElementById('cdBack');
+  flipper.classList.add('flipped'); // show back face immediately
+
+  var rm = RARITY_META[card.rarity];
+  back.className = 'cd-face cd-back rarity-' + card.rarity;
+  document.getElementById('dcRarity').textContent = (opts && opts.title ? opts.title + ' • ' : '') + rm.label;
+  document.getElementById('dcEmoji').textContent = card.emoji;
+  document.getElementById('dcName').textContent = card.name;
+  document.getElementById('dcDesc').textContent = card.desc;
+
+  var actionsEl = document.getElementById('dcActions');
+  if (card.type === 'passive') {
+    actionsEl.innerHTML = '<div style="font-size:.8rem;color:var(--text-dim);font-weight:700">Passive</div>' +
+      '<button class="btn btn-gold" onclick="closeCardPreview()" style="margin-top:.6rem">Fermer</button>';
+  } else {
+    actionsEl.innerHTML =
+      '<button class="btn btn-gold" onclick="__cardPreviewPrimary()">' + (opts.primaryLabel || 'Jouer maintenant') + '</button>' +
+      '<button class="btn btn-back" onclick="__cardPreviewSecondary()">' + (opts.secondaryLabel || 'Jouer plus tard') + '</button>';
+  }
+
+  window.__cardPreviewPrimary = function() { if (opts && opts.onPrimary) opts.onPrimary(); };
+  window.__cardPreviewSecondary = function() { if (opts && opts.onSecondary) opts.onSecondary(); else closeCardPreview(); };
+
+  document.getElementById('cardDrawOverlay').classList.add('visible');
+  cardDrawPending = true;
+}
+
+function closeCardPreview() {
+  document.getElementById('cardDrawOverlay').classList.remove('visible');
+  cardDrawPending = false;
+  // cleanup
+  window.__cardPreviewPrimary = null;
+  window.__cardPreviewSecondary = null;
+}
+
+function renderTopbar() {
+  var rm = ROUND_META[currentRound];
+  document.getElementById('gameTopbar').innerHTML =
+    '<span class="mode-badge mode-badge-' + mode + '">' + (mode === 'normal' ? '🎲 Normal' : '🔥 Chaos') + '</span>' +
+    '<span class="mode-badge" style="background:rgba(255,255,255,.08);color:var(--text)">' + rm.emoji + ' R' + (currentRound + 1) + '/3</span>' +
+    '<div class="topbar-players">' +
+    turnOrder.map(function(p, i) {
+      var cls = 'topbar-pip';
+      if (i === currentTurnIdx) cls += ' active';
+      else if (i < currentTurnIdx) cls += ' done';
+      return '<div class="' + cls + '" style="background:' + p.color + '" title="' + esc(p.name) + '">' + initial(p.name) + '</div>';
+    }).join('') +
+    '</div>' +
+    '<div class="topbar-box">📦 ' + box.length + '</div>';
+}
+
+function renderTurnCenter(player) {
+  document.getElementById('turnDot').style.background = player.color;
+  document.getElementById('turnText').innerHTML = 'C\'est au tour de <span style="color:' + player.color + '">' + esc(player.name) + '</span>';
+  var dice = document.getElementById('gameDice');
+  dice.textContent = '?';
+  dice.classList.remove('rolling');
+  var pBox = getPlayerBox(player);
+  document.getElementById('gameRange').textContent = 'Fourchette : 1 – ' + pBox.length;
+  var btn = document.getElementById('gameRollBtn');
+  btn.style.display = '';
+  btn.disabled = false;
+  btn.textContent = '🎲 Lancer le dé';
+  document.getElementById('rerollStatus').style.display = 'none';
+
+  var handArea = document.getElementById('handArea');
+  if (!handArea) {
+    handArea = document.createElement('div');
+    handArea.id = 'handArea';
+    document.getElementById('gameCenter').appendChild(handArea);
+  }
+  if (player.hand.length > 0) {
+    handArea.className = 'hand-panel';
+    handArea.innerHTML = player.hand.map(function(c, i) {
+      var rm = RARITY_META[c.rarity];
+      var disabled = player.frozenTurns && player.frozenTurns > 0;
+      return '<button class="hand-card-btn" ' + (disabled ? 'disabled style="opacity:.5;cursor:not-allowed;border-color:rgba(255,255,255,.08)"' : 'onclick="previewHandCard(' + i + ')" data-tip="' + esc(c.desc) + '" style="border-color:' + rm.color + '"') + '>' +
+        '<span>' + c.emoji + '</span> ' + c.name +
+      '</button>';
+    }).join('');
+  } else {
+    handArea.innerHTML = '';
+    handArea.className = '';
+  }
+
+  if (player.infiniteReroll) {
+    var status = document.getElementById('rerollStatus');
+    status.style.display = '';
+    status.textContent = '♾️ Relance infinie active !';
+  } else if (blindedRound === currentRound && !player.shieldedRound) {
+    var status2 = document.getElementById('rerollStatus');
+    status2.style.display = '';
+    status2.textContent = '🕶️ Blinded : ton loot est caché ce round';
+  } else if (player.frozenTurns && player.frozenTurns > 0) {
+    var status3 = document.getElementById('rerollStatus');
+    status3.style.display = '';
+    status3.textContent = '🧊 Gel : tu ne peux pas jouer de cartes jouables ce tour';
+  }
+}
+
+function renderSidebar() {
+  var isCurrent = function(p, i) { return i === currentTurnIdx; };
+  document.getElementById('gameSidebar').innerHTML = turnOrder.map(function(p, i) {
+    var cls = 'sidebar-player';
+    if (isCurrent(p, i)) cls += ' is-current';
+    var total = p.picks[0].length + p.picks[1].length + p.picks[2].length;
+    var picksHtml = '';
+    for (var r = 0; r < 3; r++) {
+      var rm = ROUND_META[r];
+      if (p.picks[r].length > 0) {
+        var blindThisRound = blindedRound === currentRound && r === currentRound && !p.shieldedRound;
+        if (blindThisRound) {
+          picksHtml += p.picks[r].map(function() {
+            return '<div class="sb-card"><span style="font-size:.6rem;opacity:.6">' + rm.emoji + '</span><div class="sb-card-thumb">🂠</div>Résultat caché</div>';
+          }).join('');
+        } else {
+          picksHtml += p.picks[r].map(function(e) {
+            return '<div class="sb-card"><span style="font-size:.6rem;opacity:.6">' + rm.emoji + '</span><div class="sb-card-thumb">' + thumbHtml(e) + '</div>' + esc(e.name) + '</div>';
+          }).join('');
+        }
+      } else if (r <= currentRound) {
+        picksHtml += '<div class="sb-empty">' + rm.emoji + ' —</div>';
+      }
+    }
+    if (!picksHtml) picksHtml = '<div class="sb-empty">Pas encore de carte</div>';
+
+    var handHtml = '';
+    if (p.hand.length > 0) {
+      handHtml = '<div class="sb-hand">';
+      if (isCurrent(p, i)) {
+        handHtml += p.hand.map(function(c, hi) {
+          var rm = RARITY_META[c.rarity];
+          return '<div class="sb-hand-card sb-hand-faceup" onclick="previewHandCard(' + hi + ')" style="border-color:' + rm.color + '" data-tip="' + esc(c.desc) + '">' + c.emoji + '</div>';
+        }).join('');
+      } else {
+        for (var h = 0; h < p.hand.length; h++) {
+          handHtml += '<div class="sb-hand-card sb-hand-facedown" title="Carte cachée">🂠</div>';
+        }
+      }
+      handHtml += '</div>';
+    }
+
+    var passiveHtml = '';
+    if (p.activePassives.length > 0) {
+      passiveHtml = '<div class="sb-passive-badges">' +
+        p.activePassives.map(function(eff) {
+          var card = PLAYABLE_CARDS.find(function(c) { return c.effect === eff; });
+          return card ? '<span class="sb-passive-badge">' + card.emoji + ' ' + card.name + '</span>' : '';
+        }).join('') +
+      '</div>';
+    }
+
+    var blindBadge = '';
+    if (blindedRound === currentRound && !p.shieldedRound) {
+      blindBadge = '<div class="sb-passive-badges"><span class="sb-passive-badge">🕶️ Blinded</span></div>';
+    }
+
+    var rerollsHtml = '<div class="sb-empty" style="font-style:normal">🎲 Relances : <b>' + (p.rerollsLeft || 0) + '</b></div>';
+
+    return '<div class="' + cls + '">' +
+      '<div class="sb-header">' +
+        '<span class="sb-dot" style="background:' + p.color + '"></span>' +
+        '<span class="sb-name">' + esc(p.name) + '</span>' +
+        '<span class="sb-badge">' + total + (p.hand.length > 0 ? ' | 🃏' + p.hand.length : '') + '</span>' +
+      '</div>' +
+      rerollsHtml +
+      '<div class="sb-cards">' + picksHtml + '</div>' +
+      handHtml +
+      passiveHtml +
+      blindBadge +
+    '</div>';
+  }).join('');
+}
+
+function renderInventory(player) {
+  var meta = ROUND_META[currentRound];
+  document.getElementById('invTitle').textContent = meta.invTitle + ' — ' + player.name;
+  var picks = player.picks[currentRound];
+  var cont = document.getElementById('invContent');
+  if (picks.length === 0) {
+    cont.innerHTML = '<p class="empty-state">Aucune carte pour l\'instant</p>';
+  } else {
+    var blindActive = blindedRound === currentRound && !player.shieldedRound;
+    if (blindActive) {
+      cont.innerHTML = '<div class="inv-grid">' +
+        picks.map(function() {
+          return '<div class="inv-item"><div class="inv-thumb">🂠</div>Résultat caché</div>';
+        }).join('') +
+      '</div>';
+      return;
+    }
+    cont.innerHTML = '<div class="inv-grid">' +
+      picks.map(function(e) {
+        return '<div class="inv-item"><div class="inv-thumb">' + thumbHtml(e) + '</div>' + esc(e.name) + '</div>';
+      }).join('') +
+    '</div>';
+  }
+}
+
+/* ── Eliminate 3 ── */
+var elimSelected = [];
+
+var elimMax = 3;
+
+function showEliminate() {
+  elimSelected = [];
+  var player = turnOrder[currentTurnIdx];
+  var pBox = getPlayerBox(player);
+  elimMax = Math.min(3, pBox.length - 1);
+  if (elimMax <= 0) { showToast('Pas assez d\'éléments !', 'danger'); return; }
+  document.getElementById('elimTitle').textContent = 'Élimine ' + elimMax + ' élément' + (elimMax > 1 ? 's' : '');
+  document.getElementById('elimSubtitle').textContent = 'Sélectionne ' + elimMax + ' élément' + (elimMax > 1 ? 's' : '') + ' à retirer de la boîte (seulement pour toi)';
+  var grid = document.getElementById('elimGrid');
+  grid.innerHTML = pBox.map(function(e, i) {
+    var inner = '';
+    if (e.emoji) {
+      inner = '<div class="ei-emoji">' + e.emoji + '</div>';
+    } else if (e.image) {
+      inner = '<div class="ei-thumb"><img src="' + e.image + '"></div>';
+    } else {
+      inner = '<div class="ei-emoji">❓</div>';
+    }
+    return '<div class="elim-item" data-idx="' + i + '" onclick="toggleElim(this,' + i + ')">' + inner + '<div>' + esc(e.name) + '</div></div>';
+  }).join('');
+  document.getElementById('elimCount').textContent = '0 / ' + elimMax + ' sélectionnés';
+  document.getElementById('elimConfirmBtn').disabled = true;
+  document.getElementById('eliminateOverlay').classList.add('visible');
+}
+
+function toggleElim(el, idx) {
+  var pos = elimSelected.indexOf(idx);
+  if (pos >= 0) {
+    elimSelected.splice(pos, 1);
+    el.classList.remove('selected');
+  } else if (elimSelected.length < elimMax) {
+    elimSelected.push(idx);
+    el.classList.add('selected');
+  }
+  document.getElementById('elimCount').textContent = elimSelected.length + ' / ' + elimMax + ' sélectionnés';
+  document.getElementById('elimConfirmBtn').disabled = elimSelected.length !== elimMax;
+}
+
+function confirmEliminate() {
+  var player = turnOrder[currentTurnIdx];
+  var pBox = getPlayerBox(player);
+  var toRemove = elimSelected.map(function(i) { return pBox[i].id; });
+  toRemove.forEach(function(id) { player.banned.push(id); });
+  elimSelected = [];
+  document.getElementById('eliminateOverlay').classList.remove('visible');
+  showToast('🗑️ ' + toRemove.length + ' élément' + (toRemove.length > 1 ? 's' : '') + ' éliminé' + (toRemove.length > 1 ? 's' : '') + ' pour toi !', 'danger');
+  renderTopbar();
+  renderTurnCenter(player);
+}
+
+/* ── Exchange ── */
+var exchTarget = null;
+var exchRound = -1;
+var exchPickIdx = -1;
+
+function showExchange(player) {
+  exchTarget = null;
+  exchRound = -1;
+  exchPickIdx = -1;
+  renderExchangeStep1(player);
+  document.getElementById('exchangeOverlay').classList.add('visible');
+}
+
+function renderExchangeStep1(player) {
+  var others = turnOrder.filter(function(p) { return p.id !== player.id; });
+  var html = '<div style="font-size:2rem;margin-bottom:.3rem">🔄</div>' +
+    '<h3 style="margin-bottom:.5rem">Choisis un adversaire</h3>';
+  if (others.every(function(p) { return p.shieldedRound; })) {
+    html += '<p style="color:var(--text-dim);font-size:.82rem;margin:1rem 0">Tous les adversaires sont protégés par un bouclier !</p>' +
+      '<button class="btn btn-back" onclick="closeExchange()">Annuler</button>';
+  } else {
+    html += '<div class="exch-players">' + others.map(function(p) {
+      var cls = 'exch-player-btn' + (p.shieldedRound ? ' shielded' : '');
+      return '<button class="' + cls + '" onclick="selectExchTarget(' + p.id + ')">' +
+        '<span style="width:10px;height:10px;border-radius:50%;background:' + p.color + ';display:inline-block"></span>' +
+        esc(p.name) + (p.shieldedRound ? ' 🛡️' : '') +
+      '</button>';
+    }).join('') + '</div>';
+  }
+  document.getElementById('exchangeContent').innerHTML = html;
+}
+
+function selectExchTarget(targetId) {
+  var player = turnOrder[currentTurnIdx];
+  exchTarget = turnOrder.find(function(p) { return p.id === targetId; });
+  var html = '<div style="font-size:2rem;margin-bottom:.3rem">🔄</div>' +
+    '<h3 style="margin-bottom:.3rem">Échange avec ' + esc(exchTarget.name) + '</h3>' +
+    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.5rem">Choisis une de TES cartes à risquer</p>';
+  var picks = [];
+  for (var r = 0; r <= currentRound; r++) {
+    player.picks[r].forEach(function(e, i) {
+      picks.push({ round: r, idx: i, entity: e });
+    });
+  }
+  if (picks.length === 0) {
+    html += '<p style="color:var(--text-dim);font-size:.82rem;margin:1rem 0">Tu n\'as aucune carte à échanger !</p>' +
+      '<button class="btn btn-back" onclick="closeExchange()">Annuler</button>';
+  } else {
+    html += '<div class="exch-picks">' + picks.map(function(pk) {
+      var rm = ROUND_META[pk.round];
+      return '<button class="exch-pick-btn" onclick="selectExchPick(' + pk.round + ',' + pk.idx + ')">' +
+        rm.emoji + ' ' + esc(pk.entity.name) +
+      '</button>';
+    }).join('') + '</div>' +
+    '<button class="btn btn-back" onclick="renderExchangeStep1(turnOrder[currentTurnIdx])" style="margin-top:.5rem">← Retour</button>';
+  }
+  document.getElementById('exchangeContent').innerHTML = html;
+}
+
+function selectExchPick(round, idx) {
+  exchRound = round;
+  exchPickIdx = idx;
+  startExchDuel();
+}
+
+function startExchDuel() {
+  var player = turnOrder[currentTurnIdx];
+  var myPick = player.picks[exchRound][exchPickIdx];
+  var html = '<h3 style="margin-bottom:.8rem">Duel de dés !</h3>' +
+    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.7rem">Tu risques : ' + esc(myPick.name) + '</p>' +
+    '<div class="exch-duel">' +
+      '<div class="exch-duel-side">' +
+        '<div style="font-weight:700;font-size:.8rem;margin-bottom:.3rem;color:' + player.color + '">' + esc(player.name) + '</div>' +
+        '<div class="exch-duel-dice rolling" id="exchDice1">?</div>' +
+      '</div>' +
+      '<div class="exch-vs">VS</div>' +
+      '<div class="exch-duel-side">' +
+        '<div style="font-weight:700;font-size:.8rem;margin-bottom:.3rem;color:' + exchTarget.color + '">' + esc(exchTarget.name) + '</div>' +
+        '<div class="exch-duel-dice rolling" id="exchDice2">?</div>' +
+      '</div>' +
+    '</div>' +
+    '<div id="exchResult"></div>';
+  document.getElementById('exchangeContent').innerHTML = html;
+
+  var d1 = document.getElementById('exchDice1');
+  var d2 = document.getElementById('exchDice2');
+  var ticks = 0;
+  var total = 20 + Math.floor(Math.random() * 8);
+  var roll1 = Math.floor(Math.random() * 6) + 1;
+  var roll2 = Math.floor(Math.random() * 6) + 1;
+
+  var iv = setInterval(function() {
+    d1.textContent = Math.floor(Math.random() * 6) + 1;
+    d2.textContent = Math.floor(Math.random() * 6) + 1;
+    ticks++;
+    if (ticks >= total) {
+      clearInterval(iv);
+      d1.textContent = roll1;
+      d2.textContent = roll2;
+      d1.classList.remove('rolling');
+      d2.classList.remove('rolling');
+      setTimeout(function() { resolveExchDuel(roll1, roll2); }, 600);
+    }
+  }, 70);
+}
+
+function resolveExchDuel(r1, r2) {
+  var player = turnOrder[currentTurnIdx];
+  var resultEl = document.getElementById('exchResult');
+  if (r1 > r2) {
+    var myPick = player.picks[exchRound][exchPickIdx];
+    var targetPicks = exchTarget.picks[exchRound];
+    if (targetPicks.length > 0) {
+      var tIdx = Math.floor(Math.random() * targetPicks.length);
+      var theirPick = targetPicks[tIdx];
+      player.picks[exchRound][exchPickIdx] = theirPick;
+      exchTarget.picks[exchRound][tIdx] = myPick;
+      resultEl.innerHTML = '<p style="color:var(--success);font-weight:700;font-size:1rem;margin-top:.5rem">Tu gagnes ! Échange effectué !</p>' +
+        '<p style="color:var(--text-dim);font-size:.8rem">' + esc(myPick.name) + ' ↔ ' + esc(theirPick.name) + '</p>' +
+        '<button class="btn btn-gold" onclick="closeExchange()" style="margin-top:.8rem">Continuer</button>';
+    } else {
+      resultEl.innerHTML = '<p style="color:var(--text-dim);font-weight:700;margin-top:.5rem">' + esc(exchTarget.name) + ' n\'a rien à échanger !</p>' +
+        '<button class="btn btn-gold" onclick="closeExchange()" style="margin-top:.8rem">Continuer</button>';
+    }
+  } else {
+    resultEl.innerHTML = '<p style="color:var(--danger);font-weight:700;font-size:1rem;margin-top:.5rem">Raté ! Rien ne se passe.</p>' +
+      '<button class="btn btn-gold" onclick="closeExchange()" style="margin-top:.8rem">Continuer</button>';
+  }
+  renderSidebar();
+  renderInventory(player);
+}
+
+function closeExchange() {
+  document.getElementById('exchangeOverlay').classList.remove('visible');
+  exchTarget = null;
+}
+
+/* ── Generic overlays helpers ── */
+function openActionOverlay(html) {
+  document.getElementById('actionContent').innerHTML = html;
+  document.getElementById('actionOverlay').classList.add('visible');
+}
+
+function closeActionOverlay() {
+  document.getElementById('actionOverlay').classList.remove('visible');
+  document.getElementById('actionContent').innerHTML = '';
+}
+
+function showCardsLibrary() {
+  // Group by rarity, then active/passive
+  var order = ['common','rare','epic','legendary','passive'];
+  var groups = {};
+  order.forEach(function(r) { groups[r] = []; });
+  PLAYABLE_CARDS.forEach(function(c) {
+    if (!groups[c.rarity]) groups[c.rarity] = [];
+    groups[c.rarity].push(c);
+  });
+
+  var html =
+    '<h3 style="margin-bottom:.25rem">🃏 Bibliothèque des cartes</h3>' +
+    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">Toutes les cartes jouables et passives disponibles</p>';
+
+  order.forEach(function(r) {
+    var arr = groups[r] || [];
+    if (!arr.length) return;
+    var rm = RARITY_META[r];
+    html += '<div class="sp-round-label" style="margin-top:1rem;color:' + rm.color + '">' + rm.label + '</div>';
+    html += '<div class="choice-grid" style="margin-top:.6rem">';
+    html += arr.map(function(c) {
+      var t = (c.type === 'passive') ? 'Passive' : 'Jouable';
+      return '<div class="choice-btn" data-tip="' + esc(c.desc) + '" style="cursor:default">' +
+        '<div class="choice-title"><span style="font-size:1.1rem">' + c.emoji + '</span> ' + esc(c.name) + ' <span class="pill" style="margin-left:auto;color:' + rm.color + ';border-color:' + rm.color + '33">' + t + '</span></div>' +
+        '<div class="choice-desc">' + esc(c.desc) + '</div>' +
+      '</div>';
+    }).join('');
+    html += '</div>';
+  });
+
+  html += '<div style="text-align:center;margin-top:1rem"><button class="btn btn-gold" onclick="closeActionOverlay()">Fermer</button></div>';
+  openActionOverlay(html);
+}
+
+function cardMiniHtml(e) {
+  var icon = e.emoji ? e.emoji : (e.image ? '' : '❓');
+  var thumb = e.image ? '<img src="' + e.image + '" alt="">' : icon;
+  var gb = (typeof e.good === 'boolean')
+    ? ('<span class="pill ' + (e.good ? 'pill-good' : 'pill-bad') + '">' + (e.good ? 'Good' : 'Bad') + '</span>')
+    : '';
+  return '<div class="choice-title"><span style="font-size:1.1rem">' + thumb + '</span>' + gb + '</div>' +
+    '<div style="font-weight:900;font-size:.85rem;margin-bottom:.15rem">' + esc(e.name) + '</div>';
+}
+
+/* ── Second regard (choice after first reveal) ── */
+let secondLookAlt = null;
+
+function triggerSecondLook() {
+  var player = turnOrder[currentTurnIdx];
+  if (!player.secondLookArmed || player.secondLookUsed) return;
+  var pBox = getPlayerBox(player);
+  if (pBox.length < 2) return;
+  var alt = pBox[Math.floor(Math.random() * pBox.length)];
+  if (alt.id === currentEntity.id && pBox.length > 1) alt = pBox.find(function(x) { return x.id !== currentEntity.id; }) || alt;
+  secondLookAlt = alt;
+  player.secondLookUsed = true;
+  showChoiceTwo(player, currentEntity, secondLookAlt, '👀 Second regard', 'Choisis lequel garder');
+}
+
+function showChoiceTwo(player, a, b, title, subtitle) {
+  var chosen = null;
+  var html =
+    '<h3 style="margin-bottom:.25rem">' + esc(title) + '</h3>' +
+    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">' + esc(subtitle) + '</p>' +
+    '<div class="choice-grid is-two">' +
+      '<button class="choice-btn" id="choiceA" onclick="selectChoiceTwo(0)">' + cardMiniHtml(a) + '</button>' +
+      '<button class="choice-btn" id="choiceB" onclick="selectChoiceTwo(1)">' + cardMiniHtml(b) + '</button>' +
+    '</div>' +
+    '<button class="btn btn-gold" id="choiceConfirm" disabled onclick="confirmChoiceTwo()">Garder</button>';
+  openActionOverlay(html);
+  window._choiceTwo = { a: a, b: b, picked: null };
+}
+
+function selectChoiceTwo(which) {
+  window._choiceTwo.picked = which;
+  document.getElementById('choiceA').classList.toggle('selected', which === 0);
+  document.getElementById('choiceB').classList.toggle('selected', which === 1);
+  document.getElementById('choiceConfirm').disabled = false;
+}
+
+function confirmChoiceTwo() {
+  var pick = (window._choiceTwo.picked === 0) ? window._choiceTwo.a : window._choiceTwo.b;
+  currentEntity = pick;
+  closeActionOverlay();
+  setTimeout(function() { showReveal(false); }, 150);
+}
+
+/* ── Petit sabotage ── */
+function showPetitSabotage(player) {
+  var others = turnOrder.filter(function(p) { return p.id !== player.id; });
+  if (others.length === 0) { showToast('Aucun joueur à saboter.', 'danger'); return; }
+  window._sabo = { mode: null };
+  var html =
+    '<h3 style="margin-bottom:.25rem">🧨 Petit sabotage</h3>' +
+    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">Choisis l\'effet</p>' +
+    '<div class="choice-grid">' +
+      '<button class="choice-btn" onclick="selectSabotageMode(\'reroll\')">' +
+        '<div class="choice-title">🎲 Retirer une relance</div>' +
+        '<div class="choice-desc">Retire 1 relance à un joueur (si il en a).</div>' +
+      '</button>' +
+      '<button class="choice-btn" onclick="selectSabotageMode(\'ban\')">' +
+        '<div class="choice-title">🗑️ Enlever 1 carte de sa boîte</div>' +
+        '<div class="choice-desc">Si il joue après toi : maintenant. Sinon : au round d\'après.</div>' +
+      '</button>' +
+      '<button class="choice-btn" onclick="selectSabotageMode(\'explode\')">' +
+        '<div class="choice-title">💥 Faire exploser sa carte jouable</div>' +
+        '<div class="choice-desc">Détruit 1 carte jouable de sa main (aléatoire).</div>' +
+      '</button>' +
+    '</div>' +
+    '<button class="btn btn-back" onclick="closeActionOverlay()">Annuler</button>';
+  openActionOverlay(html);
+}
+
+function selectSabotageMode(mode) {
+  window._sabo = window._sabo || {};
+  window._sabo.mode = mode;
+  var player = turnOrder[currentTurnIdx];
+  var others = turnOrder.filter(function(p) { return p.id !== player.id; });
+  var title = (mode === 'reroll') ? '🎲 Retirer une relance'
+    : (mode === 'ban') ? '🗑️ Enlever 1 carte de sa boîte'
+    : '💥 Exploser une carte jouable';
+  var sub = (mode === 'reroll') ? 'Choisis un joueur'
+    : (mode === 'ban') ? 'Choisis un joueur'
+    : 'Choisis un joueur';
+
+  var html =
+    '<h3 style="margin-bottom:.25rem">' + title + '</h3>' +
+    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">' + sub + '</p>' +
+    '<div class="exch-players">' +
+      others.map(function(p) {
+        return '<button class="exch-player-btn" onclick="confirmPetitSabotage(' + p.id + ')">' +
+          '<span style="width:10px;height:10px;border-radius:50%;background:' + p.color + ';display:inline-block"></span>' +
+          esc(p.name) +
+        '</button>';
+      }).join('') +
+    '</div>' +
+    '<button class="btn btn-back" onclick="showPetitSabotage(turnOrder[currentTurnIdx])">← Retour</button>';
+  openActionOverlay(html);
+}
+
+function confirmPetitSabotage(targetId) {
+  var player = turnOrder[currentTurnIdx];
+  var target = turnOrder.find(function(p) { return p.id === targetId; });
+  if (!target) return;
+
+  var mode = window._sabo && window._sabo.mode ? window._sabo.mode : 'ban';
+
+  if (mode === 'reroll') {
+    if ((target.rerollsLeft || 0) <= 0) {
+      showToast('🎲 ' + target.name + ' n\'a plus de relance.', 'danger');
+    } else {
+      target.rerollsLeft = Math.max(0, target.rerollsLeft - 1);
+      showToast('🎲 ' + target.name + ' perd 1 relance !', 'danger');
+    }
+  } else if (mode === 'explode') {
+    if (!target.hand || target.hand.length === 0) {
+      showToast('💥 Main vide : rien à détruire.', 'danger');
+    } else {
+      var idx = Math.floor(Math.random() * target.hand.length);
+      target.hand.splice(idx, 1);
+      showToast('💥 ' + target.name + ' perd 1 carte jouable !', 'danger');
+    }
+  } else {
+    // ban one from target personal box: now if they play after you this round; else next round
+    var myIdx = currentTurnIdx;
+    var tIdx = turnOrder.findIndex(function(p) { return p.id === target.id; });
+    if (tIdx > myIdx) {
+      var tBox = getPlayerBox(target);
+      if (tBox.length === 0) { showToast('Boîte vide pour ' + target.name, 'danger'); closeActionOverlay(); return; }
+      var victim = tBox[Math.floor(Math.random() * tBox.length)];
+      target.banned.push(victim.id);
+      showToast('🗑️ ' + target.name + ' perd 1 choix (perso) ce round !', 'danger');
+    } else {
+      target.pendingSabotageBan = (target.pendingSabotageBan || 0) + 1;
+      showToast('🗑️ Sabotage préparé : ' + target.name + ' perdra 1 choix au prochain round.', 'danger');
+    }
+  }
+
+  closeActionOverlay();
+  renderSidebar();
+  renderTurnCenter(player);
+  renderTurnCards(player);
+}
+
+/* ── Nostalgie ── */
+function basePoolForRound(r) {
+  if (r === 0) {
+    return entities.map(function(e) { return { id: e.id, name: e.name, image: e.image, emoji: null, category: e.category, good: e.good }; });
+  }
+  if (r === 1) {
+    return ACTIONS.map(function(a, i) { return { id: 1000 + i, name: a.name, image: null, emoji: a.emoji, category: 'action', good: a.good }; });
+  }
+  return LOCATIONS.map(function(l, i) { return { id: 2000 + i, name: l.name, image: null, emoji: l.emoji, category: 'lieu', good: l.good }; });
+}
+
+function remainingPoolForRound(r, exceptId) {
+  var base = basePoolForRound(r);
+  var taken = new Set();
+  turnOrder.forEach(function(p) {
+    (p.picks[r] || []).forEach(function(e) {
+      if (e && e.id != null) taken.add(e.id);
+    });
+  });
+  if (exceptId != null) taken.delete(exceptId);
+  return base.filter(function(e) { return !taken.has(e.id); });
+}
+
+function showNostalgie(player) {
+  window._nost = { attackerId: player.id, targetId: null, round: null, pickIdx: null };
+  var html =
+    '<h3 style="margin-bottom:.25rem">🕰️ Nostalgie</h3>' +
+    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">Choisis le joueur à forcer (toi inclus)</p>' +
+    '<div class="exch-players">' +
+      turnOrder.map(function(p) {
+        return '<button class="exch-player-btn" onclick="selectNostalgieTarget(' + p.id + ')">' +
+          '<span style="width:10px;height:10px;border-radius:50%;background:' + p.color + ';display:inline-block"></span>' +
+          esc(p.name) +
+        '</button>';
+      }).join('') +
+    '</div>' +
+    '<button class="btn btn-back" onclick="closeActionOverlay()">Annuler</button>';
+  openActionOverlay(html);
+}
+
+function selectNostalgieTarget(targetId) {
+  window._nost.targetId = targetId;
+  var target = turnOrder.find(function(p) { return p.id === targetId; });
+  if (!target) return;
+
+  // List all picks (up to any round the target has picks in)
+  var items = [];
+  for (var r = 0; r < 3; r++) {
+    (target.picks[r] || []).forEach(function(e, i) {
+      items.push({ r: r, i: i, e: e });
+    });
+  }
+
+  if (items.length === 0) {
+    showToast('🕰️ ' + target.name + ' n’a aucune carte à remplacer.', 'danger');
+    closeActionOverlay();
+    return;
+  }
+
+  var html =
+    '<h3 style="margin-bottom:.25rem">🕰️ Nostalgie</h3>' +
+    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">Choisis quelle carte remplacer chez ' + esc(target.name) + '</p>' +
+    '<div class="choice-grid">' +
+      items.map(function(it, idx) {
+        var rm = ROUND_META[it.r];
+        return '<button class="choice-btn" onclick="confirmNostalgiePick(' + targetId + ',' + it.r + ',' + it.i + ')">' +
+          '<div class="choice-title">' + rm.emoji + ' ' + rm.name + '</div>' +
+          '<div style="font-weight:900;font-size:.85rem;margin-bottom:.15rem">' + esc(it.e.name) + '</div>' +
+          '<div class="choice-desc">Remplacer par une autre carte de la boîte</div>' +
+        '</button>';
+      }).join('') +
+    '</div>' +
+    '<button class="btn btn-back" onclick="showNostalgie(turnOrder[currentTurnIdx])">← Retour</button>';
+  openActionOverlay(html);
+}
+
+function confirmNostalgiePick(targetId, r, pickIdx) {
+  var attacker = turnOrder[currentTurnIdx];
+  var target = turnOrder.find(function(p) { return p.id === targetId; });
+  if (!target) return;
+  var old = target.picks[r] && target.picks[r][pickIdx];
+  if (!old) { showToast('Choix invalide.', 'danger'); closeActionOverlay(); return; }
+
+  var remain = remainingPoolForRound(r, old.id);
+  if (remain.length === 0) {
+    showToast('Aucune autre carte disponible dans cette boîte.', 'danger');
+    closeActionOverlay();
+    return;
+  }
+  var neu = remain[Math.floor(Math.random() * remain.length)];
+  target.picks[r][pickIdx] = neu;
+
+  showToast('🕰️ ' + target.name + ' remplace : ' + old.name + ' → ' + neu.name, 'success');
+  closeActionOverlay();
+
+  renderSidebar();
+  renderInventory(attacker);
+  renderTurnCenter(attacker);
+  renderTurnCards(attacker);
+}
+
+/* ── Jackpot ── */
+function makeCardCopy(card) {
+  return Object.assign({}, card);
+}
+
+function applyJackpot(player) {
+  if (player.frozenTurns && player.frozenTurns > 0) {
+    showToast('🧊 Gel : tu ne peux pas jouer les cartes Jackpot ce tour', 'danger');
+  }
+  var c1 = drawCard();
+  var c2 = drawCard();
+  c1.mustPlayThisTurn = true;
+  c2.mustPlayThisTurn = true;
+  player.hand.push(c1, c2);
+  showToast('🎰 Jackpot : 2 cartes bonus ! (à jouer ce tour)', 'success');
+  renderSidebar();
+  renderTurnCenter(player);
+}
+
+/* ── Gel ── */
+function showGel(player) {
+  var html =
+    '<h3 style="margin-bottom:.25rem">🧊 Gel</h3>' +
+    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">Choisis un joueur</p>' +
+    '<div class="exch-players">' +
+      turnOrder.map(function(p) {
+        return '<button class="exch-player-btn" onclick="confirmGel(' + p.id + ')">' +
+          '<span style="width:10px;height:10px;border-radius:50%;background:' + p.color + ';display:inline-block"></span>' +
+          esc(p.name) +
+        '</button>';
+      }).join('') +
+    '</div>' +
+    '<button class="btn btn-back" onclick="closeActionOverlay()">Annuler</button>';
+  openActionOverlay(html);
+}
+
+function confirmGel(targetId) {
+  var attacker = turnOrder[currentTurnIdx];
+  var target = turnOrder.find(function(p) { return p.id === targetId; });
+  if (!target) return;
+  target.frozenTurns = Math.max(target.frozenTurns || 0, 1);
+  showToast('🧊 ' + target.name + ' est gelé pour son prochain tour !', 'danger');
+  closeActionOverlay();
+  renderSidebar();
+  renderTurnCenter(attacker);
+  renderTurnCards(attacker);
+}
+
+/* ── Partage ? ── */
+function showPartage(player) {
+  var candidates = turnOrder.filter(function(p) { return p.id !== player.id; });
+  var anyHave = candidates.some(function(p) { return p.hand && p.hand.length > 0; });
+  if (!anyHave) {
+    var rnd = drawCard();
+    rnd.mustPlayThisTurn = true;
+    player.hand.push(rnd);
+    showToast('🤝 Partage ? → carte aléatoire !', 'success');
+    renderSidebar();
+    renderTurnCenter(player);
+    return;
+  }
+  var html =
+    '<h3 style="margin-bottom:.25rem">🤝 Partage ?</h3>' +
+    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">Choisis un adversaire (on copie une de ses cartes)</p>' +
+    '<div class="exch-players">' +
+      candidates.map(function(p) {
+        var label = esc(p.name) + (p.hand.length ? ' (🃏' + p.hand.length + ')' : ' (vide)');
+        return '<button class="exch-player-btn" ' + (p.hand.length ? '' : 'disabled style="opacity:.35;cursor:not-allowed"') + ' onclick="confirmPartage(' + p.id + ')">' +
+          '<span style="width:10px;height:10px;border-radius:50%;background:' + p.color + ';display:inline-block"></span>' +
+          label +
+        '</button>';
+      }).join('') +
+    '</div>' +
+    '<button class="btn btn-back" onclick="closeActionOverlay()">Annuler</button>';
+  openActionOverlay(html);
+}
+
+function confirmPartage(targetId) {
+  var player = turnOrder[currentTurnIdx];
+  var target = turnOrder.find(function(p) { return p.id === targetId; });
+  if (!target || !target.hand || target.hand.length === 0) return;
+  var src = target.hand[Math.floor(Math.random() * target.hand.length)];
+  var copy = makeCardCopy(src);
+  copy.mustPlayThisTurn = true;
+  player.hand.push(copy);
+  showToast('🤝 Copie obtenue : ' + src.name + ' (à jouer ce tour)', 'success');
+  closeActionOverlay();
+  renderSidebar();
+  renderTurnCenter(player);
+}
+
+/* ── Pioche sacrée / Above average ── */
+function rollD100() { return Math.floor(Math.random() * 100) + 1; }
+
+function rarityAllowedForPiocheSacree(score) {
+  if (score > 80) return ['common','rare','epic','legendary','passive'];
+  if (score > 60) return ['common','rare','epic'];
+  if (score > 40) return ['common','rare'];
+  if (score > 20) return ['common'];
+  return [];
+}
+
+function showCardPicker(player, allowedRarities, title, subtitle, mustPlayThisTurn) {
+  var pool = PLAYABLE_CARDS.filter(function(c) { return allowedRarities.indexOf(c.rarity) >= 0; });
+  if (pool.length === 0) { showToast('Aucune carte disponible.', 'danger'); closeActionOverlay(); return; }
+  window._picker = { chosen: null, pool: pool, mustPlay: !!mustPlayThisTurn };
+  var html =
+    '<h3 style="margin-bottom:.25rem">' + esc(title) + '</h3>' +
+    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">' + esc(subtitle) + '</p>' +
+    '<div class="choice-grid" id="pickerGrid"></div>' +
+    '<button class="btn btn-gold" id="pickerConfirm" disabled onclick="confirmCardPicker()">Ajouter en main</button>' +
+    '<button class="btn btn-back" onclick="closeActionOverlay()" style="margin-left:.4rem">Annuler</button>';
+  openActionOverlay(html);
+  document.getElementById('pickerGrid').innerHTML = pool.map(function(c, i) {
+    var rm = RARITY_META[c.rarity];
+    return '<button class="choice-btn" id="pickBtn' + i + '" onclick="selectCardPicker(' + i + ')" data-tip="' + esc(c.desc) + '">' +
+      '<div class="choice-title"><span style="font-size:1.1rem">' + c.emoji + '</span> ' + esc(c.name) + '</div>' +
+      '<div class="choice-desc" style="color:' + rm.color + ';font-weight:900">' + rm.label + '</div>' +
+      '<div class="choice-desc">' + esc(c.desc) + '</div>' +
+    '</button>';
+  }).join('');
+}
+
+function selectCardPicker(i) {
+  var st = window._picker;
+  st.chosen = i;
+  for (var k = 0; k < st.pool.length; k++) {
+    var el = document.getElementById('pickBtn' + k);
+    if (el) el.classList.toggle('selected', k === i);
+  }
+  document.getElementById('pickerConfirm').disabled = false;
+}
+
+function confirmCardPicker() {
+  var player = turnOrder[currentTurnIdx];
+  var st = window._picker;
+  if (!st || st.chosen == null) return;
+  var card = makeCardCopy(st.pool[st.chosen]);
+  if (st.mustPlay) card.mustPlayThisTurn = true;
+  player.hand.push(card);
+  showToast('🃏 Carte ajoutée en main : ' + card.name, 'success');
+  closeActionOverlay();
+  renderSidebar();
+  renderTurnCenter(player);
+}
+
+function showPiocheSacree(player) {
+  var score = rollD100();
+  var allowed = rarityAllowedForPiocheSacree(score);
+  var html =
+    '<h3 style="margin-bottom:.25rem">🙏 Pioche sacrée</h3>' +
+    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.6rem">Jet : <span style="color:var(--gold);font-weight:900">' + score + '</span> / 100</p>' +
+    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">' +
+      (allowed.length ? ('Tu peux choisir : ' + allowed.map(function(r){return RARITY_META[r].label;}).join(', ')) : 'Raté…') +
+    '</p>' +
+    (allowed.length ? '<button class="btn btn-gold" onclick="openPiocheSacreePicker()">Choisir une carte</button>' : '') +
+    '<button class="btn btn-back" onclick="closeActionOverlay()" style="margin-left:.4rem">Fermer</button>';
+  window._piocheSacree = { score: score, allowed: allowed };
+  openActionOverlay(html);
+}
+
+function openPiocheSacreePicker() {
+  var player = turnOrder[currentTurnIdx];
+  var st = window._piocheSacree;
+  showCardPicker(player, st.allowed, '🙏 Pioche sacrée', 'Choisis ta carte', true);
+}
+
+function showAboveAverage(player) {
+  var score = rollD100();
+  var ok = score >= 50;
+  var html =
+    '<h3 style="margin-bottom:.25rem">📈 Above average</h3>' +
+    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.6rem">Jet : <span style="color:var(--gold);font-weight:900">' + score + '</span> / 100</p>' +
+    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">' + (ok ? 'Succès : Commune ou Rare au choix.' : 'Échec : rien ne se passe.') + '</p>' +
+    (ok ? '<button class="btn btn-gold" onclick="openAboveAveragePicker()">Choisir une carte</button>' : '') +
+    '<button class="btn btn-back" onclick="closeActionOverlay()" style="margin-left:.4rem">Fermer</button>';
+  window._aboveAvg = { ok: ok };
+  openActionOverlay(html);
+}
+
+function openAboveAveragePicker() {
+  var player = turnOrder[currentTurnIdx];
+  showCardPicker(player, ['common','rare'], '📈 Above average', 'Choisis une carte (Commune ou Rare)', true);
+}
+
+/* ── Échange de corps ── */
+function showEchangeDeCorps(player) {
+  var others = turnOrder.filter(function(p) { return p.id !== player.id; });
+  var html =
+    '<h3 style="margin-bottom:.25rem">🧬 Échange de corps</h3>' +
+    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">Choisis un joueur (Bouclier protège)</p>' +
+    '<div class="exch-players">' +
+      others.map(function(p) {
+        var cls = 'exch-player-btn' + (p.shieldedRound ? ' shielded' : '');
+        return '<button class="' + cls + '" onclick="confirmEchangeDeCorps(' + p.id + ')">' +
+          '<span style="width:10px;height:10px;border-radius:50%;background:' + p.color + ';display:inline-block"></span>' +
+          esc(p.name) + (p.shieldedRound ? ' 🛡️' : '') +
+        '</button>';
+      }).join('') +
+    '</div>' +
+    '<button class="btn btn-back" onclick="closeActionOverlay()">Annuler</button>';
+  openActionOverlay(html);
+}
+
+function swapPlayerPayload(a, b, key) {
+  var tmp = a[key];
+  a[key] = b[key];
+  b[key] = tmp;
+}
+
+function confirmEchangeDeCorps(targetId) {
+  var player = turnOrder[currentTurnIdx];
+  var target = turnOrder.find(function(p) { return p.id === targetId; });
+  if (!target) return;
+  if (target.shieldedRound) {
+    showToast('🛡️ Protégé : échange annulé.', 'danger');
+    closeActionOverlay();
+    return;
+  }
+
+  // Swap "everything important" except identity (id/name/color)
+  ['picks','hand','rerollsLeft','banned','secondLookArmed','secondLookUsed','doublePiocheArmed','curatedPoolIds','goodBoost','pendingSabotageBan','frozenTurns'].forEach(function(k) {
+    swapPlayerPayload(player, target, k);
+  });
+
+  showToast('🧬 Échange de corps : vous avez tout échangé !', 'success');
+  closeActionOverlay();
+  renderSidebar();
+  renderTurnCenter(player);
+  renderInventory(player);
+  renderTurnCards(player);
+}
+
+/* ── Vol de main ── */
+function showVolDeMain(player) {
+  var others = turnOrder.filter(function(p) { return p.id !== player.id; });
+  if (others.length === 0) { showToast('Aucun joueur.', 'danger'); return; }
+  var html =
+    '<h3 style="margin-bottom:.25rem">🃏 Vol de main</h3>' +
+    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">Choisis un joueur</p>' +
+    '<div class="exch-players">' +
+      others.map(function(p) {
+        return '<button class="exch-player-btn" onclick="confirmVolDeMain(' + p.id + ')">' +
+          '<span style="width:10px;height:10px;border-radius:50%;background:' + p.color + ';display:inline-block"></span>' +
+          esc(p.name) + (p.hand.length ? ' (🃏' + p.hand.length + ')' : ' (vide)') +
+        '</button>';
+      }).join('') +
+    '</div>' +
+    '<button class="btn btn-back" onclick="closeActionOverlay()">Annuler</button>';
+  openActionOverlay(html);
+}
+
+function confirmVolDeMain(targetId) {
+  var player = turnOrder[currentTurnIdx];
+  var target = turnOrder.find(function(p) { return p.id === targetId; });
+  if (!target) return;
+  if (!target.hand || target.hand.length === 0) {
+    showToast('Main vide…', 'danger');
+    closeActionOverlay();
+    return;
+  }
+  var idx = Math.floor(Math.random() * target.hand.length);
+  var stolen = target.hand.splice(idx, 1)[0];
+  player.hand.push(stolen);
+  showToast('🃏 Carte volée à ' + target.name + ' !', 'success');
+  closeActionOverlay();
+  renderSidebar();
+  renderTurnCenter(player);
+}
+
+/* ── Couronne ── */
+function showCouronne(player) {
+  var pBox = getPlayerBox(player);
+  if (pBox.length === 0) { showToast('Boîte vide.', 'danger'); return; }
+  var opts = [];
+  var copy = pBox.slice();
+  for (var i = 0; i < 3 && copy.length > 0; i++) {
+    opts.push(copy.splice(Math.floor(Math.random() * copy.length), 1)[0]);
+  }
+  var html =
+    '<h3 style="margin-bottom:.25rem">👑 Couronne</h3>' +
+    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">Choisis ton loot parmi 3</p>' +
+    '<div class="choice-grid">' +
+      opts.map(function(o, i) {
+        return '<button class="choice-btn" onclick="confirmCouronne(' + i + ')">' + cardMiniHtml(o) + '</button>';
+      }).join('') +
+    '</div>' +
+    '<button class="btn btn-back" onclick="closeActionOverlay()">Annuler</button>';
+  window._couronne = { opts: opts };
+  openActionOverlay(html);
+}
+
+function confirmCouronne(i) {
+  var player = turnOrder[currentTurnIdx];
+  var pick = window._couronne && window._couronne.opts ? window._couronne.opts[i] : null;
+  if (!pick) return;
+  currentEntity = pick;
+  closeActionOverlay();
+  setTimeout(function() { showReveal(false); }, 150);
+}
+
+/* ── 50% (curated pool) ── */
+function showFiftyPicker(player) {
+  var pBox = getPlayerBox(player);
+  if (pBox.length < 6) { showToast('Pas assez de cartes pour 50%.', 'danger'); return; }
+  var selected = [];
+  var html =
+    '<h3 style="margin-bottom:.25rem">⚖️ 50%</h3>' +
+    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.2rem">Choisis 3 Good et 3 Bad</p>' +
+    '<p style="color:var(--text-dim);font-size:.72rem;margin-bottom:.8rem">Ton prochain loot ce tour sera dans ces 6 cartes.</p>' +
+    '<div id="fiftyCount" style="margin:.2rem 0 .7rem;font-weight:900">0/6 (0 Good, 0 Bad)</div>' +
+    '<div class="choice-grid" id="fiftyGrid"></div>' +
+    '<button class="btn btn-gold" id="fiftyConfirm" disabled onclick="confirmFifty()">Valider</button>' +
+    '<button class="btn btn-back" onclick="closeActionOverlay()" style="margin-left:.4rem">Annuler</button>';
+  openActionOverlay(html);
+  window._fifty = { pool: pBox, selectedIds: [], good: 0, bad: 0 };
+  document.getElementById('fiftyGrid').innerHTML = pBox.map(function(e, idx) {
+    var gb = (typeof e.good === 'boolean') ? (e.good ? 'Good' : 'Bad') : '';
+    return '<button class="choice-btn" id="fiftyBtn' + idx + '" onclick="toggleFifty(' + idx + ')">' +
+      cardMiniHtml(e) +
+      '<div class="choice-desc">' + gb + '</div>' +
+    '</button>';
+  }).join('');
+}
+
+function toggleFifty(idx) {
+  var st = window._fifty;
+  var e = st.pool[idx];
+  var id = e.id;
+  var pos = st.selectedIds.indexOf(id);
+  if (pos >= 0) {
+    st.selectedIds.splice(pos, 1);
+    document.getElementById('fiftyBtn' + idx).classList.remove('selected');
+  } else {
+    if (st.selectedIds.length >= 6) return;
+    st.selectedIds.push(id);
+    document.getElementById('fiftyBtn' + idx).classList.add('selected');
+  }
+  var good = 0, bad = 0;
+  st.selectedIds.forEach(function(sid) {
+    var ent = st.pool.find(function(x) { return x.id === sid; });
+    if (ent && typeof ent.good === 'boolean') { if (ent.good) good++; else bad++; }
+  });
+  document.getElementById('fiftyCount').textContent = st.selectedIds.length + '/6 (' + good + ' Good, ' + bad + ' Bad)';
+  var ok = st.selectedIds.length === 6 && good === 3 && bad === 3;
+  document.getElementById('fiftyConfirm').disabled = !ok;
+}
+
+function confirmFifty() {
+  var player = turnOrder[currentTurnIdx];
+  player.curatedPoolIds = window._fifty.selectedIds.slice();
+  showToast('⚖️ 50% activé !', 'success');
+  closeActionOverlay();
+  renderTurnCenter(player);
+}
+
+/* ── Passive force logic ── */
+function applyPassiveForce(player, rolledEntity) {
+  if (currentRound === 0) return rolledEntity;
+  var personPick = player.picks[0].length > 0 ? player.picks[0][0] : null;
+
+  var hasForceBad = player.activePassives.indexOf('force_bad') >= 0;
+  var hasForceGood = player.activePassives.indexOf('force_good') >= 0;
+  if (!hasForceBad && !hasForceGood) return rolledEntity;
+
+  if (Math.random() > 0.25) return rolledEntity;
+
+  var wantGood;
+  if (hasForceBad) {
+    wantGood = personPick && !personPick.good ? true : false;
+  } else {
+    wantGood = personPick && !personPick.good ? false : true;
+  }
+
+  var pBox = getPlayerBox(player);
+  var filtered = pBox.filter(function(e) { return e.good === wantGood && e.id !== rolledEntity.id; });
+  if (filtered.length === 0) return rolledEntity;
+
+  var forced = filtered[Math.floor(Math.random() * filtered.length)];
+  if (hasForceBad) {
+    showToast('🌑 Malédiction ! Résultat altéré...', 'danger');
+  } else {
+    showToast('✨ Bénédiction ! Résultat amélioré !', 'success');
+  }
+  return forced;
+}
+
+function applyGoodBoost(player, rolledEntity) {
+  if (!player || !player.goodBoost || player.goodBoost <= 0) return rolledEntity;
+  if (currentRound === 0) return rolledEntity;
+  if (Math.random() > player.goodBoost) return rolledEntity;
+
+  var personPick = player.picks[0].length > 0 ? player.picks[0][0] : null;
+  if (!personPick || typeof personPick.good !== 'boolean') return rolledEntity;
+
+  var wantGood = personPick.good; // favorable alignment
+  var pBox = getPlayerBox(player);
+  var filtered = pBox.filter(function(e) { return e.good === wantGood && e.id !== rolledEntity.id; });
+  if (filtered.length === 0) return rolledEntity;
+
+  showToast('🍀 Chance forcée !', 'success');
+  return filtered[Math.floor(Math.random() * filtered.length)];
+}
+
+/* ── Roll the dice (first roll) ── */
+function rollGameDice() {
+  var player = turnOrder[currentTurnIdx];
+  var pBox = getPlayerBox(player);
+  if (isAnimating || pBox.length === 0 || cardDrawPending) return;
+  isAnimating = true;
+  document.getElementById('gameRollBtn').style.display = 'none';
+
+  var diceEl = document.getElementById('gameDice');
+  diceEl.classList.add('rolling');
+  var n = pBox.length;
+  var ticks = 0;
+  var total = 18 + Math.floor(Math.random() * 10);
+
+  var iv = setInterval(function() {
+    diceEl.textContent = Math.floor(Math.random() * n) + 1;
+    ticks++;
+    if (ticks >= total) {
+      clearInterval(iv);
+      var idx = Math.floor(Math.random() * n);
+      diceEl.textContent = idx + 1;
+      diceEl.classList.remove('rolling');
+      var picked = pBox[idx];
+      picked = applyPassiveForce(player, picked);
+      picked = applyGoodBoost(player, picked);
+      if (player.doublePiocheArmed && pBox.length >= 2) {
+        player.doublePiocheArmed = false;
+        var other = pBox[Math.floor(Math.random() * n)];
+        if (other.id === picked.id && n > 1) {
+          other = pBox[(idx + 1) % n];
+        }
+        showChoiceTwo(player, picked, other, '🎴 Double pioche', 'Choisis lequel garder');
+        isAnimating = false;
+        return;
+      }
+      currentEntity = picked;
+      isAnimating = false;
+      setTimeout(function() { showReveal(false); }, 350);
+    }
+  }, 65);
+}
+
+/* ── Roll the dice (reroll) ── */
+function rollGameDiceReroll() {
+  var player = turnOrder[currentTurnIdx];
+  var pBox = getPlayerBox(player);
+  if (pBox.length === 0) {
+    setTimeout(nextTurn, 400);
+    return;
+  }
+  isAnimating = true;
+  document.getElementById('gameRange').textContent = 'Fourchette : 1 – ' + pBox.length;
+  var status = document.getElementById('rerollStatus');
+  status.style.display = '';
+  status.textContent = 'Relance en cours…';
+
+  setTimeout(function() {
+    var diceEl = document.getElementById('gameDice');
+    diceEl.classList.add('rolling');
+    var n = pBox.length;
+    var ticks = 0;
+    var total = 18 + Math.floor(Math.random() * 10);
+
+    var iv = setInterval(function() {
+      diceEl.textContent = Math.floor(Math.random() * n) + 1;
+      ticks++;
+      if (ticks >= total) {
+        clearInterval(iv);
+        var idx = Math.floor(Math.random() * n);
+        diceEl.textContent = idx + 1;
+        diceEl.classList.remove('rolling');
+        var picked = pBox[idx];
+        picked = applyPassiveForce(player, picked);
+        picked = applyGoodBoost(player, picked);
+        currentEntity = picked;
+        isAnimating = false;
+        status.style.display = 'none';
+        setTimeout(function() { showReveal(true); }, 350);
+      }
+    }, 65);
+  }, 500);
+}
+
+/* ── Show reveal overlay ── */
+function showReveal(isReroll) {
+  var player = turnOrder[currentTurnIdx];
+  var blindActive = blindedRound === currentRound && !player.shieldedRound;
+  if (blindActive) {
+    document.getElementById('revealThumb').innerHTML = '🂠';
+    document.getElementById('revealName').textContent = 'Résultat caché';
+  } else {
+    document.getElementById('revealThumb').innerHTML = thumbHtml(currentEntity);
+    document.getElementById('revealName').textContent = currentEntity.name;
+  }
+
+  var label = document.getElementById('revealLabel');
+  var actions = document.getElementById('revealActions');
+
+  var roundLabel = ROUND_META[currentRound].revealLabel;
+  if (blindActive) roundLabel = 'Loot caché';
+
+  if (isReroll && !player.infiniteReroll) {
+    label.textContent = (mode === 'chaos' && currentRound === 0) ? 'En plus : ' : roundLabel;
+    actions.innerHTML = '<button class="btn btn-gold" onclick="keepEntity()">✅ Garder</button>';
+  } else {
+    label.textContent = roundLabel;
+    var pBox = getPlayerBox(player);
+    var canReroll = pBox.length >= 2 && (player.infiniteReroll || player.rerollsLeft > 0);
+    var rerollBtn = '';
+    var secondLookBtn = '';
+    if (canReroll) {
+      if (player.infiniteReroll) {
+        rerollBtn = '<button class="btn btn-chaos-fill" onclick="rerollEntity()">♾️ Relancer (infini)</button>';
+      } else if (mode === 'chaos' && currentRound === 0) {
+        rerollBtn = '<button class="btn btn-chaos-fill" onclick="rerollEntity()">🔄 Relancer (+1 personne) — ' + player.rerollsLeft + ' relance restant(s)</button>';
+      } else {
+        rerollBtn = '<button class="btn btn-danger-fill" onclick="rerollEntity()">🔄 Relancer (élimine) — ' + player.rerollsLeft + ' relance restant(s)</button>';
+      }
+    }
+    if (!blindActive && player.secondLookArmed && !player.secondLookUsed && pBox.length >= 2) {
+      secondLookBtn = '<button class="btn btn-accent" onclick="triggerSecondLook()">👀 Second regard</button>';
+    }
+    actions.innerHTML = '<button class="btn btn-gold" onclick="keepEntity()">✅ Garder</button>' + secondLookBtn + rerollBtn;
+  }
+
+  document.getElementById('revealOverlay').classList.add('visible');
+  spawnConfetti();
+}
+
+/* ── Keep the entity ── */
+function keepEntity() {
+  var player = turnOrder[currentTurnIdx];
+  player.picks[currentRound].push(currentEntity);
+  box = box.filter(function(e) { return e.id !== currentEntity.id; });
+  player.curatedPoolIds = null; // 50% only affects next loot this turn
+
+  showToast(currentEntity.name + ' → inventaire de ' + player.name, 'success');
+  closeReveal();
+
+  currentEntity = null;
+  firstEntity = null;
+  hasRerolled = false;
+
+  renderTopbar();
+  renderSidebar();
+  renderInventory(player);
+
+  setTimeout(nextTurn, 1000);
+}
+
+/* ── Reroll ── */
+function rerollEntity() {
+  var player = turnOrder[currentTurnIdx];
+
+  if (player.infiniteReroll) {
+    showToast('♾️ ' + currentEntity.name + ' remise dans la boîte !', 'danger');
+    firstEntity = currentEntity;
+    currentEntity = null;
+    closeReveal();
+    renderTopbar();
+    setTimeout(rollGameDiceReroll, 600);
+    return;
+  }
+
+  if (hasRerolled || isAnimating) return;
+  hasRerolled = true;
+  if (player.rerollsLeft <= 0) return;
+  player.rerollsLeft--;
+
+  if (mode === 'chaos' && currentRound === 0) {
+    player.picks[currentRound].push(currentEntity);
+    showToast(currentEntity.name + ' → inventaire', 'success');
+    renderInventory(player);
+    renderSidebar();
+  } else {
+    showToast('❌ ' + currentEntity.name + ' éliminée !', 'danger');
+  }
+
+  box = box.filter(function(e) { return e.id !== currentEntity.id; });
+  player.curatedPoolIds = null; // 50% consumed
+  firstEntity = currentEntity;
+  currentEntity = null;
+  closeReveal();
+  renderTopbar();
+
+  setTimeout(rollGameDiceReroll, 600);
+}
+
+function closeReveal() {
+  document.getElementById('revealOverlay').classList.remove('visible');
+}
+
+function nextTurn() {
+  // Discard "must play this turn" cards that were not used
+  var prevIdx = currentTurnIdx;
+  var prevPlayer = turnOrder[prevIdx];
+  if (prevPlayer && prevPlayer.hand && prevPlayer.hand.length) {
+    var before = prevPlayer.hand.length;
+    prevPlayer.hand = prevPlayer.hand.filter(function(c) { return !c.mustPlayThisTurn; });
+    var removed = before - prevPlayer.hand.length;
+    if (removed > 0) showToast('⏳ ' + removed + ' carte(s) non jouée(s) : perdues', 'danger');
+  }
+
+  currentTurnIdx++;
+  if (currentTurnIdx >= turnOrder.length || box.length === 0) {
+    advanceRound();
+  } else {
+    beginTurn();
+  }
+}
+
+/* ═══════════════════════════════════════
+   SUMMARY
+   ═══════════════════════════════════════ */
+function getComboLabel(player) {
+  var person = player.picks[0].length > 0 ? player.picks[0][0] : null;
+  var action = player.picks[1].length > 0 ? player.picks[1][0] : null;
+  var location = player.picks[2].length > 0 ? player.picks[2][0] : null;
+  if (!person || !action || !location) return null;
+
+  var actionFav = person.good === action.good;
+  var locationFav = person.good === location.good;
+
+  if (actionFav && locationFav) {
+    return person.good
+      ? { text: 'Combo de rêve !', cls: 'sp-combo-good' }
+      : { text: 'Combo maudit !', cls: 'sp-combo-bad' };
+  } else if (!actionFav && !locationFav) {
+    return person.good
+      ? { text: 'Catastrophe totale !', cls: 'sp-combo-bad' }
+      : { text: 'Chance inouïe !', cls: 'sp-combo-good' };
+  }
+  return { text: 'Combo mitigé...', cls: 'sp-combo-mixed' };
+}
+
+function endGame() {
+  showScreen('screenSummary');
+  spawnConfetti();
+  document.getElementById('summarySubtitle').textContent = 'Le destin a parlé !';
+
+  document.getElementById('summaryGrid').innerHTML = turnOrder.map(function(p) {
+    var roundsHtml = '';
+    var combo = getComboLabel(p);
+    if (combo) {
+      roundsHtml += '<div class="sp-combo ' + combo.cls + '">' + combo.text + '</div>';
+    }
+    for (var r = 0; r < 3; r++) {
+      var rm = ROUND_META[r];
+      var picks = p.picks[r];
+      if (picks.length > 0) {
+        roundsHtml += '<div class="sp-round-label">' + rm.emoji + ' ' + rm.name + '</div>';
+        roundsHtml += picks.map(function(e) {
+          var gbCls = e.good ? 'gb-tag-good' : 'gb-tag-bad';
+          return '<div class="sp-card">' +
+            '<div class="sp-card-thumb">' + thumbHtml(e) + '</div>' +
+            '<div class="sp-card-name">' + esc(e.name) + ' <span class="gb-tag ' + gbCls + '" style="font-size:.55rem">' + (e.good ? 'Good' : 'Bad') + '</span></div>' +
+          '</div>';
+        }).join('');
+      } else {
+        roundsHtml += '<div class="sp-round-label">' + rm.emoji + ' ' + rm.name + '</div>';
+        roundsHtml += '<div class="sp-empty">—</div>';
+      }
+    }
+    return '<div class="summary-player" style="border-top-color:' + p.color + '">' +
+      '<div class="sp-name"><span class="sp-dot" style="background:' + p.color + '"></span>' + esc(p.name) + '</div>' +
+      '<div class="sp-cards">' + roundsHtml + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function newGame() {
+  mode = null;
+  players = [];
+  box = [];
+  turnOrder = [];
+  currentTurnIdx = 0;
+  currentRound = 0;
+  currentEntity = null;
+  firstEntity = null;
+  hasRerolled = false;
+  isAnimating = false;
+  cardDrawPending = false;
+  showScreen('screenLanding');
+}
+
+/* ═══════════════════════════════════════
+   INIT
+   ═══════════════════════════════════════ */
+(function initParticles() {
+  var c = document.getElementById('particles');
+  for (var i = 0; i < 25; i++) {
+    var s = document.createElement('span');
+    s.style.left = Math.random() * 100 + '%';
+    s.style.animationDuration = (8 + Math.random() * 12) + 's';
+    s.style.animationDelay = (Math.random() * 10) + 's';
+    var sz = 2 + Math.random() * 4;
+    s.style.width = s.style.height = sz + 'px';
+    c.appendChild(s);
+  }
+})();
+
+(function initTooltips() {
+  var tip = document.createElement('div');
+  tip.className = 'tip-float';
+  document.body.appendChild(tip);
+
+  var activeEl = null;
+  function hide() {
+    activeEl = null;
+    tip.classList.remove('visible');
+  }
+
+  function showFor(el, evt) {
+    var txt = el.getAttribute('data-tip');
+    if (!txt) return hide();
+    activeEl = el;
+    tip.textContent = txt;
+    tip.classList.add('visible');
+    move(evt);
+  }
+
+  function move(evt) {
+    if (!activeEl || !tip.classList.contains('visible')) return;
+    var pad = 14;
+    var x = (evt && evt.clientX != null) ? evt.clientX : (window.innerWidth / 2);
+    var y = (evt && evt.clientY != null) ? evt.clientY : (window.innerHeight / 2);
+
+    // Position near cursor, clamp within viewport
+    var rect = tip.getBoundingClientRect();
+    var left = Math.min(Math.max(pad, x + 16), window.innerWidth - rect.width - pad);
+    var top = Math.min(Math.max(pad, y + 18), window.innerHeight - rect.height - pad);
+    tip.style.left = left + 'px';
+    tip.style.top = top + 'px';
+  }
+
+  document.addEventListener('mouseover', function(e) {
+    var el = e.target && e.target.closest ? e.target.closest('[data-tip]') : null;
+    if (!el) return;
+    showFor(el, e);
+  });
+  document.addEventListener('mousemove', function(e) { move(e); });
+  document.addEventListener('mouseout', function(e) {
+    if (!activeEl) return;
+    if (e.target === activeEl || (e.target && e.target.closest && e.target.closest('[data-tip]') === activeEl)) {
+      hide();
+    }
+  });
+  document.addEventListener('scroll', hide, true);
+  document.addEventListener('click', hide, true);
+  window.addEventListener('blur', hide);
+})();
+</script>
+</body>
+</html>
