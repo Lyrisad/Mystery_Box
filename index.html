@@ -1642,6 +1642,15 @@ function onlineApplyViewState(vs) {
           }
         }
       }
+
+      // If an exchange overlay is open but pending is gone, close it (online).
+      // This prevents being stuck on "Résolution en cours…" after server resolves.
+      var exOv = document.getElementById('exchangeOverlay');
+      if (ONLINE.enabled && exOv && exOv.classList.contains('visible')) {
+        if (!pending || pending.type !== 'exchange' || String(pending.byPid || '') !== String(ONLINE.playerId || '')) {
+          closeExchange(true);
+        }
+      }
     } else if (vs.phase === 'summary') {
       showScreen('screenSummary');
       endGame();
