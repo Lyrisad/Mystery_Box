@@ -2951,6 +2951,33 @@ function onlineAction(action, payload) {
       if (!p || !t7 || t7.shieldedRound) { clearPending(); return st; }
       // Échange de corps: swap the "body" (inventory/state) but keep identities (id/name/color).
       // This way each device still plays the same playerId, but with the other's stuff.
+      function normalizePlayerAfterSwap(pp) {
+        if (!pp) return;
+        // Firebase transactions cannot write `undefined` anywhere.
+        if (!Array.isArray(pp.picks)) pp.picks = [[], [], []];
+        if (!Array.isArray(pp.picks[0])) pp.picks[0] = [];
+        if (!Array.isArray(pp.picks[1])) pp.picks[1] = [];
+        if (!Array.isArray(pp.picks[2])) pp.picks[2] = [];
+        if (!Array.isArray(pp.hand)) pp.hand = [];
+        if (pp.drawnCard === undefined) pp.drawnCard = null;
+        if (!Array.isArray(pp.activePassives)) pp.activePassives = [];
+        if (typeof pp.shieldedRound !== 'boolean') pp.shieldedRound = !!pp.shieldedRound;
+        if (typeof pp.infiniteReroll !== 'boolean') pp.infiniteReroll = !!pp.infiniteReroll;
+        if (!Array.isArray(pp.banned)) pp.banned = [];
+        if (typeof pp.secondLookArmed !== 'boolean') pp.secondLookArmed = !!pp.secondLookArmed;
+        if (typeof pp.secondLookUsed !== 'boolean') pp.secondLookUsed = !!pp.secondLookUsed;
+        if (typeof pp.doublePiocheArmed !== 'boolean') pp.doublePiocheArmed = !!pp.doublePiocheArmed;
+        if (pp.curatedPoolIds === undefined) pp.curatedPoolIds = null;
+        if (typeof pp.goodBoost !== 'number') pp.goodBoost = Number(pp.goodBoost || 0) || 0;
+        if (!Array.isArray(pp.turnLog)) pp.turnLog = [];
+        if (!Array.isArray(pp.publicTurnLog)) pp.publicTurnLog = [];
+        if (typeof pp.pendingSabotageBan !== 'number') pp.pendingSabotageBan = Number(pp.pendingSabotageBan || 0) || 0;
+        if (typeof pp.frozenTurns !== 'number') pp.frozenTurns = Number(pp.frozenTurns || 0) || 0;
+        if (typeof pp.blindedTurns !== 'number') pp.blindedTurns = Number(pp.blindedTurns || 0) || 0;
+        if (typeof pp.rerollsLeft !== 'number') pp.rerollsLeft = Number(pp.rerollsLeft || 0) || 0;
+        if (typeof pp.rollRaw !== 'number') pp.rollRaw = Number(pp.rollRaw || 0) || 0;
+        if (typeof pp.rollDisplay !== 'number') pp.rollDisplay = Number(pp.rollDisplay || 0) || 0;
+      }
       var swapKeys = [
         'picks',
         'rerollsLeft',
@@ -2978,6 +3005,8 @@ function onlineAction(action, payload) {
         p[k] = t7[k];
         t7[k] = tmp;
       });
+      normalizePlayerAfterSwap(p);
+      normalizePlayerAfterSwap(t7);
       // Also swap their "seat" in turn order so the target takes your current turn slot.
       // Example: if it was your turn (currentTurnIdx points to you), after swap it's the target's turn.
       if (Array.isArray(st.turnOrder) && st.turnOrder.length) {
