@@ -2949,9 +2949,48 @@ function onlineAction(action, payload) {
       var tid7 = payload && payload.targetId ? String(payload.targetId) : '';
       var t7 = (st.players || []).find(function(pp) { return pp && String(pp.id || '') === tid7; }) || null;
       if (!p || !t7 || t7.shieldedRound) { clearPending(); return st; }
-      // Offline swaps only identities (name+color)
-      var tmpN = p.name; p.name = t7.name; t7.name = tmpN;
-      var tmpC = p.color; p.color = t7.color; t7.color = tmpC;
+      // Échange de corps: swap the "body" (inventory/state) but keep identities (id/name/color).
+      // This way each device still plays the same playerId, but with the other's stuff.
+      var swapKeys = [
+        'picks',
+        'rerollsLeft',
+        'hand',
+        'drawnCard',
+        'activePassives',
+        'shieldedRound',
+        'infiniteReroll',
+        'banned',
+        'secondLookArmed',
+        'secondLookUsed',
+        'doublePiocheArmed',
+        'curatedPoolIds',
+        'goodBoost',
+        'turnLog',
+        'publicTurnLog',
+        'pendingSabotageBan',
+        'frozenTurns',
+        'blindedTurns',
+        'rollRaw',
+        'rollDisplay'
+      ];
+      swapKeys.forEach(function(k) {
+        var tmp = p[k];
+        p[k] = t7[k];
+        t7[k] = tmp;
+      });
+      // Also swap their "seat" in turn order so the target takes your current turn slot.
+      // Example: if it was your turn (currentTurnIdx points to you), after swap it's the target's turn.
+      if (Array.isArray(st.turnOrder) && st.turnOrder.length) {
+        var pidA = String(p.id || '');
+        var pidB = String(t7.id || '');
+        var ia = st.turnOrder.findIndex(function(x) { return String(x || '') === pidA; });
+        var ib = st.turnOrder.findIndex(function(x) { return String(x || '') === pidB; });
+        if (ia >= 0 && ib >= 0 && ia !== ib) {
+          var tmpId = st.turnOrder[ia];
+          st.turnOrder[ia] = st.turnOrder[ib];
+          st.turnOrder[ib] = tmpId;
+        }
+      }
       var pc10 = st.pending && st.pending.card ? st.pending.card : null;
       if (pc10) { st.lastActiveCardId = pc10.id || null; st.lastActiveCardPlayerId = String(p.id||''); st.lastActiveCardData = { ts: Date.now(), targetId: tid7, targetName: (t7 && t7.name) ? t7.name : '' }; }
       clearPending();
