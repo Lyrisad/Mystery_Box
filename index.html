@@ -528,6 +528,13 @@
       .cd-scene { width: 220px; height: 320px; }
       .cd-front-deco { font-size: 3.5rem; }
       .ho-name { font-size: 1.5rem; }
+      /* Fix overflow: round1 2-col grid should stack on small screens */
+      .choice-grid.is-two { grid-template-columns: 1fr; max-width: 520px; }
+      /* Make inspect/picker modals readable on mobile */
+      .action-card { padding: 1.25rem 1.1rem; width: min(920px, 98vw); }
+      .choice-btn { padding: 1.05rem 1rem; }
+      .choice-title { font-size: 1.05rem; }
+      .choice-desc { font-size: .92rem; line-height: 1.45; }
     }
   </style>
 
