@@ -4405,7 +4405,7 @@ function renderExchangeStep1(player) {
   } else {
     html += '<div class="exch-players">' + others.map(function(p) {
       var cls = 'exch-player-btn' + (p.shieldedRound ? ' shielded' : '');
-      return '<button class="' + cls + '" onclick="selectExchTarget(' + p.id + ')">' +
+      return '<button class="' + cls + '" onclick="selectExchTarget(' + jsq(p.id) + ')">' +
         '<span style="width:10px;height:10px;border-radius:50%;background:' + p.color + ';display:inline-block"></span>' +
         esc(p.name) + (p.shieldedRound ? ' 🛡️' : '') +
       '</button>';
@@ -4416,7 +4416,9 @@ function renderExchangeStep1(player) {
 
 function selectExchTarget(targetId) {
   var player = turnOrder[currentTurnIdx];
-  exchTarget = turnOrder.find(function(p) { return p.id === targetId; });
+  var sid = String(targetId || '');
+  exchTarget = turnOrder.find(function(p) { return p && String(p.id || '') === sid; }) || null;
+  if (!exchTarget) { showToast('Cible invalide.', 'danger'); return; }
   var html = '<div style="font-size:2rem;margin-bottom:.3rem">🔄</div>' +
     '<h3 style="margin-bottom:.3rem">Échange avec ' + esc(exchTarget.name) + '</h3>' +
     '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.5rem">Choisis une de TES cartes à risquer</p>';
