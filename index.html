@@ -78,6 +78,46 @@
     .btn-gold:disabled { opacity: .4; cursor: not-allowed; box-shadow: none; }
     .btn-danger-fill { background: linear-gradient(135deg, var(--danger), #b91c1c); color: #fff; box-shadow: 0 4px 14px var(--danger-glow); }
     .btn-chaos-fill { background: linear-gradient(135deg, var(--success), #059669); color: #fff; box-shadow: 0 4px 14px var(--success-glow); }
+    .btn-min { background: transparent; border: 1.5px solid rgba(255,255,255,.16); color: var(--text); box-shadow: none; padding: .55rem .85rem; font-size: .82rem; border-radius: 12px; }
+    .btn-min-lg { font-size: .95rem; padding: .85rem 1.8rem; border-radius: 14px; }
+    .btn-min:hover { border-color: rgba(255,255,255,.28); box-shadow: 0 0 0 4px rgba(255,255,255,.04); }
+    .btn-min-danger { border-color: rgba(239,68,68,.35); color: #fca5a5; }
+    .btn-min-danger:hover { border-color: rgba(239,68,68,.55); box-shadow: 0 0 0 4px rgba(239,68,68,.10); }
+    .btn-min-success { border-color: rgba(16,185,129,.35); color: #6ee7b7; }
+    .btn-min-success:hover { border-color: rgba(16,185,129,.55); box-shadow: 0 0 0 4px rgba(16,185,129,.10); }
+
+    /* ── Jackpot reveal (Hearthstone-ish) ── */
+    .jackpot-stage { margin: .3rem auto 1rem; display: flex; justify-content: center; align-items: flex-end; gap: 1.1rem; perspective: 1100px; }
+    .jackpot-stage.is-columns { flex-direction: column; align-items: center; }
+    .jackpot-stage.is-columns .jackpot-card.is-left,
+    .jackpot-stage.is-columns .jackpot-card.is-right { transform: none; }
+    .jackpot-card {
+      width: 260px;
+      background: radial-gradient(140% 140% at 30% 0%, rgba(245,158,11,.22), transparent 55%),
+                  radial-gradient(140% 140% at 70% 0%, rgba(168,85,247,.18), transparent 55%),
+                  var(--surface);
+      border: 2px solid rgba(255,255,255,.10);
+      border-radius: 22px;
+      padding: 1.1rem 1.05rem 1rem;
+      box-shadow: 0 18px 60px rgba(0,0,0,.45);
+      transform-style: preserve-3d;
+      animation: jackpotIn .38s cubic-bezier(.2,1.1,.2,1) both;
+    }
+    @keyframes jackpotIn { from { opacity: 0; transform: translateY(18px) scale(.92); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    .jackpot-card.is-left { transform: rotateY(10deg) rotateZ(-2deg); }
+    .jackpot-card.is-right { transform: rotateY(-10deg) rotateZ(2deg); }
+    .jackpot-meta { margin-top: .6rem; font-size: .78rem; color: var(--text-dim); }
+    .jackpot-tag { display: inline-block; margin-top: .45rem; padding: .18rem .55rem; border-radius: 999px; font-weight: 900; font-size: .65rem; letter-spacing: .5px; text-transform: uppercase; border: 1px solid rgba(255,255,255,.14); background: rgba(0,0,0,.22); }
+    .jackpot-tag.passive { border-color: rgba(110,231,183,.35); color: #6ee7b7; }
+    .jackpot-tag.temp { border-color: rgba(245,158,11,.35); color: #fcd34d; }
+    .jackpot-card .choice-title { justify-content: center; }
+    .jackpot-card .choice-title > span { display: inline-grid; place-items: center; width: 2.4rem; }
+    .jackpot-card img { display: block; margin: 0 auto; }
+    @media (max-width: 680px) {
+      .jackpot-stage { flex-direction: column; align-items: center; }
+      .jackpot-card.is-left, .jackpot-card.is-right { transform: none; }
+      .jackpot-card { width: min(320px, 92vw); }
+    }
     .btn-sm { padding: .25rem .5rem; font-size: .7rem; border-radius: 6px; background: rgba(239,68,68,.15); color: var(--danger); border: none; cursor: pointer; font-family: inherit; }
     .btn-sm:hover { background: rgba(239,68,68,.3); }
     .btn-back { background: none; border: none; color: var(--text-dim); cursor: pointer; font-size: .88rem; font-family: inherit; font-weight: 600; transition: color .2s; padding: .4rem 0; }
@@ -125,13 +165,26 @@
     .mode-card h2 { font-size: 1.35rem; font-weight: 800; margin-bottom: .5rem; }
     .mode-card p { color: var(--text-dim); font-size: .8rem; line-height: 1.5; }
 
+    /* ── Online room mode picker ── */
+    .online-mode-cards { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; margin-top: .7rem; }
+    .online-mode-card { background: var(--surface); border: 2px solid rgba(255,255,255,.08); border-radius: 16px; padding: .9rem .9rem; text-align: left; cursor: pointer; transition: transform .15s, border-color .25s, box-shadow .25s; font-family: inherit; color: var(--text); display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; }
+    .online-mode-card:hover { transform: translateY(-2px); }
+    .online-mode-card .om-title { font-weight: 1000; display: flex; align-items: center; justify-content: flex-start; gap: .55rem; width: 100%; }
+    .online-mode-card .om-title .om-ico { width: 30px; height: 30px; border-radius: 10px; display: grid; place-items: center; background: rgba(255,255,255,.08); }
+    .online-mode-card .om-desc { margin-top: .35rem; color: var(--text-dim); font-size: .78rem; line-height: 1.35; }
+    .online-mode-card.om-normal:hover { border-color: var(--accent); box-shadow: 0 10px 34px rgba(124,58,237,.18); }
+    .online-mode-card.om-chaos:hover { border-color: rgba(16,185,129,.7); box-shadow: 0 10px 34px rgba(16,185,129,.16); }
+    @media (max-width: 520px) { .online-mode-cards { grid-template-columns: 1fr; } }
+
     /* ── SETUP ── */
     .setup-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
     .setup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
     .players-list { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .7rem; }
-    .player-chip { display: inline-flex; align-items: center; gap: .35rem; padding: .3rem .65rem .3rem .45rem; background: var(--surface-2); border-radius: 20px; font-size: .8rem; font-weight: 600; animation: popIn .3s ease-out; }
-    .player-chip .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .player-chip { display: inline-flex; align-items: center; gap: .45rem; padding: .52rem .9rem .52rem .65rem; background: radial-gradient(120% 140% at 20% 0%, rgba(124,58,237,.18), transparent 55%), var(--surface-2); border: 1px solid rgba(255,255,255,.10); border-radius: 999px; font-size: .9rem; font-weight: 800; letter-spacing: .2px; animation: popIn .3s ease-out; box-shadow: 0 10px 26px rgba(0,0,0,.25); }
+    .player-chip .dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 0 3px rgba(0,0,0,.25); }
     .player-chip .btn-sm { margin-left: .15rem; }
+    .player-chip .name { max-width: 16ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .player-chip .tag { font-size: .65rem; font-weight: 1000; letter-spacing: 1.4px; text-transform: uppercase; color: var(--text-dim); opacity: .85; }
     .start-area { text-align: center; margin-top: 1.5rem; }
     .start-hint { color: var(--text-dim); font-size: .78rem; margin-top: .4rem; min-height: 1.2em; }
 
@@ -265,6 +318,26 @@
     .dc-name { font-size: 1.25rem; font-weight: 900; margin-bottom: .45rem; padding: .35rem .7rem; border-radius: 12px; background: rgba(0,0,0,.28); border: 1px solid rgba(255,255,255,.1); }
     .dc-desc { font-size: .82rem; color: var(--text-dim); margin-bottom: 1.2rem; line-height: 1.4; }
     .dc-actions { display: flex; gap: .7rem; justify-content: center; flex-wrap: wrap; }
+
+    /* Small screens: prevent card text overflow */
+    .cd-back { overflow: hidden; }
+    .dc-desc { max-height: 9.5rem; overflow: auto; padding-right: .2rem; }
+    .dc-desc::-webkit-scrollbar { width: 8px; }
+    .dc-desc::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 10px; }
+
+    @media (max-height: 720px) {
+      .cd-scene { width: 220px; height: 320px; }
+      .dc-emoji { font-size: 3rem; }
+      .dc-name { font-size: 1.08rem; margin-bottom: .35rem; }
+      .dc-desc { font-size: .78rem; line-height: 1.32; max-height: 7.2rem; margin-bottom: .9rem; }
+    }
+    @media (max-height: 620px) {
+      .cd-scene { width: 210px; height: 300px; }
+      .cd-face { padding: 1.1rem; }
+      .dc-rarity { margin-bottom: .45rem; }
+      .dc-emoji { font-size: 2.7rem; margin-bottom: .25rem; }
+      .dc-desc { max-height: 6rem; }
+    }
     .cd-back.rarity-common { border: 2px solid #94a3b8; }
     .rarity-common .dc-rarity { color: #94a3b8; }
     .cd-back.rarity-rare { border: 2px solid #3b82f6; box-shadow: 0 0 30px rgba(59,130,246,.25); }
@@ -280,10 +353,38 @@
     /* ── Hand cards in sidebar ── */
     .sb-hand { display: flex; gap: .25rem; flex-wrap: wrap; margin-top: .35rem; }
     .sb-hand-card { width: 30px; height: 40px; border-radius: 6px; display: grid; place-items: center; font-size: .72rem; }
-    .sb-hand-facedown { background: linear-gradient(135deg, #2d2d4a, #1a1a2e); border: 1px solid rgba(255,255,255,.1); }
+    .sb-hand-facedown { background: linear-gradient(135deg, #2d2d4a, #1a1a2e); border: 1px solid rgba(255,255,255,.1); position: relative; overflow: hidden; }
+    .sb-hand-facedown::after { content: ""; position: absolute; inset: -6px; background: repeating-linear-gradient(45deg, rgba(255,255,255,.12) 0 6px, rgba(255,255,255,0) 6px 12px); opacity: .18; transform: rotate(8deg); }
     .sb-hand-faceup { border: 1px solid rgba(255,255,255,.15); background: var(--surface-2); cursor: pointer; transition: transform .15s, border-color .2s; }
     .sb-hand-faceup:hover { transform: translateY(-2px); border-color: var(--gold); }
-    .sb-passive-badges { display: flex; gap: .2rem; flex-wrap: wrap; margin-top: .2rem; }
+    .sb-card-thumb.confidential { background: radial-gradient(120% 120% at 30% 0%, rgba(239,68,68,.25), transparent 55%), rgba(255,255,255,.05); color: rgba(255,255,255,.9); font-size: .7rem; }
+    .sb-card-thumb.hidden-pick { background: radial-gradient(120% 120% at 30% 0%, rgba(124,58,237,.22), transparent 55%), rgba(255,255,255,.05); color: rgba(255,255,255,.85); font-size: .7rem; }
+    .played-toast { position: fixed; inset: 0; display: grid; place-items: center; pointer-events: none; z-index: 160; opacity: 0; transition: opacity .2s ease-out; }
+    .played-toast.visible { opacity: 1; }
+    .played-toast-card { pointer-events: none; width: 360px; max-width: 92vw; background: rgba(15, 15, 26, .92);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 0 80px rgba(0,0,0,.65);
+      border-radius: 22px;
+      padding: .95rem 1rem;
+      transform: translateY(10px) scale(.98);
+      transition: transform .2s ease-out;
+    }
+    .played-toast.visible .played-toast-card { transform: translateY(0) scale(1); }
+    .played-toast-card-inner { display: flex; flex-direction: column; align-items: center; gap: .55rem; text-align: center; }
+    .played-toast-hero { width: 86px; height: 86px; border-radius: 22px; display: grid; place-items: center; font-size: 3rem;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: inset 0 0 0 7px rgba(0,0,0,.22), 0 0 28px rgba(124,58,237,.18);
+    }
+    .played-toast-line { font-size: .82rem; color: var(--text-dim); font-weight: 950; }
+    .played-toast-line b { color: var(--text); font-weight: 1000; }
+    .played-toast-rarity { font-size: .62rem; font-weight: 1000; text-transform: uppercase; letter-spacing: 2px; padding: .25rem .55rem; border-radius: 999px; border: 1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.30); }
+    .played-toast-hero.rarity-common { box-shadow: inset 0 0 0 7px rgba(0,0,0,.22), 0 0 26px rgba(148,163,184,.14); }
+    .played-toast-hero.rarity-rare { box-shadow: inset 0 0 0 7px rgba(0,0,0,.22), 0 0 34px rgba(59,130,246,.20); }
+    .played-toast-hero.rarity-epic { box-shadow: inset 0 0 0 7px rgba(0,0,0,.22), 0 0 34px rgba(168,85,247,.22); }
+    .played-toast-hero.rarity-legendary { box-shadow: inset 0 0 0 7px rgba(0,0,0,.22), 0 0 42px rgba(245,158,11,.22); }
+    .played-toast-hero.rarity-passive { box-shadow: inset 0 0 0 7px rgba(0,0,0,.22), 0 0 34px rgba(110,231,183,.20); }
+    .sb-passive-badges { display: flex; gap: .2rem; flex-wrap: wrap; margin-top: .45rem; }
     .sb-passive-badge { font-size: .55rem; padding: .1rem .3rem; border-radius: 6px; background: rgba(110,231,183,.12); color: #6ee7b7; font-weight: 600; }
 
     /* ── Hand panel in game center ── */
@@ -326,6 +427,8 @@
     .choice-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: .75rem; margin-top: .9rem; }
     .choice-grid { margin-bottom: .9rem; }
     .choice-grid.is-two { grid-template-columns: repeat(2, minmax(280px, 1fr)); max-width: 720px; margin-left: auto; margin-right: auto; justify-content: center; }
+    .choice-grid.is-columns { grid-template-columns: 1fr; max-width: 520px; margin-left: auto; margin-right: auto; }
+    .choice-btn.disabled { opacity: .38; pointer-events: none; filter: grayscale(.25); }
 
     /* ── Better tooltip (floating, not clipped) ── */
     .tip-float {
@@ -350,9 +453,37 @@
     .tip-float.visible { opacity: 1; transform: translateY(0); }
     .choice-btn { background: var(--surface-2); border: 2px solid rgba(255,255,255,.08); border-radius: 18px; padding: 1rem .95rem; cursor: pointer; font-family: inherit; color: var(--text); text-align: left; transition: transform .15s, border-color .2s, box-shadow .2s; }
     .choice-btn:hover { transform: translateY(-2px); border-color: rgba(245,158,11,.55); }
-    .choice-btn.selected { border-color: var(--gold); box-shadow: 0 0 20px rgba(245,158,11,.12); }
+    .choice-btn.selected { border-color: var(--gold); box-shadow: 0 0 22px rgba(245,158,11,.18); }
+    .choice-btn.selected::after {
+      content: "✓";
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      font-weight: 1000;
+      font-size: .9rem;
+      color: #111827;
+      background: linear-gradient(135deg, var(--gold), #d97706);
+      box-shadow: 0 0 18px rgba(245,158,11,.25);
+    }
+    .choice-btn { position: relative; }
+    .choice-btn.r1-card { text-align: center; }
+    .choice-btn.r1-card .choice-title { justify-content: center; margin-bottom: .35rem; }
+    .choice-btn.r1-card.selected { transform: translateY(-3px) scale(1.02); box-shadow: 0 0 34px rgba(245,158,11,.20); }
+    .choice-btn.r1-card:hover { transform: translateY(-3px) scale(1.01); }
+    .r1-full-card { padding: .15rem .1rem .25rem; }
+    .r1-full-card .r1-rarity { display: inline-flex; align-items: center; gap: .35rem; font-size: .62rem; font-weight: 1000; text-transform: uppercase; letter-spacing: 2px; margin-bottom: .55rem; background: rgba(0,0,0,.30); padding: .25rem .55rem; border-radius: 999px; border: 1px solid rgba(255,255,255,.12); }
+    .r1-full-card .r1-emoji { font-size: 2.6rem; margin-bottom: .35rem; filter: drop-shadow(0 10px 18px rgba(0,0,0,.35)); }
+    .r1-full-card .r1-name { font-size: 1.05rem; font-weight: 1000; margin: 0 auto .45rem; padding: .28rem .6rem; border-radius: 12px; background: rgba(0,0,0,.25); border: 1px solid rgba(255,255,255,.10); display: inline-block; max-width: 100%; }
+    .r1-full-card .r1-desc { font-size: .78rem; color: var(--text-dim); line-height: 1.35; text-align: center; }
+    .choice-btn.r1-card .r1-desc { min-height: 3.2em; } /* keep cards same height */
     .choice-title { font-weight: 900; font-size: .95rem; display: flex; align-items: center; gap: .45rem; margin-bottom: .45rem; }
     .choice-desc { color: var(--text-dim); font-size: .8rem; line-height: 1.4; }
+    .mini-thumb-img { width: 34px; height: 34px; object-fit: cover; border-radius: 10px; display: block; }
     .pill { display: inline-flex; align-items: center; gap: .25rem; border-radius: 999px; padding: .15rem .5rem; font-size: .62rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; border: 1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.22); }
     .pill-good { color: #6ee7b7; border-color: rgba(16,185,129,.35); }
     .pill-bad { color: #fca5a5; border-color: rgba(239,68,68,.35); }
@@ -399,6 +530,10 @@
       .ho-name { font-size: 1.5rem; }
     }
   </style>
+
+  <!-- Firebase (Realtime Database) -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
 </head>
 <body>
 
@@ -423,6 +558,65 @@
         <p>Lance le dé. Tu relances ? Tu gardes les deux ! Plus de cartes, plus de folie.</p>
       </button>
     </div>
+    <div style="max-width:580px;margin:1.2rem auto 0;">
+      <div class="section" style="margin-bottom:0;">
+        <div class="section-title">
+          <span class="icon" style="background:rgba(59,130,246,.18)">🌐</span>
+          Multijoueur (plusieurs appareils)
+        </div>
+        <p style="color:var(--text-dim);font-size:.82rem;line-height:1.5;margin-bottom:.9rem">
+          Crée une room, partage le code, et chacun joue sur son téléphone/PC (tour par tour).
+        </p>
+        <button class="btn btn-accent" type="button" onclick="openOnline()">Ouvrir le mode online</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN: Online Lobby ═══ -->
+<div class="screen" id="screenOnline">
+  <div class="app">
+    <div class="setup-header">
+      <button class="btn-back" onclick="closeOnline()">← Retour</button>
+      <span class="mode-badge" style="background:rgba(255,255,255,.08);color:var(--text)">🌐 Online</span>
+      <span></span>
+    </div>
+
+    <div class="setup-grid">
+      <div class="section">
+        <div class="section-title">
+          <span class="icon" style="background:rgba(124,58,237,.2)">👑</span>
+          Créer une room (hôte)
+        </div>
+        <div class="add-form" style="display:block">
+          <input type="text" id="onlineHostName" placeholder="Ton nom…" maxlength="20" autocomplete="off" />
+          <div class="online-mode-cards">
+            <button class="online-mode-card om-normal" type="button" onclick="createRoomOnline('normal')">
+              <div class="om-title"><span class="om-ico">🎲</span> Normal</div>
+              <div class="om-desc">Mode classique.</div>
+            </button>
+            <button class="online-mode-card om-chaos" type="button" onclick="createRoomOnline('chaos')">
+              <div class="om-title"><span class="om-ico">🔥</span> Chaos</div>
+              <div class="om-desc">Identique à Normal, sauf au Round 1 : <b>Relancer</b> ajoute la personne en plus.</div>
+            </button>
+          </div>
+        </div>
+        <p style="color:var(--text-dim);font-size:.78rem;margin-top:.5rem" id="onlineCreateInfo"></p>
+      </div>
+
+      <div class="section">
+        <div class="section-title">
+          <span class="icon" style="background:rgba(16,185,129,.18)">🚪</span>
+          Rejoindre une room
+        </div>
+        <div class="add-form">
+          <input type="text" id="onlineJoinName" placeholder="Ton nom…" maxlength="20" autocomplete="off" />
+          <input type="text" id="onlineRoomCode" placeholder="Code room (ex: ABC123)" maxlength="6" autocomplete="off" />
+          <button class="btn btn-accent" type="button" onclick="joinRoomOnline()">Rejoindre</button>
+        </div>
+        <p style="color:var(--text-dim);font-size:.78rem;margin-top:.5rem" id="onlineJoinInfo"></p>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -432,6 +626,11 @@
     <div class="setup-header">
       <button class="btn-back" onclick="goBack()">← Retour</button>
       <span class="mode-badge" id="modeBadge"></span>
+      <div id="roomCodePill" style="display:none;align-items:center;gap:.4rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);padding:.28rem .6rem;border-radius:999px;font-weight:800;font-size:.72rem;letter-spacing:1px;">
+        <span style="opacity:.8">ROOM</span>
+        <span id="roomCodeText" style="color:var(--gold)"></span>
+        <button class="btn" type="button" style="padding:.25rem .5rem;font-size:.7rem;border-radius:8px;background:rgba(245,158,11,.18);color:var(--gold);box-shadow:none" onclick="copyRoomCode()">Copier</button>
+      </div>
       <button class="btn btn-accent" type="button" onclick="showCardsLibrary()">🃏 Gérer les cartes</button>
     </div>
     <div class="setup-grid">
@@ -521,7 +720,7 @@
           </div>
           <div id="invContent"><p class="empty-state">Aucune carte pour l'instant</p></div>
         </div>
-        <div class="section" id="gameTurnCards">
+        <div class="section" id="gameTurnCards" style="display:none">
           <div class="section-title">
             <span class="icon" style="background:rgba(245,158,11,.18)">🪄</span>
             Cartes ce tour
@@ -542,7 +741,7 @@
     </header>
     <div class="summary-grid" id="summaryGrid"></div>
     <div style="text-align:center;margin-top:2rem;">
-      <button class="btn btn-gold" onclick="newGame()">🔄 Nouvelle partie</button>
+      <button class="btn btn-gold" onclick="(ONLINE.enabled ? restartOnlineRoomGame() : newGame())">🔄 Nouvelle partie</button>
     </div>
   </div>
 </div>
@@ -771,10 +970,1963 @@ let hasRerolled = false;
 let isAnimating = false;
 let orderPhaseIdx = 0;
 let cardDrawPending = false;
+let currentEntityTs = 0;
 let blindedRound = null;
 let blindedBy = null;
+let blindedByPid = null;
 let lastActiveCardId = null;
 let lastActiveCardPlayerId = null;
+let lastActiveCardData = null;
+let pending = null;
+let lastPassiveDraw = null;
+let lastJackpotDraw = null;
+
+/* ═══════════════════════════════════════
+   Online (Firebase Realtime Database)
+   ═══════════════════════════════════════ */
+const ONLINE = {
+  enabled: false,
+  roomCode: null,
+  playerId: null,
+  version: 0,
+  applyingRemote: false,
+  repairingMembership: false,
+  orderRollAnim: {},
+  prevOrderRolls: {},
+  lastOrderSig: null,
+  lastLobbySig: null,
+  turnOrderIds: [],
+  listeners: {
+    roomRef: null,
+    offRoom: null,
+    heartbeatTimer: null
+  },
+  lastSeenEntityId: null,
+  prev: {
+    phase: null,
+    round: null,
+    turnIdx: null
+  },
+  lastSeenActiveKey: null,
+  lastSeenPendingKey: null,
+  lastSeenGlobalPlayKey: null,
+  lastSeenPassiveDrawKey: null,
+  lastSeenDrawnCardId: null,
+  lastSeenJackpotDrawKey: null,
+  rollAnim: {
+    iv: null,
+    mode: null, // 'roll' | 'reroll'
+    startedAt: 0
+  },
+  pendingHandoffKey: null,
+  optimistic: {
+    entities: [], // { tmpId, name, category, good, image, createdAtMs }
+    deletedTmpIds: {} // tmpId -> true (prevent re-merge after delete)
+  }
+};
+
+// Firebase config (À REMPLACER)
+// Firebase Console → Project settings → Your apps (Web) → SDK setup → Config
+const firebaseConfig = {
+  apiKey: "AIzaSyD3gYvgoAyqL5xwX-rEaIvIYoMyhXaBu3A",
+  authDomain: "mysteryroll.firebaseapp.com",
+  // REQUIRED for Realtime Database:
+  // After you create RTDB: Firebase Console → Realtime Database → copy the database URL here.
+  databaseURL: "https://mysteryroll-default-rtdb.europe-west1.firebasedatabase.app/",
+  projectId: "mysteryroll",
+  storageBucket: "mysteryroll.firebasestorage.app",
+  messagingSenderId: "973894228380",
+  appId: "1:973894228380:web:afc2cfdcc6eb9cce225059",
+  measurementId: "G-H66Z79PP0M"
+};
+
+// Backward-compat with our code
+const FIREBASE_CONFIG = firebaseConfig;
+
+let __fbApp = null;
+let __db = null;
+
+function firebaseEnsureInit() {
+  if (__db) return;
+  if (!window.firebase || !firebase.initializeApp) throw new Error('firebase_sdk_missing');
+  if (!FIREBASE_CONFIG || FIREBASE_CONFIG.apiKey === 'PASTE_ME') throw new Error('firebase_config_missing');
+  __fbApp = firebase.initializeApp(FIREBASE_CONFIG);
+  __db = firebase.database();
+}
+
+function genRoomCode() {
+  const chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for (let i = 0; i < 6; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+  return code;
+}
+
+function genPlayerId() {
+  return 'p_' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(2, 6);
+}
+
+function roomRef(roomCode) {
+  firebaseEnsureInit();
+  return __db.ref('rooms/' + String(roomCode).toUpperCase());
+}
+
+function onlineStartRealtime(roomCode, playerId) {
+  firebaseEnsureInit();
+  onlineStopRealtime();
+
+  const ref = roomRef(roomCode);
+  ONLINE.listeners.roomRef = ref;
+
+  const onVal = function(snap) {
+    const data = snap.val();
+    if (!data || !data.state) return;
+    onlineApplyViewState(data.state);
+  };
+  ref.on('value', onVal);
+  ONLINE.listeners.offRoom = function() { ref.off('value', onVal); };
+
+  const pRef = ref.child('presence/' + playerId);
+  pRef.set({ online: true, lastSeenAt: Date.now() });
+  pRef.onDisconnect().remove();
+
+  // heartbeat + lastActiveAt (best-effort)
+  ONLINE.listeners.heartbeatTimer = setInterval(function() {
+    if (!ONLINE.enabled) return;
+    pRef.update({ lastSeenAt: Date.now() }).catch(function(){});
+    ref.child('lastActiveAt').set(Date.now()).catch(function(){});
+  }, 5000);
+
+  // cleanup if room empty
+  ref.child('presence').on('value', function(ps) {
+    const v = ps.val();
+    if (!v || Object.keys(v).length === 0) {
+      ref.remove().catch(function(){});
+    }
+  });
+}
+
+function onlineStopRealtime() {
+  try { if (ONLINE.listeners.offRoom) ONLINE.listeners.offRoom(); } catch (_) {}
+  ONLINE.listeners.offRoom = null;
+  ONLINE.listeners.roomRef = null;
+  if (ONLINE.listeners.heartbeatTimer) clearInterval(ONLINE.listeners.heartbeatTimer);
+  ONLINE.listeners.heartbeatTimer = null;
+}
+
+function onlineIsHost() {
+  // Host is always the first player in server state (even in lobby where turnOrder is empty)
+  var myId = String(ONLINE.playerId || '');
+  return ONLINE.enabled && players && players.length && players[0] && String(players[0].id || '') === myId;
+}
+
+function onlineSaveSession() {
+  try {
+    sessionStorage.setItem('mb_roomCode', ONLINE.roomCode || '');
+    sessionStorage.setItem('mb_playerId', ONLINE.playerId || '');
+    sessionStorage.setItem('mb_version', String(ONLINE.version || 0));
+  } catch (_) {}
+}
+
+function onlineClearSession() {
+  try {
+    sessionStorage.removeItem('mb_roomCode');
+    sessionStorage.removeItem('mb_playerId');
+    sessionStorage.removeItem('mb_version');
+  } catch (_) {}
+}
+
+function onlineLoadSession() {
+  try {
+    const roomCode = sessionStorage.getItem('mb_roomCode') || '';
+    const playerId = sessionStorage.getItem('mb_playerId') || '';
+    const ver = Number(sessionStorage.getItem('mb_version') || 0) || 0;
+    if (roomCode && playerId) {
+      ONLINE.enabled = true;
+      ONLINE.roomCode = roomCode;
+      ONLINE.playerId = playerId;
+      ONLINE.version = ver;
+      return true;
+    }
+  } catch (_) {}
+  return false;
+}
+
+function openOnline() {
+  showScreen('screenOnline');
+}
+
+function closeOnline() {
+  showScreen('screenLanding');
+}
+
+// Apps Script polling helpers removed (Firebase realtime is used instead)
+
+function onlineApplyViewState(vs) {
+  if (!vs) return;
+  ONLINE.applyingRemote = true;
+  try {
+    const prevPhase = ONLINE.prev.phase;
+    const prevRound = ONLINE.prev.round;
+    const prevTurnIdx = ONLINE.prev.turnIdx;
+
+    mode = vs.mode || mode;
+    function asArray(v) {
+      if (Array.isArray(v)) return v;
+      if (v && typeof v === 'object') {
+        return Object.keys(v)
+          .filter(function(k) { return String(Number(k)) === k; })
+          .sort(function(a, b) { return Number(a) - Number(b); })
+          .map(function(k) { return v[k]; })
+          .filter(function(x) { return x != null; });
+      }
+      return [];
+    }
+    if (Array.isArray(vs.players)) {
+      var myId = String(ONLINE.playerId || '');
+      var hasMe = (myId && vs.players.some(function(pp) { return pp && String(pp.id || '') === myId; }));
+      if (ONLINE.enabled && !hasMe && !ONLINE.repairingMembership) {
+        ONLINE.repairingMembership = true;
+        setTimeout(function() {
+          try {
+            var nm = '';
+            try { nm = (sessionStorage.getItem('mb_playerName') || '').trim(); } catch (_) {}
+            if (!nm) nm = 'Joueur';
+            var newId = genPlayerId();
+            roomRef(ONLINE.roomCode).child('state').transaction(function(st) {
+              if (!st) return st;
+              st.players = st.players || [];
+              if (st.players.length >= 5) return st;
+              // Avoid duplicates if we somehow already exist.
+              if (st.players.some(function(pp2) { return pp2 && String(pp2.id || '') === String(ONLINE.playerId || ''); })) return st;
+              var color = COLORS[Math.min(COLORS.length - 1, st.players.length)];
+              st.players.push({
+                id: newId,
+                name: nm,
+                color: color,
+                picks: [[],[],[]],
+                rerollsLeft: 1,
+                hand: [],
+                drawnCard: null,
+                activePassives: [],
+                shieldedRound: false,
+                infiniteReroll: false,
+                banned: [],
+                secondLookArmed: false,
+                secondLookUsed: false,
+                doublePiocheArmed: false,
+                curatedPoolIds: null,
+                goodBoost: 0,
+                turnLog: [],
+                pendingSabotageBan: 0,
+                frozenTurns: 0,
+                rollRaw: 0,
+                rollDisplay: 0
+              });
+              return st;
+            }).then(function() {
+              ONLINE.playerId = newId;
+              onlineSaveSession();
+              showToast('🔄 Rejoint la room (session réparée).', 'success');
+              onlineStartRealtime(ONLINE.roomCode, newId);
+            }).catch(function() {
+              onlineLeaveRoom();
+            }).finally(function() {
+              ONLINE.repairingMembership = false;
+            });
+          } catch (_) {
+            ONLINE.repairingMembership = false;
+          }
+        }, 0);
+      }
+      players = vs.players.map(function(p) {
+        p = p || {};
+        // RTDB can deserialize arrays as objects (e.g. {0:...,1:...}). Convert safely.
+        var picksOuter = asArray(p.picks);
+        p.picks = [
+          asArray(picksOuter[0]),
+          asArray(picksOuter[1]),
+          asArray(picksOuter[2])
+        ];
+        if (!Array.isArray(p.hand)) p.hand = asArray(p.hand);
+        if (!Array.isArray(p.activePassives)) p.activePassives = [];
+        if (!Array.isArray(p.banned)) p.banned = [];
+        if (!Array.isArray(p.turnLog)) p.turnLog = asArray(p.turnLog);
+        if (!Array.isArray(p.publicTurnLog)) p.publicTurnLog = asArray(p.publicTurnLog);
+        if (typeof p.rerollsLeft !== 'number') p.rerollsLeft = 1;
+        if (typeof p.pendingSabotageBan !== 'number') p.pendingSabotageBan = 0;
+        if (typeof p.frozenTurns !== 'number') p.frozenTurns = 0;
+        if (typeof p.goodBoost !== 'number') p.goodBoost = 0;
+        if (typeof p.rollRaw !== 'number') p.rollRaw = 0;
+        if (typeof p.rollDisplay !== 'number') p.rollDisplay = 0;
+        if (!p.color) p.color = '#94a3b8';
+        if (!p.name) p.name = 'Joueur';
+
+        // Privacy in online: opponents should not see your drawn card or hand contents.
+        // Keep only the hand count for facedown rendering (store count explicitly).
+        if (ONLINE.enabled && p.id && String(p.id) !== myId) {
+          // Hide loot results from opponents (Personne/Action/Lieu)
+          p.pickCounts = [
+            (p.picks && p.picks[0]) ? p.picks[0].length : 0,
+            (p.picks && p.picks[1]) ? p.picks[1].length : 0,
+            (p.picks && p.picks[2]) ? p.picks[2].length : 0
+          ];
+          p.picks = [[], [], []];
+
+          var n = Array.isArray(p.hand) ? p.hand.length : 0;
+          p.handCount = n;
+          p.hand = [];
+          p.drawnCard = null;
+          // don't leak card names in history; keep public events only
+          p.turnLog = [];
+        }
+        return p;
+      });
+    }
+    if (Array.isArray(vs.entities)) {
+      // Merge optimistic entities (instant UI) until confirmed by server
+      const serverEntities = vs.entities;
+      const stillOptimistic = (ONLINE.optimistic.entities || []).filter(function(o) {
+        // keep optimistic for max 20s, and only if server doesn't already have it
+        if (!o || !o.createdAtMs) return false;
+        if (ONLINE.optimistic && ONLINE.optimistic.deletedTmpIds && ONLINE.optimistic.deletedTmpIds[o.tmpId]) return false;
+        if (Date.now() - o.createdAtMs > 20000) return false;
+        const exists = serverEntities.some(function(se) {
+          return se && se.name === o.name && se.category === o.category && !!se.good === !!o.good;
+        });
+        return !exists;
+      });
+      ONLINE.optimistic.entities = stillOptimistic;
+      entities = serverEntities.concat(stillOptimistic.map(function(o) {
+        return { id: o.tmpId, name: o.name, category: o.category, good: !!o.good, image: o.image || null };
+      }));
+    }
+    if (Array.isArray(vs.turnOrder)) {
+      // Server stores turnOrder as array of playerIds. UI expects full player objects.
+      ONLINE.turnOrderIds = vs.turnOrder.slice();
+      turnOrder = ONLINE.turnOrderIds
+        .map(function(pid) {
+          var spid = String(pid || '');
+          return (players || []).find(function(p) { return p && String(p.id || '') === spid; });
+        })
+        .filter(Boolean);
+    } else {
+      ONLINE.turnOrderIds = [];
+    }
+    orderPhaseIdx = vs.orderPhaseIdx || 0;
+    currentRound = vs.currentRound || 0;
+    currentTurnIdx = vs.currentTurnIdx || 0;
+    if (Array.isArray(vs.box)) box = vs.box;
+    currentEntity = vs.currentEntity || null;
+    currentEntityTs = Number(vs.currentEntityTs || 0) || 0;
+    firstEntity = vs.firstEntity || null;
+    hasRerolled = !!vs.hasRerolled;
+    blindedRound = (vs.blindedRound == null) ? null : vs.blindedRound;
+    blindedBy = (vs.blindedBy == null) ? null : vs.blindedBy;
+    blindedByPid = (vs.blindedByPid == null) ? null : String(vs.blindedByPid);
+    lastActiveCardId = vs.lastActiveCardId || null;
+    lastActiveCardPlayerId = vs.lastActiveCardPlayerId || null;
+    lastActiveCardData = vs.lastActiveCardData || null;
+    pending = vs.pending || null;
+    lastPassiveDraw = vs.lastPassiveDraw || null;
+    lastJackpotDraw = vs.lastJackpotDraw || null;
+
+    // Phase → screen routing
+    if (vs.phase === 'lobby') {
+      // reset order roll animation bookkeeping
+      ONLINE.prevOrderRolls = {};
+      if (ONLINE.orderRollAnim) {
+        Object.keys(ONLINE.orderRollAnim).forEach(function(pid) {
+          try { clearInterval(ONLINE.orderRollAnim[pid]); } catch (_) {}
+        });
+      }
+      ONLINE.orderRollAnim = {};
+      showScreen('screenSetup');
+      // Avoid flicker: only re-render if lobby lists changed
+      var pSig = (players || []).map(function(p) { return (p && p.id) ? p.id : ''; }).join(',');
+      var eSig = (entities || []).map(function(e) { return (e && e.id) ? e.id : ''; }).join(',');
+      var sig = 'lobby|' + pSig + '|' + eSig;
+      if (ONLINE.lastLobbySig !== sig) {
+        ONLINE.lastLobbySig = sig;
+        renderSetup();
+      }
+      document.getElementById('startBtn').textContent = onlineIsHost() ? '🚀 Lancer la partie (online)' : '⏳ En attente de l’hôte';
+      document.getElementById('startBtn').disabled = !onlineIsHost();
+    } else if (vs.phase === 'order') {
+      showScreen('screenTurnOrder');
+      // Avoid flicker: only re-render order cards when something actually changed.
+      var oSig = 'order|' +
+        (players || []).map(function(p) { return String(p && p.id || '') + ':' + String(p && p.rollDisplay || 0); }).join(',') +
+        '|idx:' + String(orderPhaseIdx || 0) +
+        '|to:' + String((ONLINE.turnOrderIds || []).length || 0);
+      if (ONLINE.lastOrderSig !== oSig) {
+        ONLINE.lastOrderSig = oSig;
+        renderOrderCards();
+      }
+      animateOrderRollsOnline();
+      updateOrderBtn();
+      // show final order automatically when available
+      if (ONLINE.turnOrderIds && ONLINE.turnOrderIds.length === players.length) {
+        document.getElementById('orderActions').style.display = 'none';
+        document.getElementById('finalOrder').style.display = '';
+        document.getElementById('finalOrder').className = 'final-order';
+        document.getElementById('finalOrder').innerHTML =
+          '<h3>Ordre de passage</h3>' +
+          '<div style="margin-bottom:1.5rem;display:flex;justify-content:center;flex-wrap:wrap">' +
+          ONLINE.turnOrderIds.map(function(pid, i) {
+            var spid = String(pid || '');
+            var p = players.find(function(pp) { return String(pp && pp.id || '') === spid; });
+            return '<div class="fo-item" style="animation-delay:' + (i * .1) + 's">' +
+              '<span class="fo-rank">#' + (i + 1) + '</span>' +
+              '<span class="fo-dot" style="background:' + (p ? p.color : '#999') + '"></span>' +
+              esc(p ? p.name : pid) +
+            '</div>';
+          }).join('') +
+          '</div>' +
+          (onlineIsHost()
+            ? '<div style="text-align:center"><button class="btn btn-gold" onclick="startGame()">⚔️ Commencer !</button></div>'
+            : '<p style="color:var(--text-dim);font-size:.82rem;text-align:center">En attente de l’hôte…</p>');
+      }
+    } else if (vs.phase === 'game') {
+      showScreen('screenGame');
+
+      // Online: the per-round inventory panel is redundant (sidebar already shows picks)
+      var invSec = document.getElementById('gameInventory');
+      if (invSec) invSec.style.display = ONLINE.enabled ? 'none' : '';
+
+      // Lightweight round transition overlay (no local state mutations)
+      var didRoundTransition = false;
+      if (prevPhase !== 'game' || prevRound !== currentRound) {
+        didRoundTransition = true;
+        var meta = ROUND_META[currentRound] || { emoji: '🎲', name: 'Round', desc: '' };
+        document.getElementById('roundEmoji').textContent = meta.emoji;
+        document.getElementById('roundNum').textContent = 'Round ' + (currentRound + 1) + ' / 3';
+        document.getElementById('roundTitle').textContent = meta.name;
+        document.getElementById('roundDesc').textContent = meta.desc;
+        document.getElementById('roundOverlay').classList.add('visible');
+        setTimeout(function() { document.getElementById('roundOverlay').classList.remove('visible'); }, 1200);
+      }
+
+      renderTopbar();
+      renderSidebar();
+      // Only current player can act; others see waiting message
+      var currentPid = (ONLINE.turnOrderIds || [])[currentTurnIdx];
+
+      // On any new turn, reset transient overlays so the sequence is consistent:
+      // Round modal -> Handoff modal -> Playable card -> Roll
+      if (prevPhase !== 'game' || prevTurnIdx !== currentTurnIdx || prevRound !== currentRound) {
+        ONLINE.lastSeenEntityId = null;
+        ONLINE.lastSeenDrawnCardId = null;
+        ONLINE.pendingHandoffKey = null;
+        // Don't re-open old "active card result" modals (Above average / Pioche sacrée)
+        // when the turn changes. Mark the current server key as already seen.
+        if (lastActiveCardId && lastActiveCardData && String(lastActiveCardPlayerId || '') === String(ONLINE.playerId || '')) {
+          ONLINE.lastSeenActiveKey = String(lastActiveCardId) + '|' + String(lastActiveCardData.ts || '');
+        } else {
+          ONLINE.lastSeenActiveKey = null;
+        }
+        cardDrawPending = false;
+        document.getElementById('revealOverlay').classList.remove('visible');
+        document.getElementById('cardDrawOverlay').classList.remove('visible');
+        // Prevent brief "old player's logs" flashing
+        var tc = document.getElementById('turnCardsContent');
+        if (tc) tc.innerHTML = '<p class="empty-state">—</p>';
+      }
+
+      if (currentPid && currentPid !== ONLINE.playerId) {
+        document.getElementById('gameRollBtn').style.display = '';
+        document.getElementById('gameRollBtn').disabled = true;
+        document.getElementById('rerollStatus').style.display = '';
+        var curP = players.find(function(pp) { return pp && pp.id === currentPid; });
+        document.getElementById('rerollStatus').textContent = 'C’est à ' + (curP ? curP.name : 'un joueur') + ' de jouer…';
+      } else {
+        document.getElementById('gameRollBtn').disabled = false;
+        document.getElementById('rerollStatus').style.display = 'none';
+      }
+      // Render center based on current player
+      var pl = players.find(function(pp) { return pp.id === currentPid; });
+      if (pl) {
+        // Handoff overlay on every new turn (everyone sees who plays)
+        if (prevPhase !== 'game' || prevRound !== currentRound || prevTurnIdx !== currentTurnIdx) {
+          // Avoid being hidden behind the round transition overlay
+          var key = String(currentRound) + ':' + String(currentTurnIdx);
+          if (ONLINE.pendingHandoffKey !== key) {
+            ONLINE.pendingHandoffKey = key;
+            setTimeout(function() {
+              // Only show if still same turn/round and still my turn
+              var curPidNow = (ONLINE.turnOrderIds || [])[currentTurnIdx];
+              if (!curPidNow) return;
+              var curPNow = players.find(function(pp) { return pp && pp.id === curPidNow; });
+              if (!curPNow) return;
+              showHandoff(curPNow);
+            }, didRoundTransition ? 1250 : 0);
+          }
+        }
+        renderTurnCenter(pl);
+        renderInventory(pl);
+        renderTurnCards(pl);
+      }
+
+      // Show drawn playable card overlay when server provides it
+      if (String(currentPid || '') === String(ONLINE.playerId || '') && pl && pl.drawnCard && pl.drawnCard.id) {
+        var dcid = String(pl.drawnCard.id);
+        if (ONLINE.lastSeenDrawnCardId !== dcid) {
+          ONLINE.lastSeenDrawnCardId = dcid;
+          cardDrawPending = true;
+          showCardDraw(pl, pl.drawnCard);
+        }
+      }
+
+      // Passive draw: show it too (display-only) even though it auto-activates server-side
+      if (ONLINE.enabled && lastPassiveDraw && String(lastPassiveDraw.pid || '') === String(ONLINE.playerId || '') && lastPassiveDraw.card && lastPassiveDraw.card.id) {
+        var pkey = String(lastPassiveDraw.card.id) + '|' + String(lastPassiveDraw.ts || '');
+        if (pkey && ONLINE.lastSeenPassiveDrawKey !== pkey) {
+          ONLINE.lastSeenPassiveDrawKey = pkey;
+          cardDrawPending = true;
+          showCardDraw(pl, lastPassiveDraw.card, { displayOnly: true, autoCloseMs: 900 });
+        }
+      }
+
+      // Jackpot: show the two drawn cards to the player (even if passives auto-activated)
+      if (ONLINE.enabled && lastJackpotDraw && String(lastJackpotDraw.pid || '') === String(ONLINE.playerId || '') && Array.isArray(lastJackpotDraw.cards)) {
+        var jk = String(lastJackpotDraw.ts || 0);
+        if (jk && ONLINE.lastSeenJackpotDrawKey !== jk) {
+          ONLINE.lastSeenJackpotDrawKey = jk;
+          showJackpotDraw(lastJackpotDraw.cards);
+        }
+      }
+
+      // If server set a currentEntity for my turn, open reveal overlay once
+      if (String(currentPid || '') === String(ONLINE.playerId || '')) {
+        const eid = currentEntity && currentEntity.id ? String(currentEntity.id) : null;
+        var ek = eid ? (eid + '|' + String(currentEntityTs || 0)) : null;
+        if (ek && ONLINE.lastSeenEntityId !== ek) {
+          ONLINE.lastSeenEntityId = ek;
+          // If we initiated a reroll, show the reroll animation before reveal.
+          var wantRerollReveal = (ONLINE.rollAnim && ONLINE.rollAnim.mode === 'reroll');
+          var minMs = wantRerollReveal ? 520 : 0;
+          var elapsed = ONLINE.rollAnim && ONLINE.rollAnim.startedAt ? (Date.now() - ONLINE.rollAnim.startedAt) : 0;
+          var waitMs = Math.max(50, minMs - elapsed);
+          setTimeout(function() {
+            stopOnlineGameRollAnim();
+            showReveal(wantRerollReveal);
+          }, waitMs);
+        }
+        if (!eid) ONLINE.lastSeenEntityId = null;
+      }
+
+      // If server published an active-card resolution targeted at me, show the matching UI once.
+      if (ONLINE.enabled && lastActiveCardId && String(lastActiveCardPlayerId || '') === String(ONLINE.playerId || '')) {
+        var ak = String(lastActiveCardId) + '|' + String((lastActiveCardData && lastActiveCardData.ts) || '');
+        if (ak && ONLINE.lastSeenActiveKey !== ak) {
+          ONLINE.lastSeenActiveKey = ak;
+          if (lastActiveCardId === 'above_average' && lastActiveCardData && typeof lastActiveCardData.score === 'number') {
+            showAboveAverageFromServer(lastActiveCardData.score, !!lastActiveCardData.ok);
+          } else if (lastActiveCardId === 'pioche_sacree' && lastActiveCardData && typeof lastActiveCardData.score === 'number') {
+            showPiocheSacreeFromServer(lastActiveCardData.score, Array.isArray(lastActiveCardData.allowed) ? lastActiveCardData.allowed : []);
+          }
+        }
+      }
+
+      // Waiting players see "X a joué Y" for active cards (1s center modal)
+      // Not shown to the player who played it, nor the current active player (if different).
+      if (ONLINE.enabled && lastActiveCardId && lastActiveCardPlayerId &&
+          String(lastActiveCardPlayerId || '') !== String(ONLINE.playerId || '') &&
+          String(currentPid || '') !== String(ONLINE.playerId || '')) {
+        // Above average / Pioche sacrée: don't broadcast "played" while the picker is still pending,
+        // otherwise others see it even if the player cancels before confirming.
+        if ((lastActiveCardId === 'above_average' || lastActiveCardId === 'pioche_sacree') &&
+            pending && (pending.type === 'above_average_picker' || pending.type === 'pioche_sacree_picker') &&
+            String(pending.byPid || '') === String(lastActiveCardPlayerId || '')) {
+          // skip
+        } else {
+        var cmeta2 = PLAYABLE_CARDS.find(function(c) { return c && c.id === String(lastActiveCardId); });
+        if (cmeta2 && cmeta2.type === 'active') {
+          var ts2 = (lastActiveCardData && lastActiveCardData.ts) ? lastActiveCardData.ts : 0;
+          var gk = String(lastActiveCardId) + '|' + String(lastActiveCardPlayerId) + '|' + String(ts2);
+          if (gk && ONLINE.lastSeenGlobalPlayKey !== gk) {
+            ONLINE.lastSeenGlobalPlayKey = gk;
+            var pn = 'Un joueur';
+            var pp2 = players.find(function(pp) { return pp && String(pp.id || '') === String(lastActiveCardPlayerId || ''); });
+            if (pp2 && pp2.name) pn = pp2.name;
+            showPlayedCardToast(pn, cmeta2, lastActiveCardData || null);
+          }
+        }
+        }
+      }
+
+      // Pending choice requested by server (interactive cards)
+      if (ONLINE.enabled && pending && pending.byPid && String(pending.byPid) === String(ONLINE.playerId || '')) {
+        var pk = String(pending.type || '') + '|' + String(pending.ts || '');
+        if (pk && ONLINE.lastSeenPendingKey !== pk) {
+          ONLINE.lastSeenPendingKey = pk;
+          var mep = players.find(function(pp) { return pp && String(pp.id || '') === String(ONLINE.playerId || ''); }) || null;
+          if (pending.type === 'eliminate3') showEliminate();
+          else if (pending.type === 'petit_sabotage') showPetitSabotage(mep);
+          else if (pending.type === 'pioche_sacree_picker') {
+            // Show the roll first; button opens the picker
+            if (lastActiveCardData && lastActiveCardData.kind === 'pioche_sacree' && typeof lastActiveCardData.score === 'number') {
+              showPiocheSacreeFromServer(lastActiveCardData.score, Array.isArray(lastActiveCardData.allowed) ? lastActiveCardData.allowed : []);
+            } else {
+              showPiocheSacreeFromServer(0, pending.allowedRarities || []);
+            }
+          }
+          else if (pending.type === 'above_average_picker') {
+            if (lastActiveCardData && lastActiveCardData.kind === 'above_average' && typeof lastActiveCardData.score === 'number') {
+              showAboveAverageFromServer(lastActiveCardData.score, !!lastActiveCardData.ok);
+            }
+          }
+          else if (pending.type === 'fifty') showFiftyPicker(mep);
+          else if (pending.type === 'nostalgie') showNostalgie(mep);
+          else if (pending.type === 'exchange') showExchange(mep);
+          else if (pending.type === 'vol_main') showVolDeMain(mep);
+          else if (pending.type === 'gel') showGel(mep);
+          else if (pending.type === 'partage') showPartage(mep);
+          else if (pending.type === 'couronne') showCouronne(mep);
+          else if (pending.type === 'echange_de_corps') showEchangeDeCorps(mep);
+          else if (pending.type === 'second_regard_choice' && pending.a && pending.b) {
+            showChoiceTwo(mep, pending.a, pending.b, '👀 Second regard', 'Choisis lequel garder');
+          }
+          else if (pending.type === 'double_pioche_choice' && pending.a && pending.b) {
+            showChoiceTwo(mep, pending.a, pending.b, '🎴 Double pioche', 'Choisis lequel garder');
+          }
+          else if (pending.type === 'round1_pick2of4' && Array.isArray(pending.cards)) {
+            showRound1Pick2of4(pending.cards);
+          }
+        }
+      }
+    } else if (vs.phase === 'summary') {
+      showScreen('screenSummary');
+      endGame();
+    }
+
+    ONLINE.prev.phase = vs.phase || null;
+    ONLINE.prev.round = currentRound;
+    // Only track turnIdx while in game to avoid missing the first handoff (order screen has currentTurnIdx=0 too)
+    ONLINE.prev.turnIdx = (vs.phase === 'game') ? currentTurnIdx : null;
+  } finally {
+    ONLINE.applyingRemote = false;
+  }
+}
+
+function showPlayedCardToast(playerName, card, meta) {
+  var el = document.getElementById('playedToast');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'playedToast';
+    el.className = 'played-toast';
+    el.innerHTML =
+      '<div class="played-toast-card">' +
+        '<div class="played-toast-card-inner">' +
+          '<div class="played-toast-rarity" id="playedToastRarity">Carte jouée</div>' +
+          '<div class="played-toast-hero" id="playedToastHero">🃏</div>' +
+          '<div class="played-toast-line" id="playedToastLine"></div>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(el);
+  }
+  var rarity = card && card.rarity ? String(card.rarity) : '';
+  var rm = (rarity && RARITY_META[rarity]) ? RARITY_META[rarity] : null;
+  var rarityEl = document.getElementById('playedToastRarity');
+  rarityEl.textContent = rm ? rm.label : 'Carte jouée';
+  rarityEl.style.color = rm ? rm.color : 'var(--text-dim)';
+  rarityEl.style.borderColor = rm ? rm.color : 'rgba(255,255,255,.12)';
+
+  var rr = (rarity ? ('rarity-' + rarity) : '');
+  var hero = document.getElementById('playedToastHero');
+  hero.className = 'played-toast-hero ' + rr;
+  hero.textContent = card && card.emoji ? card.emoji : '🃏';
+
+  var extra = '';
+  if (meta && meta.targetName) extra = ' sur <b>' + esc(String(meta.targetName)) + '</b>';
+  document.getElementById('playedToastLine').innerHTML =
+    '<b>' + esc(String(playerName || 'Un joueur')) + '</b> a joué <b>' + esc(card && card.name ? card.name : 'une carte') + '</b>' + extra;
+  el.classList.add('visible');
+  clearTimeout(window.__playedToastT);
+  window.__playedToastT = setTimeout(function() { el.classList.remove('visible'); }, 1800);
+}
+
+function showJackpotDraw(cards) {
+  cards = Array.isArray(cards) ? cards.filter(Boolean) : [];
+  if (!cards.length) return;
+  // Always show exactly 2 slots (Jackpot), but be defensive.
+  var c1 = cards[0] || null;
+  var c2 = cards[1] || null;
+  var html =
+    '<h3 style="margin-bottom:.25rem">🎰 Jackpot</h3>' +
+    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.9rem">Tes 2 cartes bonus apparaissent devant toi</p>' +
+    '<div class="jackpot-stage is-columns">' +
+      (c1 ? (
+        '<div class="jackpot-card is-left">' +
+          cardMiniHtml(c1) +
+          '<div class="jackpot-meta">' +
+            ((c1.type === 'passive')
+              ? '<span class="jackpot-tag passive">passive · auto</span>'
+              : '<span class="jackpot-tag temp">à jouer ce tour</span>') +
+          '</div>' +
+        '</div>'
+      ) : '') +
+      (c2 ? (
+        '<div class="jackpot-card is-right" style="animation-delay:.06s">' +
+          cardMiniHtml(c2) +
+          '<div class="jackpot-meta">' +
+            ((c2.type === 'passive')
+              ? '<span class="jackpot-tag passive">passive · auto</span>'
+              : '<span class="jackpot-tag temp">à jouer ce tour</span>') +
+          '</div>' +
+        '</div>'
+      ) : '') +
+    '</div>' +
+    '<button class="btn btn-gold" onclick="closeActionOverlay()">OK</button>';
+  openActionOverlay(html);
+}
+
+function startOrderRollAnim(pid) {
+  pid = String(pid || '');
+  if (!pid) return;
+  if (ONLINE.orderRollAnim && ONLINE.orderRollAnim[pid]) return;
+  ONLINE.orderRollAnim[pid] = setInterval(function() {
+    // Re-grab element each tick because the order cards can be re-rendered
+    // by realtime updates (otherwise the interval would update a detached node).
+    var el = document.getElementById('ocRoll_' + pid);
+    if (!el) return;
+    el.classList.add('rolling');
+    el.textContent = Math.floor(Math.random() * 100) + 1;
+  }, 55);
+}
+
+function stopOrderRollAnim(pid, finalValue) {
+  pid = String(pid || '');
+  var el = document.getElementById('ocRoll_' + pid);
+  var card = document.getElementById('oc_' + pid);
+  if (ONLINE.orderRollAnim && ONLINE.orderRollAnim[pid]) {
+    try { clearInterval(ONLINE.orderRollAnim[pid]); } catch (_) {}
+    delete ONLINE.orderRollAnim[pid];
+  }
+  if (el) {
+    el.classList.remove('rolling');
+    el.textContent = (finalValue && Number(finalValue) > 0) ? String(finalValue) : '—';
+  }
+  if (card && finalValue && Number(finalValue) > 0) card.classList.add('rolled');
+}
+
+function animateOrderRollsOnline() {
+  if (!ONLINE.enabled) return;
+  (players || []).forEach(function(p) {
+    if (!p || !p.id) return;
+    var pid = String(p.id || '');
+    var val = Number(p.rollDisplay || 0) || 0;
+    var prev = Number(ONLINE.prevOrderRolls[pid] || 0) || 0;
+    if (val > 0 && prev <= 0) {
+      startOrderRollAnim(pid);
+      setTimeout(function() { stopOrderRollAnim(pid, val); }, 520);
+    } else if (val > 0 && prev > 0 && val !== prev) {
+      // rare, but animate update
+      startOrderRollAnim(pid);
+      setTimeout(function() { stopOrderRollAnim(pid, val); }, 420);
+    } else if (val <= 0 && prev > 0) {
+      stopOrderRollAnim(pid, 0);
+    }
+    ONLINE.prevOrderRolls[pid] = val;
+  });
+}
+
+function startOnlineGameRollAnim(mode) {
+  if (!ONLINE.enabled) return;
+  stopOnlineGameRollAnim();
+  ONLINE.rollAnim.mode = mode || 'roll';
+  ONLINE.rollAnim.startedAt = Date.now();
+  var diceEl = document.getElementById('gameDice');
+  if (diceEl) diceEl.classList.add('rolling');
+  var status = document.getElementById('rerollStatus');
+  if (status) {
+    status.style.display = (ONLINE.rollAnim.mode === 'reroll') ? '' : 'none';
+    if (ONLINE.rollAnim.mode === 'reroll') status.textContent = 'Relance en cours…';
+  }
+  ONLINE.rollAnim.iv = setInterval(function() {
+    var d = document.getElementById('gameDice');
+    if (!d) return;
+    d.textContent = Math.floor(Math.random() * 100) + 1;
+  }, 65);
+}
+
+function stopOnlineGameRollAnim() {
+  if (ONLINE.rollAnim && ONLINE.rollAnim.iv) {
+    try { clearInterval(ONLINE.rollAnim.iv); } catch (_) {}
+  }
+  if (ONLINE.rollAnim) ONLINE.rollAnim.iv = null;
+  var diceEl = document.getElementById('gameDice');
+  if (diceEl) diceEl.classList.remove('rolling');
+  var status = document.getElementById('rerollStatus');
+  if (status && (ONLINE.rollAnim.mode === 'reroll')) status.style.display = 'none';
+  if (ONLINE.rollAnim) ONLINE.rollAnim.mode = null;
+}
+
+function onlineStartPolling() {
+  // Firebase mode: no polling (realtime listeners)
+}
+
+function createRoomOnline(m) {
+  onlineLeaveRoom();
+
+  const name = (document.getElementById('onlineHostName').value || '').trim() || 'Hôte';
+  const roomCode = genRoomCode();
+  const playerId = genPlayerId();
+  const color = COLORS[0];
+
+  var btns = Array.from(document.querySelectorAll('#screenOnline button[onclick^="createRoomOnline"]'));
+  btns.forEach(function(b) { b.disabled = true; b.style.opacity = .6; });
+  document.getElementById('onlineCreateInfo').textContent = 'Création de la room…';
+
+  try {
+    firebaseEnsureInit();
+  } catch (err) {
+    showToast('Firebase: ' + String(err.message || err), 'danger');
+    document.getElementById('onlineCreateInfo').textContent = '';
+    btns.forEach(function(b) { b.disabled = false; b.style.opacity = ''; });
+    return;
+  }
+
+  const ref = roomRef(roomCode);
+  const state = {
+    roomCode,
+    mode: (m === 'chaos') ? 'chaos' : 'normal',
+    phase: 'lobby',
+    entities: [],
+    pending: null,
+    lastPassiveDraw: null,
+      lastJackpotDraw: null,
+    players: [{
+      id: playerId,
+      name: name,
+      color: color,
+      picks: [[],[],[]],
+      rerollsLeft: 1,
+      hand: [],
+      drawnCard: null,
+      activePassives: [],
+      shieldedRound: false,
+      infiniteReroll: false,
+      banned: [],
+      secondLookArmed: false,
+      secondLookUsed: false,
+      doublePiocheArmed: false,
+      curatedPoolIds: null,
+      goodBoost: 0,
+      turnLog: [],
+      pendingSabotageBan: 0,
+      frozenTurns: 0,
+      rollRaw: 0,
+      rollDisplay: 0
+    }],
+    turnOrder: [],
+    orderPhaseIdx: 0,
+    currentRound: 0,
+    currentTurnIdx: 0,
+    box: [],
+    currentEntity: null,
+    currentEntityTs: 0,
+    firstEntity: null,
+    hasRerolled: false,
+    blindedRound: null,
+    blindedBy: null,
+    blindedByPid: null,
+    lastActiveCardId: null,
+    lastActiveCardPlayerId: null,
+    lastActiveCardData: null,
+    lastPassiveDraw: null,
+    lastJackpotDraw: null
+  };
+
+  ref.set({ createdAt: Date.now(), lastActiveAt: Date.now(), hostId: playerId, state: state })
+    .then(function() {
+      ONLINE.enabled = true;
+      ONLINE.roomCode = roomCode;
+      ONLINE.playerId = playerId;
+      ONLINE.version = 1;
+      try { sessionStorage.setItem('mb_playerName', name); } catch (_) {}
+      onlineSaveSession();
+      document.getElementById('onlineCreateInfo').innerHTML = '✅ Room créée : <b>' + esc(roomCode) + '</b>';
+      showToast('Room créée: ' + roomCode, 'success');
+      onlineStartRealtime(roomCode, playerId);
+    })
+    .catch(function(err) {
+      showToast('Firebase: ' + String(err.message || err), 'danger');
+      document.getElementById('onlineCreateInfo').textContent = '';
+    })
+    .finally(function() {
+      btns.forEach(function(b) { b.disabled = false; b.style.opacity = ''; });
+    });
+}
+
+function joinRoomOnline() {
+  onlineLeaveRoom();
+
+  const name = (document.getElementById('onlineJoinName').value || '').trim();
+  const roomCode = (document.getElementById('onlineRoomCode').value || '').toUpperCase().trim();
+  if (!name || !roomCode) return showToast('Nom + code room requis', 'danger');
+
+  var joinBtn = document.querySelector('#screenOnline button[onclick="joinRoomOnline()"]');
+  if (joinBtn) { joinBtn.disabled = true; joinBtn.style.opacity = .6; }
+  document.getElementById('onlineJoinInfo').textContent = 'Connexion…';
+
+  try {
+    firebaseEnsureInit();
+  } catch (err) {
+    showToast('Firebase: ' + String(err.message || err), 'danger');
+    document.getElementById('onlineJoinInfo').textContent = '';
+    if (joinBtn) { joinBtn.disabled = false; joinBtn.style.opacity = ''; }
+    return;
+  }
+
+  const playerId = genPlayerId();
+  const ref = roomRef(roomCode);
+
+  ref.get()
+    .then(function(snap) {
+      const data = snap.val();
+      if (!data || !data.state) throw new Error('room_not_found');
+      const st = data.state;
+      st.players = st.players || [];
+      if (st.players.length >= 5) throw new Error('room_full');
+      if (typeof st.pending === 'undefined') st.pending = null;
+      const color = COLORS[Math.min(COLORS.length - 1, st.players.length)];
+      st.players.push({
+        id: playerId,
+        name: name,
+        color: color,
+        picks: [[],[],[]],
+        rerollsLeft: 1,
+        hand: [],
+        drawnCard: null,
+        activePassives: [],
+        shieldedRound: false,
+        infiniteReroll: false,
+        banned: [],
+        secondLookArmed: false,
+        secondLookUsed: false,
+        doublePiocheArmed: false,
+        curatedPoolIds: null,
+        goodBoost: 0,
+        turnLog: [],
+        pendingSabotageBan: 0,
+        frozenTurns: 0,
+        rollRaw: 0,
+        rollDisplay: 0
+      });
+      return ref.child('state').set(st);
+    })
+    .then(function() {
+      ONLINE.enabled = true;
+      ONLINE.roomCode = roomCode;
+      ONLINE.playerId = playerId;
+      ONLINE.version = 1;
+      try { sessionStorage.setItem('mb_playerName', name); } catch (_) {}
+      onlineSaveSession();
+      document.getElementById('onlineJoinInfo').textContent = '✅ Connecté à ' + roomCode;
+      showToast('Rejoint: ' + roomCode, 'success');
+      onlineStartRealtime(roomCode, playerId);
+    })
+    .catch(function(err) {
+      showToast('Firebase: ' + String(err.message || err), 'danger');
+      document.getElementById('onlineJoinInfo').textContent = '';
+    })
+    .finally(function() {
+      if (joinBtn) { joinBtn.disabled = false; joinBtn.style.opacity = ''; }
+    });
+}
+
+function onlineAction(action, payload) {
+  firebaseEnsureInit();
+  const ref = roomRef(ONLINE.roomCode).child('state');
+  return ref.transaction(function(st) {
+    if (!st) return st;
+    // Minimal subset for now
+    if (action === 'host:resetRoom') {
+      if (!st.players || !st.players.length || String(st.players[0].id || '') !== String(ONLINE.playerId || '')) return st;
+      // Reset to lobby but keep players + entities
+      st.phase = 'lobby';
+      st.orderPhaseIdx = 0;
+      st.turnOrder = [];
+      st.currentRound = 0;
+      st.currentTurnIdx = 0;
+      st.box = [];
+      st.currentEntity = null;
+      st.currentEntityTs = 0;
+      st.firstEntity = null;
+      st.hasRerolled = false;
+      st.turnSetupPid = null;
+      st.pending = null;
+      st.blindedRound = null;
+      st.blindedBy = null;
+      st.blindedByPid = null;
+      st.lastActiveCardId = null;
+      st.lastActiveCardPlayerId = null;
+      st.lastActiveCardData = null;
+      st.lastPassiveDraw = null;
+      st.lastJackpotDraw = null;
+      (st.players || []).forEach(function(p) {
+        if (!p) return;
+        p.picks = [[], [], []];
+        p.rerollsLeft = 1;
+        p.hand = [];
+        p.drawnCard = null;
+        p.activePassives = [];
+        p.shieldedRound = false;
+        p.infiniteReroll = false;
+        p.banned = [];
+        p.secondLookArmed = false;
+        p.secondLookUsed = false;
+        p.doublePiocheArmed = false;
+        p.curatedPoolIds = null;
+        p.goodBoost = 0;
+        p.turnLog = [];
+        p.publicTurnLog = [];
+        p.pendingSabotageBan = 0;
+        p.frozenTurns = 0;
+        p.rollRaw = 0;
+        p.rollDisplay = 0;
+        p.lastPlayableDrawRound = -1;
+      });
+      return st;
+    }
+    if (action === 'host:addEntity') {
+      if (!st.players || !st.players.length || String(st.players[0].id || '') !== String(ONLINE.playerId || '')) return st;
+      if (st.phase !== 'lobby') return st;
+      st.entities = st.entities || [];
+      st.entities.push({ id: 'e_' + Date.now() + '_' + Math.floor(Math.random() * 1000), name: payload.name, category: payload.category, good: !!payload.good, image: payload.image || null });
+      return st;
+    }
+    if (action === 'host:removeEntity') {
+      if (!st.players || !st.players.length || String(st.players[0].id || '') !== String(ONLINE.playerId || '')) return st;
+      if (st.phase !== 'lobby') return st;
+      st.entities = (st.entities || []).filter(function(e) { return e.id !== payload.id; });
+      return st;
+    }
+    if (action === 'host:startOrder') {
+      if (!st.players || !st.players.length || String(st.players[0].id || '') !== String(ONLINE.playerId || '')) return st;
+      if (st.phase !== 'lobby') return st;
+      st.phase = 'order';
+      st.orderPhaseIdx = 0;
+      st.turnOrder = [];
+      (st.players || []).forEach(function(p) { p.rollRaw = 0; p.rollDisplay = 0; });
+      return st;
+    }
+    if (action === 'order:roll') {
+      if (st.phase !== 'order') return st;
+      const idx = Number(st.orderPhaseIdx || 0);
+      const p = (st.players || [])[idx];
+      if (!p || String(p.id || '') !== String(ONLINE.playerId || '')) return st;
+      const raw = Math.random();
+      const display = Math.floor(raw * 100) + 1;
+      p.rollRaw = raw;
+      p.rollDisplay = display;
+      st.orderPhaseIdx = idx + 1;
+      if (st.orderPhaseIdx >= (st.players || []).length) {
+        st.turnOrder = st.players.slice().sort(function(a, b) { return (b.rollRaw || 0) - (a.rollRaw || 0); }).map(function(pp) { return pp.id; });
+      }
+      return st;
+    }
+    if (action === 'host:startGame') {
+      if (!st.players || !st.players.length || String(st.players[0].id || '') !== String(ONLINE.playerId || '')) return st;
+      if (st.phase !== 'order') return st;
+      if (!st.turnOrder || st.turnOrder.length !== (st.players || []).length) return st;
+      st.phase = 'game';
+      st.currentRound = 0;
+      st.currentTurnIdx = 0;
+      st.box = (st.entities || []).map(function(e) { return { id: e.id, name: e.name, image: e.image || null, emoji: null, category: e.category, good: !!e.good }; });
+      st.currentEntity = null;
+      st.currentEntityTs = 0;
+      st.firstEntity = null;
+      st.hasRerolled = false;
+      st.turnSetupPid = null;
+      st.pending = null;
+      st.lastActiveCardId = null;
+      st.lastActiveCardPlayerId = null;
+      st.lastActiveCardData = null;
+      st.lastPassiveDraw = null;
+      st.lastJackpotDraw = null;
+      return st;
+    }
+
+    function currentPid() {
+      return (st.turnOrder || [])[Number(st.currentTurnIdx || 0)];
+    }
+    function currentPlayer() {
+      const pid = currentPid();
+      var spid = String(pid || '');
+      return (st.players || []).find(function(pp) { return pp && String(pp.id || '') === spid; }) || null;
+    }
+    function isMyTurn() {
+      return String(currentPid() || '') === String(ONLINE.playerId || '');
+    }
+    function getPlayerBoxFromState(p) {
+      const banned = (p && p.banned) ? p.banned : [];
+      var b = (st.box || []).filter(function(e) { return banned.indexOf(e.id) === -1; });
+      if (p && Array.isArray(p.curatedPoolIds) && p.curatedPoolIds.length > 0) {
+        b = b.filter(function(e) { return p.curatedPoolIds.indexOf(e.id) >= 0; });
+      }
+      return b;
+    }
+    function resetTurnFlags() {
+      st.currentEntity = null;
+      st.currentEntityTs = 0;
+      st.firstEntity = null;
+      st.hasRerolled = false;
+    }
+
+    function pushTurnLog(p, card, kind) {
+      if (!p) return;
+      p.turnLog = Array.isArray(p.turnLog) ? p.turnLog : [];
+      p.publicTurnLog = Array.isArray(p.publicTurnLog) ? p.publicTurnLog : [];
+      p.turnLog.unshift({
+        ts: Date.now(),
+        kind: kind,
+        id: card && card.id ? card.id : null,
+        name: card && card.name ? card.name : '',
+        emoji: card && card.emoji ? card.emoji : '🃏',
+        desc: card && card.desc ? card.desc : ''
+      });
+      if (p.turnLog.length > 6) p.turnLog.length = 6;
+
+      // Public redacted log (no card names/descriptions)
+      p.publicTurnLog.unshift({
+        ts: Date.now(),
+        kind: kind
+      });
+      if (p.publicTurnLog.length > 6) p.publicTurnLog.length = 6;
+    }
+
+    function ensureTurnSetup() {
+      const pid = currentPid();
+      if (!pid) return;
+      if (st.turnSetupPid === pid) return;
+      const p = currentPlayer();
+      if (!p) return;
+      // Reset per-turn fields (match beginTurn intent)
+      p.infiniteReroll = false;
+      p.activePassives = [];
+      p.secondLookArmed = false;
+      p.secondLookUsed = false;
+      p.doublePiocheArmed = false;
+      p.curatedPoolIds = null;
+      p.goodBoost = 0;
+      p.turnLog = [];
+      // IMPORTANT: do not decrement frozenTurns at start of the turn.
+      // Frozen means "can't play cards during your next turn", so we decrement at end of that turn.
+      resetTurnFlags();
+      // 1 playable card per ROUND (not per turn)
+      // Track which round the player already received their drawnCard.
+      if (typeof p.lastPlayableDrawRound !== 'number') p.lastPlayableDrawRound = -1;
+      if (p.lastPlayableDrawRound !== Number(st.currentRound || 0)) {
+        // Round 1 special: show 4 choices, player picks 2 (online)
+        if (Number(st.currentRound || 0) === 0) {
+          // Build 4-card offer (try to avoid duplicates)
+          var offer = [];
+          var tries = 0;
+          while (offer.length < 4 && tries < 40) {
+            tries++;
+            var c = drawCard();
+            if (!c || !c.id) continue;
+            if (offer.some(function(x) { return x && x.id === c.id; })) continue;
+            offer.push(c);
+          }
+          // Fallback if duplicates prevented filling
+          while (offer.length < 4) offer.push(drawCard());
+          // Don't draw the usual single drawnCard; instead require selection.
+          p.drawnCard = null;
+          ensurePending('round1_pick2of4', { cards: offer, maxPick: 2 });
+          // We'll mark lastPlayableDrawRound only after confirmation.
+        } else {
+          p.drawnCard = drawCard();
+          // Passive draws auto-apply immediately (no user action)
+          if (p.drawnCard && p.drawnCard.type === 'passive') {
+            var passiveTs = Date.now();
+            st.lastPassiveDraw = { pid: String(p.id || ''), card: p.drawnCard, ts: passiveTs };
+            applyPassiveEffect(p, p.drawnCard);
+            pushTurnLog(p, p.drawnCard, 'activated');
+            st.lastActiveCardId = p.drawnCard.id || null;
+            st.lastActiveCardPlayerId = String(p.id || '');
+            st.lastActiveCardData = { ts: passiveTs };
+            p.drawnCard = null;
+          }
+          p.lastPlayableDrawRound = Number(st.currentRound || 0);
+        }
+      } else {
+        // Keep existing drawnCard/hand state; no new draw this round
+        if (p.drawnCard == null) p.drawnCard = null;
+      }
+      st.turnSetupPid = pid;
+    }
+
+    if (action === 'turn:ready') {
+      if (st.phase !== 'game') return st;
+      if (!isMyTurn()) return st;
+      ensureTurnSetup();
+      // Log the drawn card (private; other clients don't display opponent logs)
+      const p = currentPlayer();
+      if (p && p.drawnCard) pushTurnLog(p, p.drawnCard, 'drawn');
+      return st;
+    }
+
+    if (action === 'turn:round1_pick2of4') {
+      if (st.phase !== 'game') return st;
+      if (!isMyTurn()) return st;
+      const p = currentPlayer();
+      if (!p) return st;
+      if (Number(st.currentRound || 0) !== 0) return st;
+      if (!st.pending || st.pending.type !== 'round1_pick2of4') return st;
+      var cards = Array.isArray(st.pending.cards) ? st.pending.cards : [];
+      var chosen = payload && Array.isArray(payload.cardIds) ? payload.cardIds.map(String) : [];
+      chosen = chosen.filter(function(id, idx) { return id && chosen.indexOf(id) === idx; });
+      if (chosen.length !== 2) return st;
+      var picked = cards.filter(function(c) { return c && chosen.indexOf(String(c.id || '')) >= 0; });
+      if (picked.length !== 2) return st;
+      p.hand = Array.isArray(p.hand) ? p.hand : [];
+      picked.forEach(function(c) {
+        if (!c) return;
+        if (c.type === 'passive') {
+          applyPassiveEffect(p, c);
+          pushTurnLog(p, c, 'activated');
+          // Optional: allow client to display the passive draw (display-only).
+          // Round1 already shows the card in the draft UI, but keeping parity doesn't hurt.
+          st.lastPassiveDraw = { pid: String(p.id || ''), card: c, ts: Date.now() };
+        } else {
+          p.hand.push(c);
+          pushTurnLog(p, c, 'gained');
+        }
+      });
+      p.lastPlayableDrawRound = 0;
+      clearPending();
+      return st;
+    }
+
+    if (action === 'turn:roll') {
+      if (st.phase !== 'game') return st;
+      if (!isMyTurn()) return st;
+      if (st.currentEntity) return st;
+      const p = currentPlayer();
+      if (!p) return st;
+      const pBox = getPlayerBoxFromState(p);
+      if (!pBox.length) return st;
+      var picked = pBox[Math.floor(Math.random() * pBox.length)];
+      // Passive force (25%) and chance boost can alter rolls (offline parity)
+      function applyPassiveForceServer(player, rolledEntity) {
+        if (Number(st.currentRound || 0) === 0) return rolledEntity;
+        var personPick = player.picks && player.picks[0] && player.picks[0].length ? player.picks[0][0] : null;
+        var hasForceBad = (player.activePassives || []).indexOf('force_bad') >= 0;
+        var hasForceGood = (player.activePassives || []).indexOf('force_good') >= 0;
+        if (!hasForceBad && !hasForceGood) return rolledEntity;
+        if (Math.random() > 0.25) return rolledEntity;
+        var wantGood;
+        if (hasForceBad) wantGood = personPick && !personPick.good ? true : false;
+        else wantGood = personPick && !personPick.good ? false : true;
+        var pb = getPlayerBoxFromState(player);
+        var filtered = pb.filter(function(e) { return typeof e.good === 'boolean' && e.good === wantGood && e.id !== rolledEntity.id; });
+        if (!filtered.length) return rolledEntity;
+        return filtered[Math.floor(Math.random() * filtered.length)];
+      }
+      function applyGoodBoostServer(player, rolledEntity) {
+        var gb = Number(player.goodBoost || 0) || 0;
+        if (gb <= 0) return rolledEntity;
+        if (Number(st.currentRound || 0) === 0) return rolledEntity;
+        if (Math.random() > gb) return rolledEntity;
+        var personPick = player.picks && player.picks[0] && player.picks[0].length ? player.picks[0][0] : null;
+        if (!personPick || typeof personPick.good !== 'boolean') return rolledEntity;
+        var wantGood = !!personPick.good;
+        var pb = getPlayerBoxFromState(player);
+        var filtered = pb.filter(function(e) { return typeof e.good === 'boolean' && e.good === wantGood && e.id !== rolledEntity.id; });
+        if (!filtered.length) return rolledEntity;
+        return filtered[Math.floor(Math.random() * filtered.length)];
+      }
+      picked = applyPassiveForceServer(p, picked);
+      picked = applyGoodBoostServer(p, picked);
+      if (p.doublePiocheArmed && pBox.length >= 2) {
+        p.doublePiocheArmed = false;
+        var other = pBox[Math.floor(Math.random() * pBox.length)];
+        if (other && picked && other.id === picked.id && pBox.length > 1) {
+          other = pBox.find(function(x) { return x && x.id !== picked.id; }) || other;
+        }
+        // No elimination; player chooses which result to keep.
+        ensurePending('double_pioche_choice', {
+          a: picked,
+          b: other,
+          card: { id: 'double_pioche', name: 'Double pioche', emoji: '🎴', rarity: 'rare', type: 'active' }
+        });
+        return st;
+      }
+      st.currentEntity = picked;
+      st.currentEntityTs = Date.now();
+      pushTurnLog(p, picked, 'rolled');
+      return st;
+    }
+
+    if (action === 'turn:double_pioche_choose') {
+      if (st.phase !== 'game') return st;
+      if (!isMyTurn()) return st;
+      if (st.currentEntity) return st;
+      const p = currentPlayer();
+      if (!p) return st;
+      if (!st.pending || st.pending.type !== 'double_pioche_choice') return st;
+      var keep = payload && payload.keep ? String(payload.keep) : '';
+      var chosen = (keep === 'b') ? st.pending.b : st.pending.a;
+      if (!chosen || !chosen.id) return st;
+      st.currentEntity = chosen;
+      st.currentEntityTs = Date.now();
+      pushTurnLog(p, chosen, 'rolled');
+      clearPending();
+      return st;
+    }
+
+    if (action === 'turn:keep') {
+      if (st.phase !== 'game') return st;
+      if (!isMyTurn()) return st;
+      const p = currentPlayer();
+      if (!p) return st;
+      if (!st.currentEntity) return st;
+      p.picks = p.picks || [[],[],[]];
+      const r = Number(st.currentRound || 0);
+      p.picks[r] = p.picks[r] || [];
+      p.picks[r].push(st.currentEntity);
+      st.box = (st.box || []).filter(function(e) { return e.id !== st.currentEntity.id; });
+      pushTurnLog(p, st.currentEntity, 'kept');
+
+      // Discard "must play this turn" cards that were not used (Jackpot/Partage/etc.)
+      if (Array.isArray(p.hand) && p.hand.length) {
+        // Keep "Partage ?" even if it was marked must-play.
+        p.hand = p.hand.filter(function(c) { return !(c && c.mustPlayThisTurn && String(c.id || '') !== 'partage'); });
+      }
+      // Gel: decrement at end of the frozen player's turn.
+      if (p.frozenTurns && p.frozenTurns > 0) p.frozenTurns--;
+
+      // advance turn/round
+      st.currentTurnIdx = Number(st.currentTurnIdx || 0) + 1;
+      if (st.currentTurnIdx >= (st.turnOrder || []).length || !(st.box || []).length) {
+        st.currentRound = Number(st.currentRound || 0) + 1;
+        if (st.currentRound > 2) {
+          st.phase = 'summary';
+          resetTurnFlags();
+          return st;
+        }
+        st.currentTurnIdx = 0;
+        // New round resets (offline parity)
+        (st.players || []).forEach(function(pp) { if (!pp) return; pp.banned = []; pp.shieldedRound = false; pp.curatedPoolIds = null; });
+        // Allow 1 playable draw again for the new round
+        (st.players || []).forEach(function(pp) { if (pp) pp.lastPlayableDrawRound = -1; });
+        // Init next round box (Round2=ACTIONS, Round3=LOCATIONS)
+        if (Number(st.currentRound) === 1) {
+          st.box = ACTIONS.map(function(a, i) { return { id: 'a_' + i, name: a.name, image: null, emoji: a.emoji, category: 'action', good: !!a.good }; });
+        } else if (Number(st.currentRound) === 2) {
+          st.box = LOCATIONS.map(function(l, i) { return { id: 'l_' + i, name: l.name, image: null, emoji: l.emoji, category: 'lieu', good: !!l.good }; });
+        }
+        // Apply pending sabotage bans on new round (personal boxes)
+        (st.players || []).forEach(function(pp) {
+          if (!pp || !pp.pendingSabotageBan) return;
+          pp.banned = Array.isArray(pp.banned) ? pp.banned : [];
+          var pb = getPlayerBoxFromState(pp);
+          for (var k = 0; k < (pp.pendingSabotageBan || 0); k++) {
+            if (!pb.length) break;
+            var victim = pb[Math.floor(Math.random() * pb.length)];
+            if (victim && pp.banned.indexOf(victim.id) < 0) pp.banned.push(victim.id);
+            pb = getPlayerBoxFromState(pp);
+          }
+          pp.pendingSabotageBan = 0;
+        });
+        st.blindedRound = null;
+        st.blindedBy = null;
+      st.blindedByPid = null;
+      }
+      resetTurnFlags();
+      st.turnSetupPid = null;
+      return st;
+    }
+
+    if (action === 'turn:reroll') {
+      if (st.phase !== 'game') return st;
+      if (!isMyTurn()) return st;
+      const p = currentPlayer();
+      if (!p) return st;
+      if (!st.currentEntity) return st;
+      var isInf = !!p.infiniteReroll;
+      if (!isInf && (p.rerollsLeft || 0) <= 0) return st;
+      if (!isInf) {
+        p.rerollsLeft = (p.rerollsLeft || 0) - 1;
+      }
+      // Chaos mode: Round 1 reroll adds the current person to your picks (extra),
+      // then rerolls for a new result.
+      if (String(st.mode || '') === 'chaos' && Number(st.currentRound || 0) === 0) {
+        p.picks = p.picks || [[], [], []];
+        p.picks[0] = Array.isArray(p.picks[0]) ? p.picks[0] : [];
+        p.picks[0].push(st.currentEntity);
+        pushTurnLog(p, st.currentEntity, 'kept');
+      }
+      // Offline parity:
+      // - normal reroll: eliminate the current entity from the box
+      // - infinite reroll: put it back (no elimination)
+      if (!isInf) st.box = (st.box || []).filter(function(e) { return e.id !== st.currentEntity.id; });
+      st.firstEntity = st.currentEntity;
+      pushTurnLog(p, st.firstEntity, 'rerolled');
+      st.currentEntity = null;
+      st.currentEntityTs = 0;
+
+      // Immediately roll a new one so the player gets the popup (online parity with offline animation flow).
+      var pBox2 = getPlayerBoxFromState(p);
+      if (!pBox2.length) return st;
+      var pick2 = pBox2[Math.floor(Math.random() * pBox2.length)];
+      // reuse roll modifiers
+      pick2 = (function(player, rolledEntity) {
+        if (Number(st.currentRound || 0) === 0) return rolledEntity;
+        var personPick = player.picks && player.picks[0] && player.picks[0].length ? player.picks[0][0] : null;
+        var hasForceBad = (player.activePassives || []).indexOf('force_bad') >= 0;
+        var hasForceGood = (player.activePassives || []).indexOf('force_good') >= 0;
+        if (!hasForceBad && !hasForceGood) return rolledEntity;
+        if (Math.random() > 0.25) return rolledEntity;
+        var wantGood;
+        if (hasForceBad) wantGood = personPick && !personPick.good ? true : false;
+        else wantGood = personPick && !personPick.good ? false : true;
+        var pb = getPlayerBoxFromState(player);
+        var filtered = pb.filter(function(e) { return typeof e.good === 'boolean' && e.good === wantGood && e.id !== rolledEntity.id; });
+        if (!filtered.length) return rolledEntity;
+        return filtered[Math.floor(Math.random() * filtered.length)];
+      })(p, pick2);
+      pick2 = (function(player, rolledEntity) {
+        var gb = Number(player.goodBoost || 0) || 0;
+        if (gb <= 0) return rolledEntity;
+        if (Number(st.currentRound || 0) === 0) return rolledEntity;
+        if (Math.random() > gb) return rolledEntity;
+        var personPick = player.picks && player.picks[0] && player.picks[0].length ? player.picks[0][0] : null;
+        if (!personPick || typeof personPick.good !== 'boolean') return rolledEntity;
+        var wantGood = !!personPick.good;
+        var pb = getPlayerBoxFromState(player);
+        var filtered = pb.filter(function(e) { return typeof e.good === 'boolean' && e.good === wantGood && e.id !== rolledEntity.id; });
+        if (!filtered.length) return rolledEntity;
+        return filtered[Math.floor(Math.random() * filtered.length)];
+      })(p, pick2);
+      st.currentEntity = pick2;
+      st.currentEntityTs = Date.now();
+      pushTurnLog(p, pick2, 'rolled');
+      return st;
+    }
+
+    if (action === 'card:saveDrawn') {
+      if (st.phase !== 'game') return st;
+      if (!isMyTurn()) return st;
+      const p = currentPlayer();
+      if (!p || !p.drawnCard) return st;
+      p.hand = p.hand || [];
+      p.hand.push(p.drawnCard);
+      p.drawnCard = null;
+      return st;
+    }
+
+    function applyPassiveEffect(p, card) {
+      p.activePassives = p.activePassives || [];
+      if (card.effect === 'force_bad') p.activePassives.push('force_bad');
+      if (card.effect === 'force_good') p.activePassives.push('force_good');
+      if (card.effect === 'shield') { p.shieldedRound = true; p.activePassives.push('shield'); }
+    }
+
+    function rarityAllowedForPiocheSacree(score) {
+      if (score > 80) return ['common','rare','epic','legendary','passive'];
+      if (score > 60) return ['common','rare','epic'];
+      if (score > 40) return ['common','rare'];
+      if (score > 20) return ['common'];
+      return [];
+    }
+
+    function basePoolForRound(r) {
+      if (Number(r) === 0) return (st.entities || []).map(function(e) { return { id: e.id, name: e.name, image: e.image || null, emoji: null, category: e.category, good: !!e.good }; });
+      if (Number(r) === 1) return ACTIONS.map(function(a, i) { return { id: 'a_' + i, name: a.name, image: null, emoji: a.emoji, category: 'action', good: !!a.good }; });
+      return LOCATIONS.map(function(l, i) { return { id: 'l_' + i, name: l.name, image: null, emoji: l.emoji, category: 'lieu', good: !!l.good }; });
+    }
+
+    function remainingPoolForRound(r, exceptId) {
+      var base = basePoolForRound(r);
+      var taken = {};
+      (st.players || []).forEach(function(pp) {
+        if (!pp || !pp.picks) return;
+        var arr = (pp.picks[r] && Array.isArray(pp.picks[r])) ? pp.picks[r] : [];
+        arr.forEach(function(e) { if (e && e.id != null) taken[String(e.id)] = true; });
+      });
+      if (exceptId != null) delete taken[String(exceptId)];
+      return base.filter(function(e) { return !taken[String(e.id)]; });
+    }
+
+    function ensurePending(type, extra) {
+      st.pending = Object.assign({ type: type, byPid: String(currentPid() || ''), ts: Date.now() }, extra || {});
+    }
+
+    function clearPending() {
+      st.pending = null;
+    }
+
+    function applyCard(p, card) {
+      if (!p || !card) return;
+      // Don't broadcast "played" until the effect is fully committed.
+      // For immediate cards we will set lastActive* below; for interactive cards we delay it.
+      st.lastActiveCardId = null;
+      st.lastActiveCardPlayerId = null;
+      st.lastActiveCardData = null;
+
+      if (card.type === 'passive') {
+        applyPassiveEffect(p, card);
+        st.lastActiveCardId = card.id || null;
+        st.lastActiveCardPlayerId = String(p.id || '');
+        st.lastActiveCardData = { ts: Date.now() };
+        return;
+      }
+
+      if (card.id === 'second_regard') {
+        p.secondLookArmed = true; p.secondLookUsed = false;
+        st.lastActiveCardId = card.id; st.lastActiveCardPlayerId = String(p.id || ''); st.lastActiveCardData = { ts: Date.now() };
+        return;
+      }
+      if (card.id === 'reroll_back') {
+        p.rerollsLeft = (p.rerollsLeft >= 1) ? 2 : 1;
+        st.lastActiveCardId = card.id; st.lastActiveCardPlayerId = String(p.id || ''); st.lastActiveCardData = { ts: Date.now() };
+        return;
+      }
+      if (card.id === 'double_pioche') {
+        p.doublePiocheArmed = true;
+        st.lastActiveCardId = card.id; st.lastActiveCardPlayerId = String(p.id || ''); st.lastActiveCardData = { ts: Date.now() };
+        return;
+      }
+      if (card.id === 'chance_forcee') {
+        p.goodBoost = Math.max(p.goodBoost || 0, 0.30);
+        st.lastActiveCardId = card.id; st.lastActiveCardPlayerId = String(p.id || ''); st.lastActiveCardData = { ts: Date.now() };
+        return;
+      }
+      if (card.id === 'jackpot') {
+        p.hand = p.hand || [];
+        var jts = Date.now();
+        var drawn = [drawCard(), drawCard()];
+        st.lastJackpotDraw = { pid: String(p.id || ''), cards: drawn, ts: jts };
+        function gainOrActivateBonusCard(cc) {
+          if (!cc) return;
+          if (cc.type === 'passive') {
+            applyPassiveEffect(p, cc);
+            pushTurnLog(p, cc, 'activated');
+            st.lastPassiveDraw = { pid: String(p.id || ''), card: cc, ts: jts };
+            return;
+          }
+          cc.mustPlayThisTurn = true;
+          p.hand.push(cc);
+          pushTurnLog(p, cc, 'gained');
+        }
+        gainOrActivateBonusCard(drawn[0]);
+        gainOrActivateBonusCard(drawn[1]);
+        st.lastActiveCardId = card.id || null;
+        st.lastActiveCardPlayerId = String(p.id || '');
+        st.lastActiveCardData = { ts: Date.now() };
+        return;
+      }
+      if (card.id === 'infinite_reroll') { p.infiniteReroll = true; st.lastActiveCardId = card.id; st.lastActiveCardPlayerId = String(p.id||''); st.lastActiveCardData = { ts: Date.now() }; return; }
+      if (card.id === 'blinded') { st.blindedRound = Number(st.currentRound || 0); st.blindedBy = p.name || ''; st.blindedByPid = String(p.id || ''); st.lastActiveCardId = card.id; st.lastActiveCardPlayerId = String(p.id||''); st.lastActiveCardData = { ts: Date.now() }; return; }
+
+      if (card.id === 'miroir') {
+        if (!st.lastActiveCardId || st.lastActiveCardId === 'miroir') return;
+        var copied = PLAYABLE_CARDS.find(function(c) { return c && c.id === st.lastActiveCardId; });
+        if (copied) applyCard(p, copied);
+        return;
+      }
+
+      // Interactive / UI choice cards -> pending
+      if (card.id === 'eliminate3') { ensurePending('eliminate3', { card: card }); return; }
+      if (card.id === 'petit_sabotage') { ensurePending('petit_sabotage', { card: card }); return; }
+      if (card.id === 'fifty') { ensurePending('fifty', { card: card }); return; }
+      if (card.id === 'nostalgie') { ensurePending('nostalgie', { card: card }); return; }
+      if (card.id === 'exchange') { ensurePending('exchange', { card: card }); return; }
+      if (card.id === 'vol_main') { ensurePending('vol_main', { card: card }); return; }
+      if (card.id === 'gel') { ensurePending('gel', { card: card }); return; }
+      if (card.id === 'partage') { ensurePending('partage', { card: card }); return; }
+      if (card.id === 'couronne') { ensurePending('couronne', { card: card }); return; }
+      if (card.id === 'echange_de_corps') { ensurePending('echange_de_corps', { card: card }); return; }
+
+      if (card.id === 'above_average') {
+        var score = Math.floor(Math.random() * 100) + 1;
+        var ok = score >= 50;
+        st.lastActiveCardId = card.id || null;
+        st.lastActiveCardPlayerId = String(p.id || '');
+        st.lastActiveCardData = { kind: 'above_average', score: score, ok: ok, ts: Date.now() };
+        if (ok) ensurePending('above_average_picker', { card: card });
+        return;
+      }
+
+      if (card.id === 'pioche_sacree') {
+        var score2 = Math.floor(Math.random() * 100) + 1;
+        var allowed = rarityAllowedForPiocheSacree(score2);
+        st.lastActiveCardId = card.id || null;
+        st.lastActiveCardPlayerId = String(p.id || '');
+        st.lastActiveCardData = { kind: 'pioche_sacree', score: score2, allowed: allowed, ts: Date.now() };
+        if (allowed.length) ensurePending('pioche_sacree_picker', { allowedRarities: allowed, card: card });
+        return;
+      }
+
+      // Unported card (safety): keep in hand
+      p.hand = p.hand || [];
+      p.hand.push(card);
+    }
+
+    if (action === 'card:applyPassive') {
+      if (st.phase !== 'game') return st;
+      if (!isMyTurn()) return st;
+      const p = currentPlayer();
+      const cid = payload && payload.cardId ? String(payload.cardId) : '';
+      const card = PLAYABLE_CARDS.find(function(c) { return c.id === cid; });
+      if (!p || !card || card.type !== 'passive') return st;
+      pushTurnLog(p, card, 'activated');
+      applyPassiveEffect(p, card);
+      // clear if it was drawn
+      if (p.drawnCard && p.drawnCard.id === cid) p.drawnCard = null;
+      return st;
+    }
+
+    if (action === 'card:playDrawn') {
+      if (st.phase !== 'game') return st;
+      if (!isMyTurn()) return st;
+      const p = currentPlayer();
+      if (!p || !p.drawnCard) return st;
+      if (p.frozenTurns && p.frozenTurns > 0) return st;
+      const card = p.drawnCard;
+      p.drawnCard = null;
+      pushTurnLog(p, card, 'played');
+      applyCard(p, card);
+      return st;
+    }
+
+    if (action === 'card:playHand') {
+      if (st.phase !== 'game') return st;
+      if (!isMyTurn()) return st;
+      const p = currentPlayer();
+      if (!p) return st;
+      if (p.frozenTurns && p.frozenTurns > 0) return st;
+      const idx = payload && typeof payload.handIdx === 'number' ? payload.handIdx : Number(payload && payload.handIdx);
+      if (!Array.isArray(p.hand)) p.hand = [];
+      if (!(idx >= 0 && idx < p.hand.length)) return st;
+      const card = p.hand.splice(idx, 1)[0];
+      if (!card) return st;
+      pushTurnLog(p, card, 'played');
+      applyCard(p, card);
+      return st;
+    }
+
+    if (action === 'card:pickerChoose') {
+      if (st.phase !== 'game') return st;
+      if (!isMyTurn()) return st;
+      const p = currentPlayer();
+      if (!p) return st;
+      const cid = payload && payload.cardId ? String(payload.cardId) : '';
+      const chosen = PLAYABLE_CARDS.find(function(c) { return c && c.id === cid; });
+      if (!chosen) return st;
+      // Validate pending picker (must exist + allow rarity)
+      if (!st.pending || (st.pending.type !== 'above_average_picker' && st.pending.type !== 'pioche_sacree_picker')) return st;
+      if (st.pending.type === 'above_average_picker' && !(chosen.rarity === 'common' || chosen.rarity === 'rare')) return st;
+      if (st.pending.type === 'pioche_sacree_picker') {
+        var allow = Array.isArray(st.pending.allowedRarities) ? st.pending.allowedRarities : [];
+        if (allow.indexOf(chosen.rarity) < 0) return st;
+      }
+      var copy = JSON.parse(JSON.stringify(chosen));
+      if (payload && payload.mustPlayThisTurn) copy.mustPlayThisTurn = true;
+      if (copy && copy.type === 'passive') {
+        applyPassiveEffect(p, copy);
+        pushTurnLog(p, copy, 'activated');
+      } else {
+        p.hand = p.hand || [];
+        p.hand.push(copy);
+        pushTurnLog(p, copy, 'gained');
+      }
+      // Commit the original card as "played" now that choice is finalized.
+      if (st.pending && st.pending.card) {
+        st.lastActiveCardId = st.pending.card.id || null;
+        st.lastActiveCardPlayerId = String(p.id || '');
+        // IMPORTANT: don't re-publish the roll payload here, otherwise clients will re-open
+        // the roll modal and allow choosing again. We only need a timestamp for the public popup.
+        st.lastActiveCardData = { ts: Date.now() };
+      }
+      clearPending();
+      return st;
+    }
+
+    if (action === 'card:eliminate3_confirm') {
+      if (st.phase !== 'game') return st;
+      if (!isMyTurn()) return st;
+      const p = currentPlayer();
+      if (!p) return st;
+      if (!st.pending || st.pending.type !== 'eliminate3') return st;
+      var ids = payload && Array.isArray(payload.ids) ? payload.ids.map(function(x){return String(x);}) : [];
+      p.banned = Array.isArray(p.banned) ? p.banned : [];
+      ids.forEach(function(id) { if (p.banned.indexOf(id) < 0) p.banned.push(id); });
+      var pc1 = st.pending && st.pending.card ? st.pending.card : null;
+      if (pc1) { st.lastActiveCardId = pc1.id || null; st.lastActiveCardPlayerId = String(p.id||''); st.lastActiveCardData = { ts: Date.now() }; }
+      clearPending();
+      return st;
+    }
+
+    if (action === 'card:fifty_confirm') {
+      if (st.phase !== 'game') return st;
+      if (!isMyTurn()) return st;
+      const p = currentPlayer();
+      if (!p) return st;
+      if (!st.pending || st.pending.type !== 'fifty') return st;
+      var ids2 = payload && Array.isArray(payload.ids) ? payload.ids.map(function(x){return String(x);}) : [];
+      if (ids2.length === 6) {
+        p.curatedPoolIds = ids2;
+      }
+      var pc2 = st.pending && st.pending.card ? st.pending.card : null;
+      if (pc2) { st.lastActiveCardId = pc2.id || null; st.lastActiveCardPlayerId = String(p.id||''); st.lastActiveCardData = { ts: Date.now() }; }
+      clearPending();
+      return st;
+    }
+
+    if (action === 'card:couronne_resolve') {
+      if (st.phase !== 'game') return st;
+      if (!isMyTurn()) return st;
+      const p = currentPlayer();
+      if (!p) return st;
+      if (!st.pending || st.pending.type !== 'couronne') return st;
+      if (st.currentEntity) return st;
+      var pid = payload && payload.entityId ? String(payload.entityId) : '';
+      var pBox = getPlayerBoxFromState(p);
+      var pick = pBox.find(function(e) { return String(e && e.id || '') === pid; }) || null;
+      if (!pick) return st;
+      st.currentEntity = pick;
+      var pc3 = st.pending && st.pending.card ? st.pending.card : null;
+      if (pc3) { st.lastActiveCardId = pc3.id || null; st.lastActiveCardPlayerId = String(p.id||''); st.lastActiveCardData = { ts: Date.now() }; }
+      clearPending();
+      return st;
+    }
+
+    if (action === 'card:gel_resolve') {
+      if (st.phase !== 'game') return st;
+      if (!isMyTurn()) return st;
+      if (!st.pending || st.pending.type !== 'gel') return st;
+      var tid = payload && payload.targetId ? String(payload.targetId) : '';
+      var t = (st.players || []).find(function(pp) { return pp && String(pp.id || '') === tid; }) || null;
+      if (!t) return st;
+      t.frozenTurns = Math.max(Number(t.frozenTurns || 0) || 0, 1);
+      var pc4 = st.pending && st.pending.card ? st.pending.card : null;
+      if (pc4) { st.lastActiveCardId = pc4.id || null; st.lastActiveCardPlayerId = String(currentPid()||''); st.lastActiveCardData = { ts: Date.now(), targetId: tid, targetName: (t && t.name) ? t.name : '' }; }
+      clearPending();
+      return st;
+    }
+
+    if (action === 'card:vol_main_resolve') {
+      if (st.phase !== 'game') return st;
+      if (!isMyTurn()) return st;
+      if (!st.pending || st.pending.type !== 'vol_main') return st;
+      const p = currentPlayer();
+      var tid2 = payload && payload.targetId ? String(payload.targetId) : '';
+      var t2 = (st.players || []).find(function(pp) { return pp && String(pp.id || '') === tid2; }) || null;
+      if (!p || !t2 || !Array.isArray(t2.hand) || t2.hand.length === 0) { clearPending(); return st; }
+      var idx2 = Math.floor(Math.random() * t2.hand.length);
+      var stolen = t2.hand.splice(idx2, 1)[0];
+      p.hand = p.hand || [];
+      if (stolen) p.hand.push(stolen);
+      var pc5 = st.pending && st.pending.card ? st.pending.card : null;
+      if (pc5) { st.lastActiveCardId = pc5.id || null; st.lastActiveCardPlayerId = String(p.id||''); st.lastActiveCardData = { ts: Date.now(), targetId: tid2, targetName: (t2 && t2.name) ? t2.name : '' }; }
+      clearPending();
+      return st;
+    }
+
+    if (action === 'card:partage_start') {
+      if (st.phase !== 'game') return st;
+      if (!isMyTurn()) return st;
+      const p = currentPlayer();
+      if (!p) return st;
+      // same as applying card effect directly (if no candidates -> random)
+      var others = (st.players || []).filter(function(pp) { return pp && String(pp.id || '') !== String(p.id || ''); });
+      var anyHave = others.some(function(pp) { return pp.hand && pp.hand.length > 0; });
+      if (!anyHave) {
+        var rnd = drawCard();
+        rnd.mustPlayThisTurn = true;
+        p.hand = p.hand || [];
+        p.hand.push(rnd);
+        st.lastActiveCardId = 'partage';
+        st.lastActiveCardPlayerId = String(p.id || '');
+        st.lastActiveCardData = { ts: Date.now() };
+        clearPending();
+        return st;
+      }
+      ensurePending('partage', {});
+      return st;
+    }
+
+    if (action === 'card:partage_resolve') {
+      if (st.phase !== 'game') return st;
+      if (!isMyTurn()) return st;
+      if (!st.pending || st.pending.type !== 'partage') return st;
+      const p = currentPlayer();
+      if (!p) return st;
+      var tid3 = payload && payload.targetId ? String(payload.targetId) : '';
+      var t3 = (st.players || []).find(function(pp) { return pp && String(pp.id || '') === tid3; }) || null;
+      if (!t3 || !Array.isArray(t3.hand) || t3.hand.length === 0) { clearPending(); return st; }
+      var src = t3.hand[Math.floor(Math.random() * t3.hand.length)];
+      if (src) {
+        var copy3 = JSON.parse(JSON.stringify(src));
+        copy3.mustPlayThisTurn = true;
+        p.hand = p.hand || [];
+        p.hand.push(copy3);
+      }
+      var pc6 = st.pending && st.pending.card ? st.pending.card : null;
+      if (pc6) { st.lastActiveCardId = pc6.id || null; st.lastActiveCardPlayerId = String(p.id||''); st.lastActiveCardData = { ts: Date.now(), targetId: tid3, targetName: (t3 && t3.name) ? t3.name : '' }; }
+      clearPending();
+      return st;
+    }
+
+    if (action === 'card:petit_sabotage_resolve') {
+      if (st.phase !== 'game') return st;
+      if (!isMyTurn()) return st;
+      if (!st.pending || st.pending.type !== 'petit_sabotage') return st;
+      const p = currentPlayer();
+      var mode = payload && payload.mode ? String(payload.mode) : 'ban';
+      var tid4 = payload && payload.targetId ? String(payload.targetId) : '';
+      var t4 = (st.players || []).find(function(pp) { return pp && String(pp.id || '') === tid4; }) || null;
+      if (!p || !t4) { clearPending(); return st; }
+      if (mode === 'reroll') {
+        t4.rerollsLeft = Math.max(0, Number(t4.rerollsLeft || 0) - 1);
+      } else if (mode === 'explode') {
+        if (Array.isArray(t4.hand) && t4.hand.length) t4.hand.splice(Math.floor(Math.random() * t4.hand.length), 1);
+      } else {
+        // ban one from target personal box: now if they play after you this round; else next round
+        var myIdx = Number(st.currentTurnIdx || 0);
+        var order = (st.turnOrder || []).map(function(x){return String(x||'');});
+        var tIdx = order.indexOf(String(t4.id || ''));
+        if (tIdx > myIdx) {
+          var tBox = getPlayerBoxFromState(t4);
+          if (tBox.length) {
+            var victim = tBox[Math.floor(Math.random() * tBox.length)];
+            t4.banned = Array.isArray(t4.banned) ? t4.banned : [];
+            t4.banned.push(victim.id);
+          }
+        } else {
+          t4.pendingSabotageBan = (Number(t4.pendingSabotageBan || 0) || 0) + 1;
+        }
+      }
+      var pc7 = st.pending && st.pending.card ? st.pending.card : null;
+      if (pc7) { st.lastActiveCardId = pc7.id || null; st.lastActiveCardPlayerId = String(currentPid()||''); st.lastActiveCardData = { ts: Date.now(), targetId: tid4, targetName: (t4 && t4.name) ? t4.name : '', mode: mode }; }
+      clearPending();
+      return st;
+    }
+
+    if (action === 'card:nostalgie_confirm') {
+      if (st.phase !== 'game') return st;
+      if (!isMyTurn()) return st;
+      if (!st.pending || st.pending.type !== 'nostalgie') return st;
+      var tid5 = payload && payload.targetId ? String(payload.targetId) : '';
+      var t5 = (st.players || []).find(function(pp) { return pp && String(pp.id || '') === tid5; }) || null;
+      var rr = Number(payload && payload.round);
+      var pi = Number(payload && payload.pickIdx);
+      if (!t5 || !(rr >= 0 && rr <= 2)) { clearPending(); return st; }
+      if (!t5.picks || !Array.isArray(t5.picks[rr]) || !(pi >= 0 && pi < t5.picks[rr].length)) { clearPending(); return st; }
+      var old = t5.picks[rr][pi];
+      var remain = remainingPoolForRound(rr, old && old.id);
+      if (remain.length) {
+        var neu = remain[Math.floor(Math.random() * remain.length)];
+        t5.picks[rr][pi] = neu;
+      }
+      var pc8 = st.pending && st.pending.card ? st.pending.card : null;
+      if (pc8) { st.lastActiveCardId = pc8.id || null; st.lastActiveCardPlayerId = String(currentPid()||''); st.lastActiveCardData = { ts: Date.now(), targetId: tid5, targetName: (t5 && t5.name) ? t5.name : '', round: rr }; }
+      clearPending();
+      return st;
+    }
+
+    if (action === 'card:exchange_resolve') {
+      if (st.phase !== 'game') return st;
+      if (!isMyTurn()) return st;
+      if (!st.pending || st.pending.type !== 'exchange') return st;
+      const p = currentPlayer();
+      var tid6 = payload && payload.targetId ? String(payload.targetId) : '';
+      var t6 = (st.players || []).find(function(pp) { return pp && String(pp.id || '') === tid6; }) || null;
+      var rr2 = Number(payload && payload.round);
+      var pi2 = Number(payload && payload.pickIdx);
+      if (!p || !t6 || t6.shieldedRound) { clearPending(); return st; }
+      if (!p.picks || !Array.isArray(p.picks[rr2]) || !(pi2 >= 0 && pi2 < p.picks[rr2].length)) { clearPending(); return st; }
+      var roll1 = Math.floor(Math.random() * 6) + 1;
+      var roll2 = Math.floor(Math.random() * 6) + 1;
+      if (roll1 > roll2) {
+        var their = (t6.picks && Array.isArray(t6.picks[rr2]) && t6.picks[rr2].length) ? t6.picks[rr2][Math.floor(Math.random() * t6.picks[rr2].length)] : null;
+        if (their) {
+          var mine = p.picks[rr2][pi2];
+          // swap in-place
+          p.picks[rr2][pi2] = their;
+          var tIdx2 = t6.picks[rr2].findIndex(function(e) { return e && e.id === their.id; });
+          if (tIdx2 >= 0) t6.picks[rr2][tIdx2] = mine;
+        }
+      }
+      var pc9 = st.pending && st.pending.card ? st.pending.card : null;
+      if (pc9) { st.lastActiveCardId = pc9.id || null; st.lastActiveCardPlayerId = String(p.id||''); st.lastActiveCardData = { ts: Date.now(), targetId: tid6, targetName: (t6 && t6.name) ? t6.name : '' }; }
+      clearPending();
+      return st;
+    }
+
+    if (action === 'card:echange_de_corps_resolve') {
+      if (st.phase !== 'game') return st;
+      if (!isMyTurn()) return st;
+      if (!st.pending || st.pending.type !== 'echange_de_corps') return st;
+      const p = currentPlayer();
+      var tid7 = payload && payload.targetId ? String(payload.targetId) : '';
+      var t7 = (st.players || []).find(function(pp) { return pp && String(pp.id || '') === tid7; }) || null;
+      if (!p || !t7 || t7.shieldedRound) { clearPending(); return st; }
+      // Offline swaps only identities (name+color)
+      var tmpN = p.name; p.name = t7.name; t7.name = tmpN;
+      var tmpC = p.color; p.color = t7.color; t7.color = tmpC;
+      var pc10 = st.pending && st.pending.card ? st.pending.card : null;
+      if (pc10) { st.lastActiveCardId = pc10.id || null; st.lastActiveCardPlayerId = String(p.id||''); st.lastActiveCardData = { ts: Date.now(), targetId: tid7, targetName: (t7 && t7.name) ? t7.name : '' }; }
+      clearPending();
+      return st;
+    }
+
+    if (action === 'card:cancelPending') {
+      if (st.phase !== 'game') return st;
+      if (!isMyTurn()) return st;
+      const p = currentPlayer();
+      if (!p) return st;
+      if (!st.pending || String(st.pending.byPid || '') !== String(currentPid() || '')) return st;
+      // Put the card back in hand if it was an interactive card
+      if (st.pending.card) {
+        p.hand = p.hand || [];
+        p.hand.push(st.pending.card);
+      }
+      clearPending();
+      return st;
+    }
+
+    if (action === 'card:second_regard_roll') {
+      if (st.phase !== 'game') return st;
+      if (!isMyTurn()) return st;
+      const p = currentPlayer();
+      if (!p) return st;
+      if (!p.secondLookArmed || p.secondLookUsed) return st;
+      if (!st.currentEntity) return st;
+      var pBox = getPlayerBoxFromState(p);
+      if (pBox.length < 2) return st;
+      var alt = pBox[Math.floor(Math.random() * pBox.length)];
+      if (alt && st.currentEntity && alt.id === st.currentEntity.id && pBox.length > 1) {
+        alt = pBox.find(function(x) { return x && x.id !== st.currentEntity.id; }) || alt;
+      }
+      p.secondLookUsed = true;
+      // Store choice in pending (no broadcast yet)
+      ensurePending('second_regard_choice', { a: st.currentEntity, b: alt, card: { id: 'second_regard', name: 'Second regard', emoji: '👀', rarity: 'common', type: 'active' } });
+      return st;
+    }
+
+    if (action === 'card:second_regard_confirm') {
+      if (st.phase !== 'game') return st;
+      if (!isMyTurn()) return st;
+      const p = currentPlayer();
+      if (!p) return st;
+      if (!st.pending || st.pending.type !== 'second_regard_choice') return st;
+      var w = payload && payload.which != null ? Number(payload.which) : -1;
+      var pick = (w === 0) ? st.pending.a : (w === 1 ? st.pending.b : null);
+      if (!pick) return st;
+      st.currentEntity = pick;
+      // Now commit the card as played (after player finalized)
+      if (st.pending.card) { st.lastActiveCardId = st.pending.card.id || null; st.lastActiveCardPlayerId = String(p.id||''); st.lastActiveCardData = { ts: Date.now() }; }
+      clearPending();
+      return st;
+    }
+    return st;
+  });
+}
 
 /* ═══════════════════════════════════════
    Utilities
@@ -785,11 +2937,25 @@ function esc(s) {
   return d.innerHTML;
 }
 
-function initial(s) { return s.charAt(0).toUpperCase(); }
+function jsq(s) {
+  // Return a single-quoted JS string literal safe for inline onclick="fn(<here>)"
+  s = String(s == null ? '' : s);
+  return "'" + s.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "'";
+}
+
+function initial(s) {
+  if (s == null) return '?';
+  s = String(s);
+  if (!s.length) return '?';
+  return s.charAt(0).toUpperCase();
+}
 
 function showScreen(id) {
+  const next = document.getElementById(id);
+  if (!next) return;
+  if (next.classList.contains('active')) return; // avoid flicker/re-animate on polling
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+  next.classList.add('active');
 }
 
 function showToast(msg, type) {
@@ -799,6 +2965,33 @@ function showToast(msg, type) {
   document.body.appendChild(t);
   requestAnimationFrame(() => requestAnimationFrame(() => t.classList.add('visible')));
   setTimeout(() => { t.classList.remove('visible'); setTimeout(() => t.remove(), 300); }, 1800);
+}
+
+function copyRoomCode() {
+  if (!ONLINE.enabled || !ONLINE.roomCode) return;
+  var code = String(ONLINE.roomCode).toUpperCase();
+  function done(ok) {
+    showToast(ok ? ('Code copié: ' + code) : 'Impossible de copier', ok ? 'success' : 'danger');
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(code).then(function() { done(true); }).catch(function() { done(false); });
+    return;
+  }
+  // Fallback
+  try {
+    var ta = document.createElement('textarea');
+    ta.value = code;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    var ok = document.execCommand('copy');
+    ta.remove();
+    done(!!ok);
+  } catch (_) {
+    done(false);
+  }
 }
 
 function spawnConfetti() {
@@ -851,9 +3044,23 @@ function selectMode(m) {
 }
 
 function goBack() {
+  if (ONLINE.enabled) {
+    onlineLeaveRoom();
+    return;
+  }
   mode = null;
   players = [];
   showScreen('screenLanding');
+}
+
+function onlineLeaveRoom() {
+  onlineStopRealtime();
+  ONLINE.enabled = false;
+  ONLINE.roomCode = null;
+  ONLINE.playerId = null;
+  ONLINE.version = 0;
+  onlineClearSession();
+  newGame();
 }
 
 /* ═══════════════════════════════════════
@@ -916,6 +3123,10 @@ function autoFetchImage(name) {
 
 document.getElementById('playerForm').addEventListener('submit', function(e) {
   e.preventDefault();
+  if (ONLINE.enabled) {
+    showToast('En online, les joueurs rejoignent avec le code room.', 'danger');
+    return;
+  }
   var inp = document.getElementById('playerNameInput');
   var name = inp.value.trim();
   if (!name || players.length >= 5) return;
@@ -961,13 +3172,64 @@ document.getElementById('entityForm').addEventListener('submit', function(e) {
   submitBtn.disabled = true;
   inp.value = '';
 
-  if (fileInp.files.length > 0) {
+  if (ONLINE.enabled && !onlineIsHost()) {
+    showToast('Seul l’hôte peut modifier les entités.', 'danger');
+    submitBtn.disabled = false;
+    return;
+  }
+
+  function sendOnlineEntity(entityToSend) {
+    if (!ONLINE.enabled) return;
+
+    // Optimistic UI: show instantly, confirm via polling/server
+    var tmpId = 'tmp_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+    ONLINE.optimistic.entities = ONLINE.optimistic.entities || [];
+    ONLINE.optimistic.entities.push({
+      tmpId: tmpId,
+      name: entityToSend.name,
+      category: entityToSend.category,
+      good: !!entityToSend.good,
+      image: entityToSend.image || null,
+      createdAtMs: Date.now()
+    });
+    // Make it appear immediately for host without waiting
+    entities = (entities || []).concat([{ id: tmpId, name: entityToSend.name, category: entityToSend.category, good: !!entityToSend.good, image: entityToSend.image || null }]);
+    renderSetup();
+
+    onlineAction('host:addEntity', {
+      name: entityToSend.name,
+      category: entityToSend.category,
+      good: !!entityToSend.good,
+      image: entityToSend.image || null
+    }).catch(function(err) {
+      showToast(String(err.message || err), 'danger');
+      // Rollback optimistic entity on hard failure
+      ONLINE.optimistic.entities = (ONLINE.optimistic.entities || []).filter(function(o) { return o.tmpId !== tmpId; });
+      entities = (entities || []).filter(function(e) { return e.id !== tmpId; });
+      renderSetup();
+    }).finally(function() {
+      submitBtn.disabled = false;
+    });
+  }
+
+  if (fileInp.files && fileInp.files.length > 0 && fileInp.files[0]) {
     var reader = new FileReader();
     reader.onload = function(ev) {
       entity.image = ev.target.result;
-      entities.push(entity);
-      renderSetup();
-      submitBtn.disabled = false;
+      if (ONLINE.enabled) {
+        sendOnlineEntity(entity);
+      } else {
+        entities.push(entity);
+        renderSetup();
+        submitBtn.disabled = false;
+      }
+    };
+    reader.onerror = function() {
+      showToast('Image invalide.', 'danger');
+      // Fallback: add entity without image
+      entity.image = null;
+      if (ONLINE.enabled) sendOnlineEntity(entity);
+      else { entities.push(entity); renderSetup(); submitBtn.disabled = false; }
     };
     reader.readAsDataURL(fileInp.files[0]);
     fileInp.value = '';
@@ -975,20 +3237,36 @@ document.getElementById('entityForm').addEventListener('submit', function(e) {
     document.getElementById('fileLabel').classList.remove('has-file');
     inp.focus();
   } else if (cat !== 'autre') {
-    autoFetchImage(name).then(function(url) {
-      entity.image = url;
-      entities.push(entity);
-      renderSetup();
-      submitBtn.disabled = false;
-      inp.focus();
-    });
+    // Try auto-image for both modes (URL, not base64). If it fails, still add the entity.
+    if (ONLINE.enabled) {
+      autoFetchImage(name).then(function(url) {
+        entity.image = url;
+      }).catch(function() {
+        // ignore
+      }).finally(function() {
+        sendOnlineEntity(entity);
+        inp.focus();
+      });
+    } else {
+      autoFetchImage(name).then(function(url) {
+        entity.image = url;
+        entities.push(entity);
+        renderSetup();
+        submitBtn.disabled = false;
+        inp.focus();
+      });
+    }
     fileInp.value = '';
     document.getElementById('fileLabelText').textContent = '📷 Perso';
     document.getElementById('fileLabel').classList.remove('has-file');
   } else {
-    entities.push(entity);
-    renderSetup();
-    submitBtn.disabled = false;
+    if (ONLINE.enabled) {
+      sendOnlineEntity(entity);
+    } else {
+      entities.push(entity);
+      renderSetup();
+      submitBtn.disabled = false;
+    }
     fileInp.value = '';
     document.getElementById('fileLabelText').textContent = '📷 Perso';
     document.getElementById('fileLabel').classList.remove('has-file');
@@ -999,8 +3277,9 @@ document.getElementById('entityForm').addEventListener('submit', function(e) {
 document.getElementById('entityImageInput').addEventListener('change', function() {
   var lbl = document.getElementById('fileLabelText');
   var wrap = document.getElementById('fileLabel');
-  if (this.files.length > 0) {
-    lbl.textContent = '✅ ' + this.files[0].name.slice(0, 14);
+  // Some browsers can fire change with files undefined/null
+  if (this.files && this.files.length > 0 && this.files[0]) {
+    lbl.textContent = '✅ ' + String(this.files[0].name || '').slice(0, 14);
     wrap.classList.add('has-file');
   } else {
     lbl.textContent = '📷 Perso';
@@ -1018,18 +3297,53 @@ function removePlayer(id) {
 }
 
 function removeEntity(id) {
+  if (ONLINE.enabled && !ONLINE.applyingRemote) {
+    if (!onlineIsHost()) return showToast('Seul l’hôte peut supprimer des entités.', 'danger');
+    // If it's an optimistic (tmp) entity, remove it locally so it doesn't "come back"
+    // during the optimistic merge window.
+    var sid = String(id || '');
+    if (sid.indexOf('tmp_') === 0) {
+      ONLINE.optimistic.deletedTmpIds = ONLINE.optimistic.deletedTmpIds || {};
+      ONLINE.optimistic.deletedTmpIds[sid] = true;
+      ONLINE.optimistic.entities = (ONLINE.optimistic.entities || []).filter(function(o) { return o && o.tmpId !== sid; });
+      entities = (entities || []).filter(function(e) { return e && String(e.id || '') !== sid; });
+      renderSetup();
+    }
+    onlineAction('host:removeEntity', { id: id }).catch(function(err) { showToast(String(err.message || err), 'danger'); });
+    return;
+  }
   const idx = entities.findIndex(function(e) { return e.id === id; });
   if (idx !== -1) entities.splice(idx, 1);
   renderSetup();
 }
 
 function renderSetup() {
+  // Toggle cards library button in online (not synchronized yet)
+  var cardsBtn = document.querySelector('.setup-header .btn.btn-accent');
+  if (cardsBtn) {
+    cardsBtn.style.display = ONLINE.enabled ? 'none' : '';
+  }
+
+  // Room code pill (online)
+  var pill = document.getElementById('roomCodePill');
+  var txt = document.getElementById('roomCodeText');
+  if (pill && txt) {
+    if (ONLINE.enabled && ONLINE.roomCode) {
+      pill.style.display = 'inline-flex';
+      txt.textContent = String(ONLINE.roomCode).toUpperCase();
+    } else {
+      pill.style.display = 'none';
+      txt.textContent = '';
+    }
+  }
+
   document.getElementById('playerCounter').textContent = players.length + ' / 5';
   document.getElementById('playersList').innerHTML = players.map(function(p) {
     return '<span class="player-chip">' +
       '<span class="dot" style="background:' + p.color + '"></span>' +
-      esc(p.name) +
-      '<button class="btn-sm" onclick="removePlayer(' + p.id + ')">✕</button>' +
+      '<span class="name">' + esc(p.name) + '</span>' +
+      (ONLINE.enabled && onlineIsHost() && String(p.id || '') === String(ONLINE.playerId || '') ? '<span class="tag">HOST</span>' : '') +
+      (ONLINE.enabled ? '' : '<button class="btn-sm" onclick="removePlayer(' + p.id + ')">✕</button>') +
     '</span>';
   }).join('');
 
@@ -1037,7 +3351,7 @@ function renderSetup() {
   document.getElementById('entitiesGrid').innerHTML = entities.map(function(e) {
     var cm = CAT_META[e.category] || CAT_META.autre;
     return '<div class="entity-card">' +
-      '<button class="btn-sm remove-btn" onclick="removeEntity(' + e.id + ')">✕</button>' +
+      '<button class="btn-sm remove-btn" onclick="removeEntity(' + jsq(e.id) + ')">✕</button>' +
       '<div class="thumb">' + thumbHtml(e) + '</div>' +
       '<div class="name">' + esc(e.name) + '</div>' +
       '<div class="cat-tag">' + cm.icon + ' ' + cm.label + '</div>' +
@@ -1046,14 +3360,30 @@ function renderSetup() {
   }).join('');
 
   var ok = players.length >= 1 && entities.length >= 1;
-  document.getElementById('startBtn').disabled = !ok;
-  document.getElementById('startHint').textContent = ok ? '' : 'Ajoute au moins 1 joueur et 1 entité';
+  if (ONLINE.enabled) {
+    var pf = document.getElementById('playerForm');
+    if (pf) pf.style.display = 'none';
+    document.getElementById('startBtn').disabled = !(ok && onlineIsHost());
+    document.getElementById('startHint').textContent = ok ? (onlineIsHost() ? 'Prêt: lance la partie pour tout le monde.' : 'En attente que l’hôte lance la partie…') : 'En online: l’hôte doit ajouter au moins 1 entité.';
+  } else {
+    var pf2 = document.getElementById('playerForm');
+    if (pf2) pf2.style.display = '';
+    document.getElementById('playerNameInput').disabled = false;
+    document.querySelector('#playerForm button[type=\"submit\"]').disabled = false;
+    document.getElementById('startBtn').disabled = !ok;
+    document.getElementById('startHint').textContent = ok ? '' : 'Ajoute au moins 1 joueur et 1 entité';
+  }
 }
 
 /* ═══════════════════════════════════════
    TURN ORDER
    ═══════════════════════════════════════ */
 function goToTurnOrder() {
+  if (ONLINE.enabled && !ONLINE.applyingRemote) {
+    if (!onlineIsHost()) return;
+    onlineAction('host:startOrder', {}).catch(function(err) { showToast(String(err.message || err), 'danger'); });
+    return;
+  }
   players.forEach(function(p) {
     p.picks = [[],[],[]]; p.rerollsLeft = 1; p.rollRaw = 0; p.rollDisplay = 0;
     p.hand = []; p.drawnCard = null; p.activePassives = [];
@@ -1063,6 +3393,10 @@ function goToTurnOrder() {
   });
 
   if (players.length <= 1) {
+    if (!players[0]) {
+      showToast('Aucun joueur', 'danger');
+      return;
+    }
     turnOrder = [players[0]];
     startGame();
     return;
@@ -1090,11 +3424,22 @@ function updateOrderBtn() {
   var btn = document.getElementById('orderRollBtn');
   if (orderPhaseIdx < players.length) {
     btn.textContent = '🎲 Lancer pour ' + players[orderPhaseIdx].name;
-    btn.disabled = false;
+    if (ONLINE.enabled) {
+      btn.disabled = String(players[orderPhaseIdx] && players[orderPhaseIdx].id || '') !== String(ONLINE.playerId || '');
+      if (btn.disabled) btn.textContent = '⏳ En attente de ' + players[orderPhaseIdx].name;
+    } else {
+      btn.disabled = false;
+    }
   }
 }
 
 function rollForOrder() {
+  if (ONLINE.enabled && !ONLINE.applyingRemote) {
+    // local optimistic animation while waiting for RTDB update
+    startOrderRollAnim(ONLINE.playerId);
+    onlineAction('order:roll', {}).catch(function(err) { showToast(String(err.message || err), 'danger'); });
+    return;
+  }
   if (isAnimating || orderPhaseIdx >= players.length) return;
   isAnimating = true;
   var player = players[orderPhaseIdx];
@@ -1154,6 +3499,11 @@ function showFinalOrder() {
    GAME
    ═══════════════════════════════════════ */
 function startGame() {
+  if (ONLINE.enabled && !ONLINE.applyingRemote) {
+    if (!onlineIsHost()) return;
+    onlineAction('host:startGame', {}).catch(function(err) { showToast(String(err.message || err), 'danger'); });
+    return;
+  }
   currentRound = 0;
   hasRerolled = false;
   currentEntity = null;
@@ -1202,6 +3552,7 @@ function showRoundTransition() {
       turnOrder.forEach(function(p) { p.shieldedRound = false; });
       blindedRound = null;
       blindedBy = null;
+      blindedByPid = null;
       currentTurnIdx = 0;
       beginTurn();
     }, 300);
@@ -1231,7 +3582,8 @@ function beginTurn() {
   player.curatedPoolIds = null;
   player.goodBoost = 0;
   player.turnLog = [];
-  if (player.frozenTurns && player.frozenTurns > 0) player.frozenTurns--;
+  // IMPORTANT: do not decrement frozenTurns at start of the turn.
+  // Frozen means "can't play cards during your next turn", so we decrement at end of that turn.
 
   renderTopbar();
   renderSidebar();
@@ -1241,13 +3593,29 @@ function beginTurn() {
 
 function showHandoff(player) {
   var rm = ROUND_META[currentRound];
+  var isMe = ONLINE.enabled ? (player && player.id === ONLINE.playerId) : true;
   document.getElementById('hoName').innerHTML = '<span style="color:' + player.color + '">' + esc(player.name) + '</span>';
   document.getElementById('hoRound').textContent = rm.emoji + ' ' + rm.name + ' — Round ' + (currentRound + 1) + '/3';
+  var labelEl = document.querySelector('.ho-label');
+  if (labelEl) labelEl.textContent = isMe ? "C'est à toi !" : "C'est au tour de";
+  var hintEl = document.querySelector('.ho-hint');
+  if (hintEl) hintEl.textContent = isMe ? 'Prépare-toi à jouer' : 'Tout le monde regarde';
+  var btnEl = document.querySelector('#handoffOverlay .ho-btn');
+  if (btnEl) btnEl.textContent = isMe ? 'Je suis prêt !' : 'OK';
   document.getElementById('handoffOverlay').classList.add('visible');
 }
 
 function dismissHandoff() {
   document.getElementById('handoffOverlay').classList.remove('visible');
+  if (ONLINE.enabled) {
+    ONLINE.pendingHandoffKey = null;
+    var currentPid = (ONLINE.turnOrderIds || [])[currentTurnIdx];
+    if (currentPid === ONLINE.playerId) {
+      // Online: ask server to setup this turn (draw playable card, reset per-turn fields)
+      onlineAction('turn:ready', {}).catch(function(err) { showToast(String(err.message || err), 'danger'); });
+    }
+    return;
+  }
   var player = turnOrder[currentTurnIdx];
 
   setTimeout(function() {
@@ -1279,12 +3647,42 @@ function addTurnLog(player, card, kind) {
 function renderTurnCards(player) {
   var cont = document.getElementById('turnCardsContent');
   if (!cont) return;
-  if (!player.turnLog || player.turnLog.length === 0) {
-    cont.innerHTML = '<p class="empty-state">Aucune carte jouée</p>';
+  var isMe = ONLINE.enabled ? (player && player.id === ONLINE.playerId) : true;
+  var items = isMe ? (player.turnLog || []) : (player.publicTurnLog || []);
+  if (!items || items.length === 0) {
+    cont.innerHTML = '<p class="empty-state">Aucune action</p>';
     return;
   }
-  cont.innerHTML = '<div class="tc-list">' + player.turnLog.map(function(x) {
-    var tag = x.kind === 'activated' ? 'Activé' : 'Joué';
+  cont.innerHTML = '<div class="tc-list">' + items.map(function(x) {
+    var kind = x && x.kind ? x.kind : '';
+    var tag =
+      kind === 'activated' ? 'Activé' :
+      kind === 'played' ? 'Joué' :
+      kind === 'drawn' ? 'Pioché' :
+      kind === 'rolled' ? 'Dé' :
+      kind === 'kept' ? 'Gardé' :
+      kind === 'rerolled' ? 'Relance' :
+      'Action';
+
+    if (!isMe) {
+      var label =
+        kind === 'activated' ? 'Passive activée' :
+        kind === 'played' ? 'Carte jouée' :
+        kind === 'drawn' ? 'Carte piochée' :
+        kind === 'rolled' ? 'Lancé le dé' :
+        kind === 'kept' ? 'Carte gardée' :
+        kind === 'rerolled' ? 'Relancé' :
+        'Action';
+      return '<div class="tc-item">' +
+        '<div class="tc-emoji">🂠</div>' +
+        '<div class="tc-meta">' +
+          '<div class="tc-name">' + esc(label) + '</div>' +
+          '<div class="tc-desc" style="font-style:italic">Détails cachés</div>' +
+        '</div>' +
+        '<div class="tc-tag">' + tag + '</div>' +
+      '</div>';
+    }
+
     return '<div class="tc-item" data-tip="' + esc(x.desc) + '">' +
       '<div class="tc-emoji">' + x.emoji + '</div>' +
       '<div class="tc-meta">' +
@@ -1297,6 +3695,10 @@ function renderTurnCards(player) {
 }
 
 function showCardDraw(player, card) {
+  // Optional third arg: { displayOnly: boolean, autoCloseMs: number }
+  var opts = arguments.length >= 3 ? arguments[2] : null;
+  var displayOnly = !!(opts && opts.displayOnly);
+  var autoCloseMs = (opts && typeof opts.autoCloseMs === 'number') ? opts.autoCloseMs : 900;
   var flipper = document.getElementById('cdFlipper');
   var back = document.getElementById('cdBack');
   flipper.classList.remove('flipped');
@@ -1332,12 +3734,23 @@ function showCardDraw(player, card) {
     // Passive cards auto-apply this round (no choice)
     if (card.type === 'passive') {
       setTimeout(function() {
-        applyPassiveCard(player, card);
-        // Auto-close after showing it briefly
-        setTimeout(function() {
-          document.getElementById('cardDrawOverlay').classList.remove('visible');
-          cardDrawPending = false;
-        }, 900);
+        if (!ONLINE.enabled) {
+          applyPassiveCard(player, card);
+          setTimeout(function() {
+            document.getElementById('cardDrawOverlay').classList.remove('visible');
+            cardDrawPending = false;
+          }, autoCloseMs);
+        } else {
+          // Online: passive already applied server-side; just show it briefly
+          if (!displayOnly) {
+            // Backward compat: if we ever pass a passive as drawnCard, still ask server to apply
+            applyPassiveCard(player, card);
+          }
+          setTimeout(function() {
+            document.getElementById('cardDrawOverlay').classList.remove('visible');
+            cardDrawPending = false;
+          }, autoCloseMs);
+        }
       }, 250);
     }
   };
@@ -1347,6 +3760,13 @@ function showCardDraw(player, card) {
 }
 
 function applyPassiveCard(player, card) {
+  if (ONLINE.enabled && !ONLINE.applyingRemote) {
+    // Server-authoritative in online
+    onlineAction('card:applyPassive', { cardId: card.id }).catch(function(err) { showToast(String(err.message || err), 'danger'); });
+    document.getElementById('cardDrawOverlay').classList.remove('visible');
+    cardDrawPending = false;
+    return;
+  }
   addTurnLog(player, card, 'activated');
   if (card.effect === 'force_bad') {
     player.activePassives.push('force_bad');
@@ -1367,6 +3787,12 @@ function applyPassiveCard(player, card) {
 
 function saveDrawnCard() {
   var player = turnOrder[currentTurnIdx];
+  if (ONLINE.enabled && !ONLINE.applyingRemote) {
+    onlineAction('card:saveDrawn', {}).catch(function(err) { showToast(String(err.message || err), 'danger'); });
+    document.getElementById('cardDrawOverlay').classList.remove('visible');
+    cardDrawPending = false;
+    return;
+  }
   player.hand.push(player.drawnCard);
   player.drawnCard = null;
   document.getElementById('cardDrawOverlay').classList.remove('visible');
@@ -1378,6 +3804,12 @@ function saveDrawnCard() {
 
 function playDrawnCard() {
   var player = turnOrder[currentTurnIdx];
+  if (ONLINE.enabled && !ONLINE.applyingRemote) {
+    onlineAction('card:playDrawn', {}).catch(function(err) { showToast(String(err.message || err), 'danger'); });
+    document.getElementById('cardDrawOverlay').classList.remove('visible');
+    cardDrawPending = false;
+    return;
+  }
   if (player.frozenTurns && player.frozenTurns > 0) {
     showToast('🧊 Gel : impossible de jouer des cartes ce tour', 'danger');
     return;
@@ -1465,6 +3897,7 @@ function executeCard(player, card) {
   } else if (card.id === 'blinded') {
     blindedRound = currentRound;
     blindedBy = player.name;
+    blindedByPid = String(player.id || '');
     showToast(card.emoji + ' Blinded ! Loot caché jusqu’au prochain round.', 'danger');
     renderTurnCenter(player);
   }
@@ -1474,6 +3907,10 @@ function executeCard(player, card) {
 
 function playHandCard(idx) {
   var player = turnOrder[currentTurnIdx];
+  if (ONLINE.enabled && !ONLINE.applyingRemote) {
+    onlineAction('card:playHand', { handIdx: idx }).catch(function(err) { showToast(String(err.message || err), 'danger'); });
+    return;
+  }
   if (idx < 0 || idx >= player.hand.length) return;
   var card = player.hand.splice(idx, 1)[0];
   executeCard(player, card);
@@ -1534,6 +3971,10 @@ function closeCardPreview() {
 
 function renderTopbar() {
   var rm = ROUND_META[currentRound];
+  var hostBtn = '';
+  if (ONLINE.enabled && onlineIsHost()) {
+    hostBtn = '<button class="btn btn-danger-fill" style="padding:.5rem .7rem;font-size:.72rem" onclick="endOnlineRoomGame()">⛔ Terminer la partie</button>';
+  }
   document.getElementById('gameTopbar').innerHTML =
     '<span class="mode-badge mode-badge-' + mode + '">' + (mode === 'normal' ? '🎲 Normal' : '🔥 Chaos') + '</span>' +
     '<span class="mode-badge" style="background:rgba(255,255,255,.08);color:var(--text)">' + rm.emoji + ' R' + (currentRound + 1) + '/3</span>' +
@@ -1545,7 +3986,19 @@ function renderTopbar() {
       return '<div class="' + cls + '" style="background:' + p.color + '" title="' + esc(p.name) + '">' + initial(p.name) + '</div>';
     }).join('') +
     '</div>' +
-    '<div class="topbar-box">📦 ' + box.length + '</div>';
+    '<div class="topbar-box">📦 ' + box.length + '</div>' +
+    hostBtn;
+}
+
+function endOnlineRoomGame() {
+  if (!ONLINE.enabled) return;
+  if (!onlineIsHost()) return showToast('Seul l’hôte peut terminer la partie.', 'danger');
+  onlineAction('host:resetRoom', {}).catch(function(err) { showToast(String(err.message || err), 'danger'); });
+}
+
+function restartOnlineRoomGame() {
+  // Same effect as "terminer": reset room back to lobby
+  endOnlineRoomGame();
 }
 
 function renderTurnCenter(player) {
@@ -1558,9 +4011,21 @@ function renderTurnCenter(player) {
   document.getElementById('gameRange').textContent = 'Fourchette : 1 – ' + pBox.length;
   var btn = document.getElementById('gameRollBtn');
   btn.style.display = '';
-  btn.disabled = false;
   btn.textContent = '🎲 Lancer le dé';
-  document.getElementById('rerollStatus').style.display = 'none';
+  var statusEl = document.getElementById('rerollStatus');
+  statusEl.style.display = 'none';
+
+  if (ONLINE.enabled) {
+    var currentPid = (ONLINE.turnOrderIds || [])[currentTurnIdx];
+    var isMyTurn = String(currentPid || '') === String(ONLINE.playerId || '');
+    btn.disabled = !isMyTurn;
+    if (!isMyTurn) {
+      statusEl.style.display = '';
+      statusEl.textContent = 'C’est au tour de ' + esc(player.name) + '…';
+    }
+  } else {
+    btn.disabled = false;
+  }
 
   var handArea = document.getElementById('handArea');
   if (!handArea) {
@@ -1568,7 +4033,23 @@ function renderTurnCenter(player) {
     handArea.id = 'handArea';
     document.getElementById('gameCenter').appendChild(handArea);
   }
-  if (player.hand.length > 0) {
+  // Online: always show *my* hand, even when it's not my turn.
+  var myId = String(ONLINE.playerId || '');
+  var me = (ONLINE.enabled && players && players.find) ? players.find(function(p) { return p && String(p.id || '') === myId; }) : null;
+  var handOwner = (ONLINE.enabled ? (me || player) : player);
+
+  if (ONLINE.enabled && handOwner && String(handOwner.id || '') === myId && handOwner.hand && handOwner.hand.length > 0) {
+    var disabledAll = (String(((ONLINE.turnOrderIds || [])[currentTurnIdx]) || '') !== myId) || (handOwner.frozenTurns && handOwner.frozenTurns > 0);
+    handArea.className = 'hand-panel';
+    handArea.innerHTML = handOwner.hand.map(function(c, i) {
+      var rm = RARITY_META[c.rarity];
+      return '<button class="hand-card-btn" ' +
+        (disabledAll ? 'disabled style="opacity:.5;cursor:not-allowed;border-color:rgba(255,255,255,.08)"' : 'onclick="previewHandCard(' + i + ')" data-tip="' + esc(c.desc) + '" style="border-color:' + rm.color + '"') +
+        '>' +
+        '<span>' + c.emoji + '</span> ' + c.name +
+      '</button>';
+    }).join('');
+  } else if (!ONLINE.enabled && player.hand.length > 0) {
     handArea.className = 'hand-panel';
     handArea.innerHTML = player.hand.map(function(c, i) {
       var rm = RARITY_META[c.rarity];
@@ -1602,18 +4083,41 @@ function renderSidebar() {
   document.getElementById('gameSidebar').innerHTML = turnOrder.map(function(p, i) {
     var cls = 'sidebar-player';
     if (isCurrent(p, i)) cls += ' is-current';
-    var total = p.picks[0].length + p.picks[1].length + p.picks[2].length;
+    var myId0 = String(ONLINE.playerId || '');
+    var isMe0 = ONLINE.enabled ? (p && String(p.id || '') === myId0) : true;
+    // Defensive: online state can be partially missing for some players
+    var picks0 = (p && p.picks && p.picks[0]) ? p.picks[0] : [];
+    var picks1 = (p && p.picks && p.picks[1]) ? p.picks[1] : [];
+    var picks2 = (p && p.picks && p.picks[2]) ? p.picks[2] : [];
+    var total = picks0.length + picks1.length + picks2.length;
+    if (ONLINE.enabled && !isMe0 && p && p.pickCounts) {
+      total = (Number(p.pickCounts[0] || 0) + Number(p.pickCounts[1] || 0) + Number(p.pickCounts[2] || 0));
+    }
     var picksHtml = '';
     for (var r = 0; r < 3; r++) {
       var rm = ROUND_META[r];
-      if (p.picks[r].length > 0) {
+      var roundPicks = (p && p.picks && Array.isArray(p.picks[r])) ? p.picks[r] : [];
+      // Online privacy: opponents' picks are hidden, but we can show count placeholders
+      var myId = String(ONLINE.playerId || '');
+      if (ONLINE.enabled && p && String(p.id || '') !== myId && p.pickCounts && typeof p.pickCounts[r] === 'number') {
+        var cnt = p.pickCounts[r];
+        if (cnt > 0) {
+          for (var kk = 0; kk < cnt; kk++) {
+            picksHtml += '<div class="sb-card"><span style="font-size:.6rem;opacity:.6">' + rm.emoji + '</span><div class="sb-card-thumb confidential">🔒</div>Confidentiel</div>';
+          }
+        } else if (r <= currentRound) {
+          picksHtml += '<div class="sb-empty">' + rm.emoji + ' —</div>';
+        }
+        continue;
+      }
+      if (roundPicks.length > 0) {
         var blindThisRound = blindedRound === currentRound && r === currentRound && !p.shieldedRound;
         if (blindThisRound) {
-          picksHtml += p.picks[r].map(function() {
-            return '<div class="sb-card"><span style="font-size:.6rem;opacity:.6">' + rm.emoji + '</span><div class="sb-card-thumb">🂠</div>Résultat caché</div>';
+          picksHtml += roundPicks.map(function() {
+            return '<div class="sb-card"><span style="font-size:.6rem;opacity:.6">' + rm.emoji + '</span><div class="sb-card-thumb hidden-pick">🌫️</div>Résultat caché</div>';
           }).join('');
         } else {
-          picksHtml += p.picks[r].map(function(e) {
+          picksHtml += roundPicks.map(function(e) {
             return '<div class="sb-card"><span style="font-size:.6rem;opacity:.6">' + rm.emoji + '</span><div class="sb-card-thumb">' + thumbHtml(e) + '</div>' + esc(e.name) + '</div>';
           }).join('');
         }
@@ -1624,16 +4128,20 @@ function renderSidebar() {
     if (!picksHtml) picksHtml = '<div class="sb-empty">Pas encore de carte</div>';
 
     var handHtml = '';
-    if (p.hand.length > 0) {
+    var handArr = (p && Array.isArray(p.hand)) ? p.hand : [];
+    var handCount = (p && typeof p.handCount === 'number') ? p.handCount : handArr.length;
+    if (handCount > 0) {
       handHtml = '<div class="sb-hand">';
-      if (isCurrent(p, i)) {
-        handHtml += p.hand.map(function(c, hi) {
+      var myId2 = String(ONLINE.playerId || '');
+      // In online mode, you should always see your own hand face-up (even off-turn).
+      if (ONLINE.enabled && p && String(p.id || '') === myId2) {
+        handHtml += handArr.map(function(c, hi) {
           var rm = RARITY_META[c.rarity];
           return '<div class="sb-hand-card sb-hand-faceup" onclick="previewHandCard(' + hi + ')" style="border-color:' + rm.color + '" data-tip="' + esc(c.desc) + '">' + c.emoji + '</div>';
         }).join('');
       } else {
-        for (var h = 0; h < p.hand.length; h++) {
-          handHtml += '<div class="sb-hand-card sb-hand-facedown" title="Carte cachée">🂠</div>';
+        for (var h2 = 0; h2 < handCount; h2++) {
+          handHtml += '<div class="sb-hand-card sb-hand-facedown" title="Carte cachée">❓</div>';
         }
       }
       handHtml += '</div>';
@@ -1660,7 +4168,7 @@ function renderSidebar() {
       '<div class="sb-header">' +
         '<span class="sb-dot" style="background:' + p.color + '"></span>' +
         '<span class="sb-name">' + esc(p.name) + '</span>' +
-        '<span class="sb-badge">' + total + (p.hand.length > 0 ? ' | 🃏' + p.hand.length : '') + '</span>' +
+        '<span class="sb-badge">' + total + (handCount > 0 ? ' | 🃏' + handCount : '') + '</span>' +
       '</div>' +
       rerollsHtml +
       '<div class="sb-cards">' + picksHtml + '</div>' +
@@ -1674,11 +4182,18 @@ function renderSidebar() {
 function renderInventory(player) {
   var meta = ROUND_META[currentRound];
   document.getElementById('invTitle').textContent = meta.invTitle + ' — ' + player.name;
-  var picks = player.picks[currentRound];
   var cont = document.getElementById('invContent');
-  if (picks.length === 0) {
-    cont.innerHTML = '<p class="empty-state">Aucune carte pour l\'instant</p>';
-  } else {
+  if (!player || !player.picks) {
+    cont.innerHTML = '<p class="empty-state">—</p>';
+    return;
+  }
+
+  if (!ONLINE.enabled) {
+    var picks = player.picks[currentRound] || [];
+    if (picks.length === 0) {
+      cont.innerHTML = '<p class="empty-state">Aucune carte pour l\'instant</p>';
+      return;
+    }
     var blindActive = blindedRound === currentRound && !player.shieldedRound;
     if (blindActive) {
       cont.innerHTML = '<div class="inv-grid">' +
@@ -1693,7 +4208,32 @@ function renderInventory(player) {
         return '<div class="inv-item"><div class="inv-thumb">' + thumbHtml(e) + '</div>' + esc(e.name) + '</div>';
       }).join('') +
     '</div>';
+    return;
   }
+
+  // Online: keep loot private between players (only show your own results)
+  if (String(player.id || '') !== String(ONLINE.playerId || '')) {
+    cont.innerHTML = '<p class="empty-state">Résultats cachés</p>';
+    return;
+  }
+
+  // Show your full progress (3 rounds)
+  var html = '';
+  for (var r = 0; r < 3; r++) {
+    var rm = ROUND_META[r];
+    var rp = (player.picks && Array.isArray(player.picks[r])) ? player.picks[r] : [];
+    html += '<div style="margin:.2rem 0 .35rem;font-weight:900;color:var(--text-dim);font-size:.78rem">' +
+      rm.emoji + ' ' + esc(rm.name) +
+    '</div>';
+    if (rp.length === 0) {
+      html += '<p class="empty-state" style="padding:.4rem 0">—</p>';
+      continue;
+    }
+    html += '<div class="inv-grid">' +
+      rp.map(function(e) { return '<div class="inv-item"><div class="inv-thumb">' + thumbHtml(e) + '</div>' + esc(e.name) + '</div>'; }).join('') +
+    '</div>';
+  }
+  cont.innerHTML = html || '<p class="empty-state">—</p>';
 }
 
 /* ── Eliminate 3 ── */
@@ -1743,6 +4283,12 @@ function confirmEliminate() {
   var player = turnOrder[currentTurnIdx];
   var pBox = getPlayerBox(player);
   var toRemove = elimSelected.map(function(i) { return pBox[i].id; });
+  if (ONLINE.enabled && !ONLINE.applyingRemote) {
+    elimSelected = [];
+    document.getElementById('eliminateOverlay').classList.remove('visible');
+    onlineAction('card:eliminate3_confirm', { ids: toRemove }).catch(function(err) { showToast(String(err.message || err), 'danger'); });
+    return;
+  }
   toRemove.forEach(function(id) { player.banned.push(id); });
   elimSelected = [];
   document.getElementById('eliminateOverlay').classList.remove('visible');
@@ -1841,6 +4387,11 @@ function startExchDuel() {
   var total = 20 + Math.floor(Math.random() * 8);
   var roll1 = Math.floor(Math.random() * 6) + 1;
   var roll2 = Math.floor(Math.random() * 6) + 1;
+  // Online: the server will resolve; we only show the animation.
+  if (ONLINE.enabled) {
+    roll1 = Math.floor(Math.random() * 6) + 1;
+    roll2 = Math.floor(Math.random() * 6) + 1;
+  }
 
   var iv = setInterval(function() {
     d1.textContent = Math.floor(Math.random() * 6) + 1;
@@ -1860,6 +4411,17 @@ function startExchDuel() {
 function resolveExchDuel(r1, r2) {
   var player = turnOrder[currentTurnIdx];
   var resultEl = document.getElementById('exchResult');
+  if (ONLINE.enabled && !ONLINE.applyingRemote) {
+    // In online, server resolves the duel and applies the exchange.
+    var tid = exchTarget && exchTarget.id != null ? exchTarget.id : null;
+    resultEl.innerHTML = '<p style="color:var(--text-dim);font-weight:700;margin-top:.5rem">Résolution en cours…</p>';
+    onlineAction('card:exchange_resolve', { targetId: tid, round: exchRound, pickIdx: exchPickIdx }).catch(function(err) {
+      showToast(String(err.message || err), 'danger');
+      resultEl.innerHTML = '<p style="color:var(--danger);font-weight:700;margin-top:.5rem">Erreur…</p>' +
+        '<button class="btn btn-gold" onclick="closeExchange()" style="margin-top:.8rem">Fermer</button>';
+    });
+    return;
+  }
   if (r1 > r2) {
     var myPick = player.picks[exchRound][exchPickIdx];
     var targetPicks = exchTarget.picks[exchRound];
@@ -1883,9 +4445,12 @@ function resolveExchDuel(r1, r2) {
   renderInventory(player);
 }
 
-function closeExchange() {
+function closeExchange(skipOnlineCancel) {
   document.getElementById('exchangeOverlay').classList.remove('visible');
   exchTarget = null;
+  if (!skipOnlineCancel && ONLINE.enabled && !ONLINE.applyingRemote && pending && pending.byPid && String(pending.byPid) === String(ONLINE.playerId || '')) {
+    onlineAction('card:cancelPending', {}).catch(function(err) { showToast(String(err.message || err), 'danger'); });
+  }
 }
 
 /* ── Generic overlays helpers ── */
@@ -1894,9 +4459,12 @@ function openActionOverlay(html) {
   document.getElementById('actionOverlay').classList.add('visible');
 }
 
-function closeActionOverlay() {
+function closeActionOverlay(skipOnlineCancel) {
   document.getElementById('actionOverlay').classList.remove('visible');
   document.getElementById('actionContent').innerHTML = '';
+  if (!skipOnlineCancel && ONLINE.enabled && !ONLINE.applyingRemote && pending && pending.byPid && String(pending.byPid) === String(ONLINE.playerId || '')) {
+    onlineAction('card:cancelPending', {}).catch(function(err) { showToast(String(err.message || err), 'danger'); });
+  }
 }
 
 function showCardsLibrary() {
@@ -1935,7 +4503,7 @@ function showCardsLibrary() {
 
 function cardMiniHtml(e) {
   var icon = e.emoji ? e.emoji : (e.image ? '' : '❓');
-  var thumb = e.image ? '<img src="' + e.image + '" alt="">' : icon;
+  var thumb = e.image ? '<img class="mini-thumb-img" src="' + e.image + '" alt="">' : icon;
   var gb = (typeof e.good === 'boolean')
     ? ('<span class="pill ' + (e.good ? 'pill-good' : 'pill-bad') + '">' + (e.good ? 'Good' : 'Bad') + '</span>')
     : '';
@@ -1949,6 +4517,10 @@ let secondLookAlt = null;
 function triggerSecondLook() {
   var player = turnOrder[currentTurnIdx];
   if (!player.secondLookArmed || player.secondLookUsed) return;
+  if (ONLINE.enabled && !ONLINE.applyingRemote) {
+    onlineAction('card:second_regard_roll', {}).catch(function(err) { showToast(String(err.message || err), 'danger'); });
+    return;
+  }
   var pBox = getPlayerBox(player);
   if (pBox.length < 2) return;
   var alt = pBox[Math.floor(Math.random() * pBox.length)];
@@ -1960,10 +4532,13 @@ function triggerSecondLook() {
 
 function showChoiceTwo(player, a, b, title, subtitle) {
   var chosen = null;
+  // For these cards we prefer vertical layout (one per row).
+  var gridClass = 'choice-grid is-two';
+  if (title && (title.indexOf('👀') === 0 || title.indexOf('🎴') === 0)) gridClass = 'choice-grid is-columns';
   var html =
     '<h3 style="margin-bottom:.25rem">' + esc(title) + '</h3>' +
     '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">' + esc(subtitle) + '</p>' +
-    '<div class="choice-grid is-two">' +
+    '<div class="' + gridClass + '">' +
       '<button class="choice-btn" id="choiceA" onclick="selectChoiceTwo(0)">' + cardMiniHtml(a) + '</button>' +
       '<button class="choice-btn" id="choiceB" onclick="selectChoiceTwo(1)">' + cardMiniHtml(b) + '</button>' +
     '</div>' +
@@ -1981,6 +4556,18 @@ function selectChoiceTwo(which) {
 
 function confirmChoiceTwo() {
   var pick = (window._choiceTwo.picked === 0) ? window._choiceTwo.a : window._choiceTwo.b;
+  if (ONLINE.enabled && !ONLINE.applyingRemote) {
+    closeActionOverlay(true);
+    // Reused UI for multiple pending flows.
+    if (pending && pending.type === 'double_pioche_choice') {
+      onlineAction('turn:double_pioche_choose', { keep: (window._choiceTwo.picked === 1) ? 'b' : 'a' })
+        .catch(function(err) { showToast(String(err.message || err), 'danger'); });
+    } else {
+      onlineAction('card:second_regard_confirm', { which: window._choiceTwo.picked })
+        .catch(function(err) { showToast(String(err.message || err), 'danger'); });
+    }
+    return;
+  }
   currentEntity = pick;
   closeActionOverlay();
   setTimeout(function() { showReveal(false); }, 150);
@@ -2029,7 +4616,7 @@ function selectSabotageMode(mode) {
     '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">' + sub + '</p>' +
     '<div class="exch-players">' +
       others.map(function(p) {
-        return '<button class="exch-player-btn" onclick="confirmPetitSabotage(' + p.id + ')">' +
+        return '<button class="exch-player-btn" onclick="confirmPetitSabotage(' + jsq(p.id) + ')">' +
           '<span style="width:10px;height:10px;border-radius:50%;background:' + p.color + ';display:inline-block"></span>' +
           esc(p.name) +
         '</button>';
@@ -2041,10 +4628,16 @@ function selectSabotageMode(mode) {
 
 function confirmPetitSabotage(targetId) {
   var player = turnOrder[currentTurnIdx];
-  var target = turnOrder.find(function(p) { return p.id === targetId; });
-  if (!target) return;
-
   var mode = window._sabo && window._sabo.mode ? window._sabo.mode : 'ban';
+
+  if (ONLINE.enabled && !ONLINE.applyingRemote) {
+    closeActionOverlay(true);
+    onlineAction('card:petit_sabotage_resolve', { mode: mode, targetId: targetId }).catch(function(err) { showToast(String(err.message || err), 'danger'); });
+    return;
+  }
+
+  var target = turnOrder.find(function(p) { return String(p && p.id || '') === String(targetId || ''); });
+  if (!target) return;
 
   if (mode === 'reroll') {
     if ((target.rerollsLeft || 0) <= 0) {
@@ -2113,7 +4706,7 @@ function showNostalgie(player) {
     '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">Choisis le joueur à forcer (toi inclus)</p>' +
     '<div class="exch-players">' +
       turnOrder.map(function(p) {
-        return '<button class="exch-player-btn" onclick="selectNostalgieTarget(' + p.id + ')">' +
+        return '<button class="exch-player-btn" onclick="selectNostalgieTarget(' + jsq(p.id) + ')">' +
           '<span style="width:10px;height:10px;border-radius:50%;background:' + p.color + ';display:inline-block"></span>' +
           esc(p.name) +
         '</button>';
@@ -2128,30 +4721,31 @@ function selectNostalgieTarget(targetId) {
   var target = turnOrder.find(function(p) { return p.id === targetId; });
   if (!target) return;
 
-  // List all picks (up to any round the target has picks in)
-  var items = [];
-  for (var r = 0; r < 3; r++) {
-    (target.picks[r] || []).forEach(function(e, i) {
-      items.push({ r: r, i: i, e: e });
-    });
+  var pc = target && Array.isArray(target.pickCounts) ? target.pickCounts : null;
+  function countForRound(r) {
+    if (ONLINE.enabled && pc) return Number(pc[r] || 0) || 0;
+    return (target.picks && target.picks[r] && target.picks[r].length) ? target.picks[r].length : 0;
   }
-
-  if (items.length === 0) {
+  var c0 = countForRound(0), c1 = countForRound(1), c2 = countForRound(2);
+  if ((c0 + c1 + c2) <= 0) {
     showToast('🕰️ ' + target.name + ' n’a aucune carte à remplacer.', 'danger');
     closeActionOverlay();
     return;
   }
 
+  // Step 1: show 3 blocks (Personne / Action / Lieu), greyed if not available.
   var html =
     '<h3 style="margin-bottom:.25rem">🕰️ Nostalgie</h3>' +
-    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">Choisis quelle carte remplacer chez ' + esc(target.name) + '</p>' +
-    '<div class="choice-grid">' +
-      items.map(function(it, idx) {
-        var rm = ROUND_META[it.r];
-        return '<button class="choice-btn" onclick="confirmNostalgiePick(' + targetId + ',' + it.r + ',' + it.i + ')">' +
+    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">Choisis la catégorie à modifier chez ' + esc(target.name) + '</p>' +
+    '<div class="choice-grid is-columns">' +
+      [0,1,2].map(function(r) {
+        var rm = ROUND_META[r];
+        var cnt = countForRound(r);
+        var disabled = cnt <= 0;
+        return '<button class="choice-btn' + (disabled ? ' disabled' : '') + '" ' +
+          (disabled ? '' : ('onclick="showNostalgieRound(' + jsq(targetId) + ',' + r + ')"')) + '>' +
           '<div class="choice-title">' + rm.emoji + ' ' + rm.name + '</div>' +
-          '<div style="font-weight:900;font-size:.85rem;margin-bottom:.15rem">' + esc(it.e.name) + '</div>' +
-          '<div class="choice-desc">Remplacer par une autre carte de la boîte</div>' +
+          '<div class="choice-desc">' + (disabled ? 'Pas encore choisi' : ('Choisir 1 carte à remplacer (' + cnt + ')')) + '</div>' +
         '</button>';
       }).join('') +
     '</div>' +
@@ -2159,8 +4753,49 @@ function selectNostalgieTarget(targetId) {
   openActionOverlay(html);
 }
 
+function showNostalgieRound(targetId, r) {
+  var target = turnOrder.find(function(p) { return p && p.id === targetId; });
+  if (!target) return;
+  var rm = ROUND_META[r];
+  var items = [];
+
+  if (ONLINE.enabled && target && Array.isArray(target.pickCounts)) {
+    var cnt = Number(target.pickCounts[r] || 0) || 0;
+    for (var i = 0; i < cnt; i++) items.push({ r: r, i: i, e: { name: 'Carte #' + (i + 1) } });
+  } else {
+    (target.picks && target.picks[r] ? target.picks[r] : []).forEach(function(e, i) {
+      items.push({ r: r, i: i, e: e });
+    });
+  }
+
+  if (!items.length) {
+    showToast('🕰️ Rien à remplacer dans ' + rm.name + '.', 'danger');
+    return;
+  }
+
+  var html =
+    '<h3 style="margin-bottom:.25rem">🕰️ Nostalgie</h3>' +
+    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">Choisis quelle carte remplacer (' + esc(rm.name) + ')</p>' +
+    '<div class="choice-grid is-columns">' +
+      items.map(function(it) {
+        return '<button class="choice-btn" onclick="confirmNostalgiePick(' + jsq(targetId) + ',' + it.r + ',' + it.i + ')">' +
+          '<div class="choice-title">' + rm.emoji + ' ' + rm.name + '</div>' +
+          '<div style="font-weight:900;font-size:.85rem;margin-bottom:.15rem">' + esc((it.e && it.e.name) ? it.e.name : 'Carte') + '</div>' +
+          '<div class="choice-desc">Remplacer par une autre carte de la boîte</div>' +
+        '</button>';
+      }).join('') +
+    '</div>' +
+    '<button class="btn btn-back" onclick="selectNostalgieTarget(' + jsq(targetId) + ')">← Retour</button>';
+  openActionOverlay(html);
+}
+
 function confirmNostalgiePick(targetId, r, pickIdx) {
   var attacker = turnOrder[currentTurnIdx];
+  if (ONLINE.enabled && !ONLINE.applyingRemote) {
+    closeActionOverlay(true);
+    onlineAction('card:nostalgie_confirm', { targetId: targetId, round: r, pickIdx: pickIdx }).catch(function(err) { showToast(String(err.message || err), 'danger'); });
+    return;
+  }
   var target = turnOrder.find(function(p) { return p.id === targetId; });
   if (!target) return;
   var old = target.picks[r] && target.picks[r][pickIdx];
@@ -2195,9 +4830,19 @@ function applyJackpot(player) {
   }
   var c1 = drawCard();
   var c2 = drawCard();
-  c1.mustPlayThisTurn = true;
-  c2.mustPlayThisTurn = true;
-  player.hand.push(c1, c2);
+  function gainOrActivate(cc) {
+    if (!cc) return;
+    if (cc.type === 'passive') {
+      applyPassiveCard(player, cc);
+      return;
+    }
+    cc.mustPlayThisTurn = true;
+    player.hand.push(cc);
+  }
+  gainOrActivate(c1);
+  gainOrActivate(c2);
+  // Show what you got (use the same UI as online)
+  showJackpotDraw([c1, c2]);
   showToast('🎰 Jackpot : 2 cartes bonus ! (à jouer ce tour)', 'success');
   renderSidebar();
   renderTurnCenter(player);
@@ -2210,7 +4855,7 @@ function showGel(player) {
     '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">Choisis un joueur</p>' +
     '<div class="exch-players">' +
       turnOrder.map(function(p) {
-        return '<button class="exch-player-btn" onclick="confirmGel(' + p.id + ')">' +
+        return '<button class="exch-player-btn" onclick="confirmGel(' + jsq(p.id) + ')">' +
           '<span style="width:10px;height:10px;border-radius:50%;background:' + p.color + ';display:inline-block"></span>' +
           esc(p.name) +
         '</button>';
@@ -2222,6 +4867,11 @@ function showGel(player) {
 
 function confirmGel(targetId) {
   var attacker = turnOrder[currentTurnIdx];
+  if (ONLINE.enabled && !ONLINE.applyingRemote) {
+    closeActionOverlay(true);
+    onlineAction('card:gel_resolve', { targetId: targetId }).catch(function(err) { showToast(String(err.message || err), 'danger'); });
+    return;
+  }
   var target = turnOrder.find(function(p) { return p.id === targetId; });
   if (!target) return;
   target.frozenTurns = Math.max(target.frozenTurns || 0, 1);
@@ -2234,8 +4884,14 @@ function confirmGel(targetId) {
 
 /* ── Partage ? ── */
 function showPartage(player) {
+  if (ONLINE.enabled && !ONLINE.applyingRemote) {
+    // Server already opened pending.type === 'partage' when the card was played.
+  }
   var candidates = turnOrder.filter(function(p) { return p.id !== player.id; });
-  var anyHave = candidates.some(function(p) { return p.hand && p.hand.length > 0; });
+  var anyHave = candidates.some(function(p) {
+    var hc = (p && typeof p.handCount === 'number') ? p.handCount : ((p.hand && p.hand.length) ? p.hand.length : 0);
+    return hc > 0;
+  });
   if (!anyHave) {
     var rnd = drawCard();
     rnd.mustPlayThisTurn = true;
@@ -2250,8 +4906,9 @@ function showPartage(player) {
     '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">Choisis un adversaire (on copie une de ses cartes)</p>' +
     '<div class="exch-players">' +
       candidates.map(function(p) {
-        var label = esc(p.name) + (p.hand.length ? ' (🃏' + p.hand.length + ')' : ' (vide)');
-        return '<button class="exch-player-btn" ' + (p.hand.length ? '' : 'disabled style="opacity:.35;cursor:not-allowed"') + ' onclick="confirmPartage(' + p.id + ')">' +
+        var hc = (p && typeof p.handCount === 'number') ? p.handCount : ((p.hand && p.hand.length) ? p.hand.length : 0);
+        var label = esc(p.name) + (hc ? ' (🃏' + hc + ')' : ' (vide)');
+        return '<button class="exch-player-btn" ' + (hc ? '' : 'disabled style="opacity:.35;cursor:not-allowed"') + ' onclick="confirmPartage(' + jsq(p.id) + ')">' +
           '<span style="width:10px;height:10px;border-radius:50%;background:' + p.color + ';display:inline-block"></span>' +
           label +
         '</button>';
@@ -2263,6 +4920,11 @@ function showPartage(player) {
 
 function confirmPartage(targetId) {
   var player = turnOrder[currentTurnIdx];
+  if (ONLINE.enabled && !ONLINE.applyingRemote) {
+    closeActionOverlay(true);
+    onlineAction('card:partage_resolve', { targetId: targetId }).catch(function(err) { showToast(String(err.message || err), 'danger'); });
+    return;
+  }
   var target = turnOrder.find(function(p) { return p.id === targetId; });
   if (!target || !target.hand || target.hand.length === 0) return;
   var src = target.hand[Math.floor(Math.random() * target.hand.length)];
@@ -2323,11 +4985,103 @@ function confirmCardPicker() {
   if (!st || st.chosen == null) return;
   var card = makeCardCopy(st.pool[st.chosen]);
   if (st.mustPlay) card.mustPlayThisTurn = true;
+  if (ONLINE.enabled && !ONLINE.applyingRemote) {
+    closeActionOverlay(true);
+    onlineAction('card:pickerChoose', { cardId: card.id, mustPlayThisTurn: !!st.mustPlay }).catch(function(err) {
+      showToast(String(err.message || err), 'danger');
+    });
+    return;
+  }
   player.hand.push(card);
   showToast('🃏 Carte ajoutée en main : ' + card.name, 'success');
   closeActionOverlay();
   renderSidebar();
   renderTurnCenter(player);
+}
+
+function showAboveAverageFromServer(score, ok) {
+  var html =
+    '<h3 style="margin-bottom:.25rem">📈 Above average</h3>' +
+    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.6rem">Jet : <span style="color:var(--gold);font-weight:900">' + Number(score) + '</span> / 100</p>' +
+    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">' + (ok ? 'Succès : Commune ou Rare au choix.' : 'Échec : rien ne se passe.') + '</p>' +
+    (ok ? '<button class="btn btn-gold" onclick="openAboveAveragePicker()">Choisir une carte</button>' : '') +
+    '<button class="btn btn-back" onclick="closeActionOverlay()" style="margin-left:.4rem">Fermer</button>';
+  window._aboveAvg = { ok: !!ok };
+  openActionOverlay(html);
+}
+
+function showPiocheSacreeFromServer(score, allowed) {
+  var a = Array.isArray(allowed) ? allowed : [];
+  var html =
+    '<h3 style="margin-bottom:.25rem">🙏 Pioche sacrée</h3>' +
+    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.6rem">Jet : <span style="color:var(--gold);font-weight:900">' + Number(score) + '</span> / 100</p>' +
+    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">' +
+      (a.length ? ('Tu peux choisir : ' + a.map(function(r){ return (RARITY_META[r] ? RARITY_META[r].label : r); }).join(', ')) : 'Raté…') +
+    '</p>' +
+    (a.length ? '<button class="btn btn-gold" onclick="openPiocheSacreePicker()">Choisir une carte</button>' : '') +
+    '<button class="btn btn-back" onclick="closeActionOverlay()" style="margin-left:.4rem">Fermer</button>';
+  window._piocheSacree = { score: Number(score) || 0, allowed: a };
+  openActionOverlay(html);
+}
+
+function showRound1Pick2of4(cards) {
+  var arr = Array.isArray(cards) ? cards.filter(Boolean) : [];
+  if (!arr.length) return;
+  window._r1pick = { selected: {}, cards: arr };
+  var html =
+    '<h3 style="margin-bottom:.25rem">🃏 Choisis tes cartes (Round 1)</h3>' +
+    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">Choisis <b>2</b> cartes sur 4</p>' +
+    '<div class="choice-grid is-two" id="r1Grid"></div>' +
+    '<button class="btn btn-gold" id="r1Confirm" disabled onclick="confirmRound1Pick2of4()">Valider (2/2)</button>';
+  openActionOverlay(html);
+  document.getElementById('r1Grid').innerHTML = arr.map(function(c, i) {
+    var rm = RARITY_META[c.rarity] || { label: '', color: 'rgba(255,255,255,.25)' };
+    return '<button class="choice-btn r1-card" id="r1Btn' + i + '" onclick="toggleRound1Pick(' + i + ')" style="border-color:' + rm.color + '">' +
+      '<div class="r1-full-card">' +
+        '<span class="r1-rarity" style="color:' + rm.color + ';border-color:' + rm.color + '">' + esc(rm.label || '') + '</span>' +
+        '<div class="r1-emoji">' + esc(c.emoji || '🃏') + '</div>' +
+        '<div class="r1-name">' + esc(c.name || 'Carte') + '</div>' +
+        '<div class="r1-desc">' + esc(c.desc || '') + '</div>' +
+      '</div>' +
+    '</button>';
+  }).join('');
+}
+
+function toggleRound1Pick(i) {
+  var st = window._r1pick;
+  if (!st || !st.cards || !st.cards[i]) return;
+  var id = String(st.cards[i].id || '');
+  if (!id) return;
+  if (st.selected[id]) {
+    delete st.selected[id];
+    var el = document.getElementById('r1Btn' + i);
+    if (el) el.classList.remove('selected');
+  } else {
+    var keys = Object.keys(st.selected);
+    if (keys.length >= 2) return;
+    st.selected[id] = true;
+    var el2 = document.getElementById('r1Btn' + i);
+    if (el2) el2.classList.add('selected');
+  }
+  var cnt = Object.keys(st.selected).length;
+  var btn = document.getElementById('r1Confirm');
+  if (btn) {
+    btn.disabled = cnt !== 2;
+    btn.textContent = 'Valider (' + cnt + '/2)';
+  }
+}
+
+function confirmRound1Pick2of4() {
+  var st = window._r1pick;
+  if (!st) return;
+  var ids = Object.keys(st.selected || {});
+  if (ids.length !== 2) return;
+  if (ONLINE.enabled && !ONLINE.applyingRemote) {
+    closeActionOverlay(true);
+    onlineAction('turn:round1_pick2of4', { cardIds: ids }).catch(function(err) { showToast(String(err.message || err), 'danger'); });
+    return;
+  }
+  closeActionOverlay();
 }
 
 function showPiocheSacree(player) {
@@ -2378,7 +5132,7 @@ function showEchangeDeCorps(player) {
     '<div class="exch-players">' +
       others.map(function(p) {
         var cls = 'exch-player-btn' + (p.shieldedRound ? ' shielded' : '');
-        return '<button class="' + cls + '" onclick="confirmEchangeDeCorps(' + p.id + ')">' +
+        return '<button class="' + cls + '" onclick="confirmEchangeDeCorps(' + jsq(p.id) + ')">' +
           '<span style="width:10px;height:10px;border-radius:50%;background:' + p.color + ';display:inline-block"></span>' +
           esc(p.name) + (p.shieldedRound ? ' 🛡️' : '') +
         '</button>';
@@ -2390,6 +5144,11 @@ function showEchangeDeCorps(player) {
 
 function confirmEchangeDeCorps(targetId) {
   var player = turnOrder[currentTurnIdx];
+  if (ONLINE.enabled && !ONLINE.applyingRemote) {
+    closeActionOverlay(true);
+    onlineAction('card:echange_de_corps_resolve', { targetId: targetId }).catch(function(err) { showToast(String(err.message || err), 'danger'); });
+    return;
+  }
   var target = turnOrder.find(function(p) { return p.id === targetId; });
   if (!target) return;
   if (target.shieldedRound) {
@@ -2425,9 +5184,10 @@ function showVolDeMain(player) {
     '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">Choisis un joueur</p>' +
     '<div class="exch-players">' +
       others.map(function(p) {
-        return '<button class="exch-player-btn" onclick="confirmVolDeMain(' + p.id + ')">' +
+        var hc = (p && typeof p.handCount === 'number') ? p.handCount : ((p.hand && p.hand.length) ? p.hand.length : 0);
+        return '<button class="exch-player-btn" onclick="confirmVolDeMain(' + jsq(p.id) + ')">' +
           '<span style="width:10px;height:10px;border-radius:50%;background:' + p.color + ';display:inline-block"></span>' +
-          esc(p.name) + (p.hand.length ? ' (🃏' + p.hand.length + ')' : ' (vide)') +
+          esc(p.name) + (hc ? ' (🃏' + hc + ')' : ' (vide)') +
         '</button>';
       }).join('') +
     '</div>' +
@@ -2437,6 +5197,11 @@ function showVolDeMain(player) {
 
 function confirmVolDeMain(targetId) {
   var player = turnOrder[currentTurnIdx];
+  if (ONLINE.enabled && !ONLINE.applyingRemote) {
+    closeActionOverlay(true);
+    onlineAction('card:vol_main_resolve', { targetId: targetId }).catch(function(err) { showToast(String(err.message || err), 'danger'); });
+    return;
+  }
   var target = turnOrder.find(function(p) { return p.id === targetId; });
   if (!target) return;
   if (!target.hand || target.hand.length === 0) {
@@ -2465,7 +5230,7 @@ function showCouronne(player) {
   var html =
     '<h3 style="margin-bottom:.25rem">👑 Couronne</h3>' +
     '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">Choisis ton loot parmi 3</p>' +
-    '<div class="choice-grid">' +
+    '<div class="choice-grid is-columns">' +
       opts.map(function(o, i) {
         return '<button class="choice-btn" onclick="confirmCouronne(' + i + ')">' + cardMiniHtml(o) + '</button>';
       }).join('') +
@@ -2479,6 +5244,11 @@ function confirmCouronne(i) {
   var player = turnOrder[currentTurnIdx];
   var pick = window._couronne && window._couronne.opts ? window._couronne.opts[i] : null;
   if (!pick) return;
+  if (ONLINE.enabled && !ONLINE.applyingRemote) {
+    closeActionOverlay(true);
+    onlineAction('card:couronne_resolve', { entityId: pick.id }).catch(function(err) { showToast(String(err.message || err), 'danger'); });
+    return;
+  }
   currentEntity = pick;
   closeActionOverlay();
   setTimeout(function() { showReveal(false); }, 150);
@@ -2533,6 +5303,13 @@ function toggleFifty(idx) {
 
 function confirmFifty() {
   var player = turnOrder[currentTurnIdx];
+  if (ONLINE.enabled && !ONLINE.applyingRemote) {
+    closeActionOverlay(true);
+    onlineAction('card:fifty_confirm', { ids: (window._fifty && window._fifty.selectedIds) ? window._fifty.selectedIds.slice() : [] }).catch(function(err) {
+      showToast(String(err.message || err), 'danger');
+    });
+    return;
+  }
   player.curatedPoolIds = window._fifty.selectedIds.slice();
   showToast('⚖️ 50% activé !', 'success');
   closeActionOverlay();
@@ -2589,6 +5366,36 @@ function applyGoodBoost(player, rolledEntity) {
 
 /* ── Roll the dice (first roll) ── */
 function rollGameDice() {
+  if (ONLINE.enabled && !ONLINE.applyingRemote) {
+    // Same rule as offline: you can't roll while the playable card overlay is pending.
+    if (cardDrawPending) {
+      showToast('Résous d’abord la carte jouable', 'danger');
+      return;
+    }
+    // Dice animation (client-side) + server roll (authoritative)
+    var player = turnOrder[currentTurnIdx];
+    var pBox = getPlayerBox(player);
+    if (!player || !pBox || pBox.length === 0) return;
+
+    var diceEl = document.getElementById('gameDice');
+    diceEl.classList.add('rolling');
+    document.getElementById('gameRollBtn').style.display = 'none';
+
+    var n = pBox.length;
+    var ticks = 0;
+    var total = 18 + Math.floor(Math.random() * 10);
+    var iv = setInterval(function() {
+      diceEl.textContent = Math.floor(Math.random() * n) + 1;
+      ticks++;
+      if (ticks >= total) {
+        clearInterval(iv);
+        diceEl.classList.remove('rolling');
+        document.getElementById('gameRollBtn').style.display = '';
+        onlineAction('turn:roll', {}).catch(function(err) { showToast(String(err.message || err), 'danger'); });
+      }
+    }, 45);
+    return;
+  }
   var player = turnOrder[currentTurnIdx];
   var pBox = getPlayerBox(player);
   if (isAnimating || pBox.length === 0 || cardDrawPending) return;
@@ -2673,7 +5480,7 @@ function rollGameDiceReroll() {
 /* ── Show reveal overlay ── */
 function showReveal(isReroll) {
   var player = turnOrder[currentTurnIdx];
-  var blindActive = blindedRound === currentRound && !player.shieldedRound;
+  var blindActive = blindedRound === currentRound && !player.shieldedRound && String(player.id || '') !== String(blindedByPid || '');
   if (blindActive) {
     document.getElementById('revealThumb').innerHTML = '🂠';
     document.getElementById('revealName').textContent = 'Résultat caché';
@@ -2688,29 +5495,24 @@ function showReveal(isReroll) {
   var roundLabel = ROUND_META[currentRound].revealLabel;
   if (blindActive) roundLabel = 'Loot caché';
 
-  if (isReroll && !player.infiniteReroll) {
-    label.textContent = (mode === 'chaos' && currentRound === 0) ? 'En plus : ' : roundLabel;
-    actions.innerHTML = '<button class="btn btn-gold" onclick="keepEntity()">✅ Garder</button>';
-  } else {
-    label.textContent = roundLabel;
-    var pBox = getPlayerBox(player);
-    var canReroll = pBox.length >= 2 && (player.infiniteReroll || player.rerollsLeft > 0);
-    var rerollBtn = '';
-    var secondLookBtn = '';
-    if (canReroll) {
-      if (player.infiniteReroll) {
-        rerollBtn = '<button class="btn btn-chaos-fill" onclick="rerollEntity()">♾️ Relancer (infini)</button>';
-      } else if (mode === 'chaos' && currentRound === 0) {
-        rerollBtn = '<button class="btn btn-chaos-fill" onclick="rerollEntity()">🔄 Relancer (+1 personne) — ' + player.rerollsLeft + ' relance restant(s)</button>';
-      } else {
-        rerollBtn = '<button class="btn btn-danger-fill" onclick="rerollEntity()">🔄 Relancer (élimine) — ' + player.rerollsLeft + ' relance restant(s)</button>';
-      }
+  label.textContent = (isReroll && (mode === 'chaos' && currentRound === 0)) ? 'En plus : ' : roundLabel;
+  var pBox = getPlayerBox(player);
+  var canReroll = pBox.length >= 2 && (player.infiniteReroll || player.rerollsLeft > 0);
+  var rerollBtn = '';
+  var secondLookBtn = '';
+  if (canReroll) {
+    if (player.infiniteReroll) {
+        rerollBtn = '<button class="btn btn-min btn-min-lg btn-min-success" onclick="rerollEntity()">↻ Relancer</button>';
+    } else if (mode === 'chaos' && currentRound === 0) {
+        rerollBtn = '<button class="btn btn-min btn-min-lg btn-min-success" onclick="rerollEntity()">↻ Relancer · ' + player.rerollsLeft + '</button>';
+    } else {
+        rerollBtn = '<button class="btn btn-min btn-min-lg btn-min-danger" onclick="rerollEntity()">↻ Relancer · ' + player.rerollsLeft + '</button>';
     }
-    if (!blindActive && player.secondLookArmed && !player.secondLookUsed && pBox.length >= 2) {
-      secondLookBtn = '<button class="btn btn-accent" onclick="triggerSecondLook()">👀 Second regard</button>';
-    }
-    actions.innerHTML = '<button class="btn btn-gold" onclick="keepEntity()">✅ Garder</button>' + secondLookBtn + rerollBtn;
   }
+  if (!blindActive && player.secondLookArmed && !player.secondLookUsed && pBox.length >= 2) {
+    secondLookBtn = '<button class="btn btn-accent" onclick="triggerSecondLook()">👀 Second regard</button>';
+  }
+  actions.innerHTML = '<button class="btn btn-gold" onclick="keepEntity()">✅ Garder</button>' + secondLookBtn + rerollBtn;
 
   document.getElementById('revealOverlay').classList.add('visible');
   spawnConfetti();
@@ -2718,10 +5520,18 @@ function showReveal(isReroll) {
 
 /* ── Keep the entity ── */
 function keepEntity() {
+  if (ONLINE.enabled && !ONLINE.applyingRemote) {
+    // Close immediately; server will advance state
+    closeReveal();
+    onlineAction('turn:keep', {}).catch(function(err) { showToast(String(err.message || err), 'danger'); });
+    return;
+  }
   var player = turnOrder[currentTurnIdx];
   player.picks[currentRound].push(currentEntity);
   box = box.filter(function(e) { return e.id !== currentEntity.id; });
   player.curatedPoolIds = null; // 50% only affects next loot this turn
+  // Gel: decrement at end of the frozen player's turn.
+  if (player.frozenTurns && player.frozenTurns > 0) player.frozenTurns--;
 
   showToast(currentEntity.name + ' → inventaire de ' + player.name, 'success');
   closeReveal();
@@ -2739,6 +5549,13 @@ function keepEntity() {
 
 /* ── Reroll ── */
 function rerollEntity() {
+  if (ONLINE.enabled && !ONLINE.applyingRemote) {
+    closeReveal();
+    // Optimistic animation while waiting for RTDB update
+    startOnlineGameRollAnim('reroll');
+    onlineAction('turn:reroll', {}).catch(function(err) { showToast(String(err.message || err), 'danger'); });
+    return;
+  }
   var player = turnOrder[currentTurnIdx];
 
   if (player.infiniteReroll) {
@@ -2751,8 +5568,6 @@ function rerollEntity() {
     return;
   }
 
-  if (hasRerolled || isAnimating) return;
-  hasRerolled = true;
   if (player.rerollsLeft <= 0) return;
   player.rerollsLeft--;
 
@@ -2785,7 +5600,8 @@ function nextTurn() {
   var prevPlayer = turnOrder[prevIdx];
   if (prevPlayer && prevPlayer.hand && prevPlayer.hand.length) {
     var before = prevPlayer.hand.length;
-    prevPlayer.hand = prevPlayer.hand.filter(function(c) { return !c.mustPlayThisTurn; });
+    // Keep "Partage ?" even if it was marked must-play.
+    prevPlayer.hand = prevPlayer.hand.filter(function(c) { return !(c && c.mustPlayThisTurn && String(c.id || '') !== 'partage'); });
     var removed = before - prevPlayer.hand.length;
     if (removed > 0) showToast('⏳ ' + removed + ' carte(s) non jouée(s) : perdues', 'danger');
   }
@@ -2827,6 +5643,23 @@ function endGame() {
   spawnConfetti();
   document.getElementById('summarySubtitle').textContent = 'Le destin a parlé !';
 
+  // Host-only: allow resetting the room back to lobby (online)
+  var existing = document.getElementById('summaryHostActions');
+  if (existing) existing.remove();
+  if (ONLINE.enabled && onlineIsHost()) {
+    var hostActions = document.createElement('div');
+    hostActions.id = 'summaryHostActions';
+    hostActions.style.margin = '1rem 0 1.5rem';
+    hostActions.style.display = 'flex';
+    hostActions.style.justifyContent = 'center';
+    hostActions.style.gap = '.10rem';
+    hostActions.innerHTML =
+      '<button class="btn btn-gold" style="padding:.6rem 1rem" onclick="restartOnlineRoomGame()">🔄 Relancer une game</button>' +
+      '<button class="btn btn-danger-fill" style="padding:.6rem 1rem" onclick="endOnlineRoomGame()">⛔ Terminer la partie</button>';
+    var grid = document.getElementById('summaryGrid');
+    if (grid && grid.parentNode) grid.parentNode.insertBefore(hostActions, grid);
+  }
+
   document.getElementById('summaryGrid').innerHTML = turnOrder.map(function(p) {
     var roundsHtml = '';
     var combo = getComboLabel(p);
@@ -2858,6 +5691,14 @@ function endGame() {
 }
 
 function newGame() {
+  if (ONLINE.enabled && !ONLINE.applyingRemote) {
+    if (!onlineIsHost()) {
+      showToast('En online: seul l’hôte peut relancer.', 'danger');
+      return;
+    }
+    onlineAction('host:resetRoom', {}).catch(function(err) { showToast(String(err.message || err), 'danger'); });
+    return;
+  }
   mode = null;
   players = [];
   box = [];
@@ -2885,6 +5726,19 @@ function newGame() {
     var sz = 2 + Math.random() * 4;
     s.style.width = s.style.height = sz + 'px';
     c.appendChild(s);
+  }
+})();
+
+// Restore online session if present
+(function initOnlineSession() {
+  if (!onlineLoadSession()) return;
+  showToast('🌐 Reconnexion online…', 'success');
+  try {
+    firebaseEnsureInit();
+    onlineStartRealtime(ONLINE.roomCode, ONLINE.playerId);
+  } catch (err) {
+    showToast('Firebase: ' + String(err.message || err), 'danger');
+    onlineLeaveRoom();
   }
 })();
 
