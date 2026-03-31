@@ -946,7 +946,7 @@ const PLAYABLE_CARDS = [
   { id: 'eliminate3', name: 'Élagage', emoji: '🗑️', rarity: 'common', type: 'active', desc: 'Avant de lancer le dé, élimine jusqu’à 3 éléments de TA boîte (personnel). Idéal pour virer des choix que tu ne veux jamais voir.' },
   { id: 'second_regard', name: 'Second regard', emoji: '👀', rarity: 'common', type: 'active', desc: 'Après ton premier loot, tu peux en révéler un 2e (sans éliminer). Tu choisis ensuite lequel garder.' },
   { id: 'petit_sabotage', name: 'Petit sabotage', emoji: '🧨', rarity: 'common', type: 'active', desc: 'Choisis un joueur : ce round, 1 élément est retiré de SA boîte (personnel, au hasard).' },
-  { id: 'pioche_sacree', name: 'Pioche sacrée', emoji: '🙏', rarity: 'common', type: 'active', desc: 'Lance 1d100, débloque des raretés, puis choisis une carte pour ta main.' },
+  { id: 'pioche_sacree', name: 'Pioche sacrée', emoji: '🙏', rarity: 'common', type: 'active', desc: 'Lance 1d100, débloque des raretés selon ton score, puis choisis une carte pour ta main (prête à être jouée).' },
   { id: 'above_average', name: 'Above average', emoji: '📈', rarity: 'common', type: 'active', desc: 'Lance 1d100 : si ≥ 50, choisis une carte Commune ou Rare et elle arrive dans ta main (prête à être jouée).' },
   { id: 'reroll_back', name: 'Deuxième souffle', emoji: '🎲', rarity: 'rare', type: 'active', desc: 'Récupère des relances : si tu n’as pas encore relancé, tu passes à 2. Sinon tu reviens à 1.' },
   { id: 'double_pioche', name: 'Double pioche', emoji: '🎴', rarity: 'rare', type: 'active', desc: 'Ce tour, tu lances 2 fois (sans éliminer) et tu choisis le meilleur résultat à garder.' },
@@ -1258,6 +1258,7 @@ function onlineApplyViewState(vs) {
                 turnLog: [],
                 pendingSabotageBan: 0,
                 frozenTurns: 0,
+                blindedTurns: 0,
                 rollRaw: 0,
                 rollDisplay: 0
               });
@@ -1294,15 +1295,19 @@ function onlineApplyViewState(vs) {
         if (typeof p.rerollsLeft !== 'number') p.rerollsLeft = 1;
         if (typeof p.pendingSabotageBan !== 'number') p.pendingSabotageBan = 0;
         if (typeof p.frozenTurns !== 'number') p.frozenTurns = 0;
+        if (typeof p.blindedTurns !== 'number') p.blindedTurns = 0;
         if (typeof p.goodBoost !== 'number') p.goodBoost = 0;
         if (typeof p.rollRaw !== 'number') p.rollRaw = 0;
         if (typeof p.rollDisplay !== 'number') p.rollDisplay = 0;
         if (!p.color) p.color = '#94a3b8';
         if (!p.name) p.name = 'Joueur';
 
-        // Privacy in online: opponents should not see your drawn card or hand contents.
+        // Privacy in online: opponents should not see your drawn card/hand/picks during the game.
+        // On summary screen, reveal full results to everyone.
+        var phaseNow = String(vs.phase || '');
+        var shouldRedact = (ONLINE.enabled && phaseNow === 'game');
         // Keep only the hand count for facedown rendering (store count explicitly).
-        if (ONLINE.enabled && p.id && String(p.id) !== myId) {
+        if (shouldRedact && p.id && String(p.id) !== myId) {
           // Hide loot results from opponents (Personne/Action/Lieu)
           p.pickCounts = [
             (p.picks && p.picks[0]) ? p.picks[0].length : 0,
@@ -1404,7 +1409,7 @@ function onlineApplyViewState(vs) {
       animateOrderRollsOnline();
       updateOrderBtn();
       // show final order automatically when available
-      if (ONLINE.turnOrderIds && ONLINE.turnOrderIds.length === players.length) {
+      if (ONLINE.turnOrderIds && ONLINE.turnOrderIds.length === players.length && players.length > 0) {
         document.getElementById('orderActions').style.display = 'none';
         document.getElementById('finalOrder').style.display = '';
         document.getElementById('finalOrder').className = 'final-order';
@@ -1424,6 +1429,10 @@ function onlineApplyViewState(vs) {
           (onlineIsHost()
             ? '<div style="text-align:center"><button class="btn btn-gold" onclick="startGame()">⚔️ Commencer !</button></div>'
             : '<p style="color:var(--text-dim);font-size:.82rem;text-align:center">En attente de l’hôte…</p>');
+      } else {
+        // Ensure we don't keep showing a stale "Commencer" from a previous order session
+        document.getElementById('orderActions').style.display = '';
+        document.getElementById('finalOrder').style.display = 'none';
       }
     } else if (vs.phase === 'game') {
       showScreen('screenGame');
@@ -1854,6 +1863,7 @@ function createRoomOnline(m) {
       turnLog: [],
       pendingSabotageBan: 0,
       frozenTurns: 0,
+      blindedTurns: 0,
       rollRaw: 0,
       rollDisplay: 0
     }],
@@ -1949,6 +1959,7 @@ function joinRoomOnline() {
         turnLog: [],
         pendingSabotageBan: 0,
         frozenTurns: 0,
+      blindedTurns: 0,
         rollRaw: 0,
         rollDisplay: 0
       });
@@ -2336,6 +2347,7 @@ function onlineAction(action, payload) {
       }
       // Gel: decrement at end of the frozen player's turn.
       if (p.frozenTurns && p.frozenTurns > 0) p.frozenTurns--;
+      if (p.blindedTurns && p.blindedTurns > 0) p.blindedTurns--;
 
       // advance turn/round
       st.currentTurnIdx = Number(st.currentTurnIdx || 0) + 1;
@@ -2559,7 +2571,21 @@ function onlineAction(action, payload) {
         return;
       }
       if (card.id === 'infinite_reroll') { p.infiniteReroll = true; st.lastActiveCardId = card.id; st.lastActiveCardPlayerId = String(p.id||''); st.lastActiveCardData = { ts: Date.now() }; return; }
-      if (card.id === 'blinded') { st.blindedRound = Number(st.currentRound || 0); st.blindedBy = p.name || ''; st.blindedByPid = String(p.id || ''); st.lastActiveCardId = card.id; st.lastActiveCardPlayerId = String(p.id||''); st.lastActiveCardData = { ts: Date.now() }; return; }
+      if (card.id === 'blinded') {
+        // Apply to the NEXT turn of every opponent (not just the current round).
+        (st.players || []).forEach(function(pp) {
+          if (!pp) return;
+          if (String(pp.id || '') === String(p.id || '')) return; // caster not blinded
+          if (pp.shieldedRound) return; // shield protects
+          pp.blindedTurns = Math.max(Number(pp.blindedTurns || 0) || 0, 1);
+        });
+        st.blindedBy = p.name || '';
+        st.blindedByPid = String(p.id || '');
+        st.lastActiveCardId = card.id;
+        st.lastActiveCardPlayerId = String(p.id||'');
+        st.lastActiveCardData = { ts: Date.now() };
+        return;
+      }
 
       if (card.id === 'miroir') {
         if (!st.lastActiveCardId || st.lastActiveCardId === 'miroir') return;
@@ -3189,6 +3215,7 @@ document.getElementById('playerForm').addEventListener('submit', function(e) {
     turnLog: [],
     pendingSabotageBan: 0,
     frozenTurns: 0,
+      blindedTurns: 0,
     rollRaw: 0,
     rollDisplay: 0
   });
@@ -3940,10 +3967,15 @@ function executeCard(player, card) {
   } else if (card.id === 'echange_de_corps') {
     showEchangeDeCorps(player);
   } else if (card.id === 'blinded') {
-    blindedRound = currentRound;
+    turnOrder.forEach(function(pp) {
+      if (!pp) return;
+      if (pp.id === player.id) return;
+      if (pp.shieldedRound) return;
+      pp.blindedTurns = Math.max(pp.blindedTurns || 0, 1);
+    });
     blindedBy = player.name;
     blindedByPid = String(player.id || '');
-    showToast(card.emoji + ' Blinded ! Loot caché jusqu’au prochain round.', 'danger');
+    showToast(card.emoji + ' Blinded ! Loot caché pour le prochain tour des adversaires.', 'danger');
     renderTurnCenter(player);
   }
   renderSidebar();
@@ -4118,10 +4150,10 @@ function renderTurnCenter(player) {
     var status = document.getElementById('rerollStatus');
     status.style.display = '';
     status.textContent = '♾️ Relance infinie active !';
-  } else if (blindedRound === currentRound && !player.shieldedRound) {
+  } else if ((player.blindedTurns && player.blindedTurns > 0) && !player.shieldedRound) {
     var status2 = document.getElementById('rerollStatus');
     status2.style.display = '';
-    status2.textContent = '🕶️ Blinded : ton loot est caché ce round';
+    status2.textContent = '🕶️ Blinded : ton loot est caché pour ce tour';
   } else if (player.frozenTurns && player.frozenTurns > 0) {
     var status3 = document.getElementById('rerollStatus');
     status3.style.display = '';
@@ -4162,7 +4194,9 @@ function renderSidebar() {
         continue;
       }
       if (roundPicks.length > 0) {
-        var blindThisRound = blindedRound === currentRound && r === currentRound && !p.shieldedRound;
+        // If the player is blinded for their next turn, hide the pick for this round in UI.
+        // (Online opponents are already redacted; this mainly affects offline/shared screen.)
+        var blindThisRound = (p.blindedTurns && p.blindedTurns > 0) && r === currentRound && !p.shieldedRound;
         if (blindThisRound) {
           picksHtml += roundPicks.map(function() {
             return '<div class="sb-card"><span style="font-size:.6rem;opacity:.6">' + rm.emoji + '</span><div class="sb-card-thumb hidden-pick">🌫️</div>Résultat caché</div>';
@@ -5531,7 +5565,7 @@ function rollGameDiceReroll() {
 /* ── Show reveal overlay ── */
 function showReveal(isReroll) {
   var player = turnOrder[currentTurnIdx];
-  var blindActive = blindedRound === currentRound && !player.shieldedRound && String(player.id || '') !== String(blindedByPid || '');
+  var blindActive = (player.blindedTurns && player.blindedTurns > 0) && !player.shieldedRound;
   if (blindActive) {
     document.getElementById('revealThumb').innerHTML = '🂠';
     document.getElementById('revealName').textContent = 'Résultat caché';
@@ -5581,8 +5615,9 @@ function keepEntity() {
   player.picks[currentRound].push(currentEntity);
   box = box.filter(function(e) { return e.id !== currentEntity.id; });
   player.curatedPoolIds = null; // 50% only affects next loot this turn
-  // Gel: decrement at end of the frozen player's turn.
+  // Gel / Blinded: decrement at end of the affected player's turn.
   if (player.frozenTurns && player.frozenTurns > 0) player.frozenTurns--;
+  if (player.blindedTurns && player.blindedTurns > 0) player.blindedTurns--;
 
   showToast(currentEntity.name + ' → inventaire de ' + player.name, 'success');
   closeReveal();
