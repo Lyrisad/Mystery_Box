@@ -3989,14 +3989,20 @@ function showCardPreview(card, opts) {
   document.getElementById('dcName').textContent = card.name;
   document.getElementById('dcDesc').textContent = card.desc;
 
-  var actionsEl = document.getElementById('dcActions');
+  var actionsElIn = document.getElementById('dcActionsIn');
+  var actionsElOut = document.getElementById('dcActionsOut');
+  var setActions = function(html) {
+    if (actionsElIn) actionsElIn.innerHTML = html;
+    if (actionsElOut) actionsElOut.innerHTML = html;
+  };
   if (card.type === 'passive') {
-    actionsEl.innerHTML = '<div style="font-size:.8rem;color:var(--text-dim);font-weight:700">Passive</div>' +
-      '<button class="btn btn-gold" onclick="closeCardPreview()" style="margin-top:.6rem">Fermer</button>';
+    setActions('<div style="font-size:.8rem;color:var(--text-dim);font-weight:700">Passive</div>' +
+      '<button class="btn btn-gold" onclick="closeCardPreview()" style="margin-top:.6rem">Fermer</button>');
   } else {
-    actionsEl.innerHTML =
+    setActions(
       '<button class="btn btn-gold" onclick="__cardPreviewPrimary()">' + (opts.primaryLabel || 'Jouer maintenant') + '</button>' +
       '<button class="btn btn-back" onclick="__cardPreviewSecondary()">' + (opts.secondaryLabel || 'Jouer plus tard') + '</button>';
+    );
   }
 
   window.__cardPreviewPrimary = function() { if (opts && opts.onPrimary) opts.onPrimary(); };
