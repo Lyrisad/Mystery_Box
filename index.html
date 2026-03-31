@@ -960,7 +960,7 @@ const PLAYABLE_CARDS = [
   { id: 'partage', name: 'Partage ?', emoji: '🤝', rarity: 'epic', type: 'active', desc: 'Copie l’effet d’une carte d’un adversaire et devient sa réplique (prête à être jouée ce tour). Si personne n’a de carte, devient une carte aléatoire.' },
   { id: 'infinite_reroll', name: 'Boucle temporelle', emoji: '♾️', rarity: 'legendary', type: 'active', desc: 'Relances illimitées ce tour. Les cartes relancées NE sont pas éliminées : elles retournent dans la boîte.' },
   { id: 'couronne', name: 'Couronne', emoji: '👑', rarity: 'legendary', type: 'active', desc: 'Ce tour, tu choisis ton loot parmi 3 résultats tirés au hasard.' },
-  { id: 'miroir', name: 'Miroir', emoji: '🪞', rarity: 'legendary', type: 'active', desc: 'Copie la dernière carte active jouée ce round (sauf Miroir).' },
+  { id: 'troisieme_oeil', name: 'Troisième œil', emoji: '🔎', rarity: 'legendary', type: 'active', desc: 'Ce tour uniquement, tu peux voir la main de tout le monde (eux ne voient rien de plus).' },
   { id: 'echange_de_corps', name: 'Échange de corps', emoji: '🧬', rarity: 'legendary', type: 'active', desc: 'Choisis un joueur : vous échangez complètement vos “places” (inventaires, main, relances…). Bouclier protège aussi de ça.' },
   { id: 'blinded', name: 'Blinded', emoji: '🕶️', rarity: 'legendary', type: 'active', desc: 'Ce round, tous les joueurs (sauf protégés) ne voient pas leurs résultats de loot. Tout reste caché jusqu’au prochain round.' },
   { id: 'bad_luck', name: 'Malédiction', emoji: '🌑', rarity: 'passive', type: 'passive', desc: 'Ce tour, 25% de chance que ton résultat devienne défavorable (inversé selon ta Personne Good/Bad).', effect: 'force_bad' },
@@ -1019,6 +1019,7 @@ let lastActiveCardData = null;
 let pending = null;
 let lastPassiveDraw = null;
 let lastJackpotDraw = null;
+let revealHands = null;
 
 /* ═══════════════════════════════════════
    Online (Firebase Realtime Database)
@@ -1306,8 +1307,18 @@ function onlineApplyViewState(vs) {
         // On summary screen, reveal full results to everyone.
         var phaseNow = String(vs.phase || '');
         var shouldRedact = (ONLINE.enabled && phaseNow === 'game');
+        // Troisième œil: only the caster sees everyone's hands, only for their current turn.
+        var canSeeAllHands = false;
+        if (shouldRedact && vs.revealHands && String(vs.revealHands.pid || '') === myId) {
+          var curPidNow = (Array.isArray(vs.turnOrder) ? vs.turnOrder[Number(vs.currentTurnIdx || 0) || 0] : null);
+          if (String(curPidNow || '') === myId &&
+              Number(vs.revealHands.round || 0) === Number(vs.currentRound || 0) &&
+              Number(vs.revealHands.turnIdx || 0) === Number(vs.currentTurnIdx || 0)) {
+            canSeeAllHands = true;
+          }
+        }
         // Keep only the hand count for facedown rendering (store count explicitly).
-        if (shouldRedact && p.id && String(p.id) !== myId) {
+        if (shouldRedact && !canSeeAllHands && p.id && String(p.id) !== myId) {
           // Hide loot results from opponents (Personne/Action/Lieu)
           p.pickCounts = [
             (p.picks && p.picks[0]) ? p.picks[0].length : 0,
@@ -1373,6 +1384,7 @@ function onlineApplyViewState(vs) {
     pending = vs.pending || null;
     lastPassiveDraw = vs.lastPassiveDraw || null;
     lastJackpotDraw = vs.lastJackpotDraw || null;
+    revealHands = vs.revealHands || null;
 
     // Phase → screen routing
     if (vs.phase === 'lobby') {
@@ -2605,14 +2617,11 @@ function onlineAction(action, payload) {
         return;
       }
 
-      if (card.id === 'miroir') {
-        if (!st.lastActiveCardId || st.lastActiveCardId === 'miroir') return;
-        var copied = PLAYABLE_CARDS.find(function(c) { return c && c.id === st.lastActiveCardId; });
-        // Publish that Miroir was played (for toasts / UX), then apply the copied card effect.
-        st.lastActiveCardId = 'miroir';
+      if (card.id === 'troisieme_oeil') {
+        st.revealHands = { pid: String(p.id || ''), round: Number(st.currentRound || 0) || 0, turnIdx: Number(st.currentTurnIdx || 0) || 0, ts: Date.now() };
+        st.lastActiveCardId = card.id;
         st.lastActiveCardPlayerId = String(p.id || '');
-        st.lastActiveCardData = { ts: Date.now(), copiedId: copied ? (copied.id || null) : null, copiedName: copied ? (copied.name || '') : '' };
-        if (copied) applyCard(p, copied);
+        st.lastActiveCardData = { ts: Date.now() };
         return;
       }
 
@@ -3989,8 +3998,8 @@ function playDrawnCard() {
 }
 
 function executeCard(player, card) {
-  // Track last active (for Miroir)
-  if (card.type === 'active' && card.id !== 'miroir') {
+  // Track last active
+  if (card.type === 'active') {
     lastActiveCardId = card.id;
     lastActiveCardPlayerId = player.id;
   }
@@ -4043,22 +4052,10 @@ function executeCard(player, card) {
     renderTurnCenter(player);
   } else if (card.id === 'couronne') {
     showCouronne(player);
-  } else if (card.id === 'miroir') {
-    if (!lastActiveCardId) {
-      showToast(card.emoji + ' Rien à copier…', 'danger');
-    } else if (lastActiveCardId === 'miroir') {
-      showToast(card.emoji + ' Impossible de copier Miroir.', 'danger');
-    } else {
-      var copied = PLAYABLE_CARDS.find(function(c) { return c.id === lastActiveCardId; });
-      if (!copied) {
-        showToast(card.emoji + ' Copie impossible.', 'danger');
-      } else {
-        showToast(card.emoji + ' Copie : ' + copied.name, 'success');
-        // Execute copied effect (do not re-track as last card here; executeCard will track it, that's fine)
-        executeCard(player, copied);
-        return; // executeCard already re-rendered
-      }
-    }
+  } else if (card.id === 'troisieme_oeil') {
+    // Offline: reveal doesn't exist (no privacy filter). Just a feedback.
+    showToast(card.emoji + ' Troisième œil : tu vois la main de tout le monde (online).', 'success');
+    renderTurnCenter(player);
   } else if (card.id === 'echange_de_corps') {
     showEchangeDeCorps(player);
   } else if (card.id === 'blinded') {
