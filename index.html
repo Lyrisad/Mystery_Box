@@ -2608,6 +2608,10 @@ function onlineAction(action, payload) {
       if (card.id === 'miroir') {
         if (!st.lastActiveCardId || st.lastActiveCardId === 'miroir') return;
         var copied = PLAYABLE_CARDS.find(function(c) { return c && c.id === st.lastActiveCardId; });
+        // Publish that Miroir was played (for toasts / UX), then apply the copied card effect.
+        st.lastActiveCardId = 'miroir';
+        st.lastActiveCardPlayerId = String(p.id || '');
+        st.lastActiveCardData = { ts: Date.now(), copiedId: copied ? (copied.id || null) : null, copiedName: copied ? (copied.name || '') : '' };
         if (copied) applyCard(p, copied);
         return;
       }
@@ -3032,6 +3036,11 @@ function onlineAction(action, payload) {
       const p = currentPlayer();
       if (!p) return st;
       if (!st.pending || String(st.pending.byPid || '') !== String(currentPid() || '')) return st;
+      // Some cards (Above average / Pioche sacrée) must be resolved: no cancel-to-reroll exploit.
+      if (st.pending && (st.pending.type === 'above_average_picker' || st.pending.type === 'pioche_sacree_picker')) {
+        clearPending();
+        return st;
+      }
       // Put the card back in hand if it was an interactive card
       if (st.pending.card) {
         p.hand = p.hand || [];
@@ -4633,6 +4642,13 @@ function openActionOverlay(html) {
 }
 
 function closeActionOverlay(skipOnlineCancel) {
+  // Non-cancelable pendings: must be resolved to avoid exploits / soft-locks.
+  if (!skipOnlineCancel && ONLINE.enabled && !ONLINE.applyingRemote && pending &&
+      (pending.type === 'above_average_picker' || pending.type === 'pioche_sacree_picker') &&
+      String(pending.byPid || '') === String(ONLINE.playerId || '')) {
+    showToast('Tu dois résoudre la carte (pas d’annulation).', 'danger');
+    return;
+  }
   document.getElementById('actionOverlay').classList.remove('visible');
   document.getElementById('actionContent').innerHTML = '';
   if (!skipOnlineCancel && ONLINE.enabled && !ONLINE.applyingRemote && pending && pending.byPid && String(pending.byPid) === String(ONLINE.playerId || '')) {
@@ -5125,12 +5141,15 @@ function showCardPicker(player, allowedRarities, title, subtitle, mustPlayThisTu
   var pool = PLAYABLE_CARDS.filter(function(c) { return allowedRarities.indexOf(c.rarity) >= 0; });
   if (pool.length === 0) { showToast('Aucune carte disponible.', 'danger'); closeActionOverlay(); return; }
   window._picker = { chosen: null, pool: pool, mustPlay: !!mustPlayThisTurn };
+  var nonCancelableOnline = (ONLINE.enabled && !ONLINE.applyingRemote && pending &&
+    (pending.type === 'above_average_picker' || pending.type === 'pioche_sacree_picker') &&
+    String(pending.byPid || '') === String(ONLINE.playerId || ''));
   var html =
     '<h3 style="margin-bottom:.25rem">' + esc(title) + '</h3>' +
     '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">' + esc(subtitle) + '</p>' +
     '<div class="choice-grid" id="pickerGrid"></div>' +
     '<button class="btn btn-gold" id="pickerConfirm" disabled onclick="confirmCardPicker()">Ajouter en main</button>' +
-    '<button class="btn btn-back" onclick="closeActionOverlay()" style="margin-left:.4rem">Annuler</button>';
+    (nonCancelableOnline ? '' : '<button class="btn btn-back" onclick="closeActionOverlay()" style="margin-left:.4rem">Annuler</button>');
   openActionOverlay(html);
   document.getElementById('pickerGrid').innerHTML = pool.map(function(c, i) {
     var rm = RARITY_META[c.rarity];
@@ -5173,18 +5192,22 @@ function confirmCardPicker() {
 }
 
 function showAboveAverageFromServer(score, ok) {
+  var mustResolve = !!ok && ONLINE.enabled && pending && pending.type === 'above_average_picker' &&
+    String(pending.byPid || '') === String(ONLINE.playerId || '');
   var html =
     '<h3 style="margin-bottom:.25rem">📈 Above average</h3>' +
     '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.6rem">Jet : <span style="color:var(--gold);font-weight:900">' + Number(score) + '</span> / 100</p>' +
     '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">' + (ok ? 'Succès : Commune ou Rare au choix.' : 'Échec : rien ne se passe.') + '</p>' +
     (ok ? '<button class="btn btn-gold" onclick="openAboveAveragePicker()">Choisir une carte</button>' : '') +
-    '<button class="btn btn-back" onclick="closeActionOverlay()" style="margin-left:.4rem">Fermer</button>';
+    (mustResolve ? '' : '<button class="btn btn-back" onclick="closeActionOverlay()" style="margin-left:.4rem">Fermer</button>');
   window._aboveAvg = { ok: !!ok };
   openActionOverlay(html);
 }
 
 function showPiocheSacreeFromServer(score, allowed) {
   var a = Array.isArray(allowed) ? allowed : [];
+  var mustResolve = !!a.length && ONLINE.enabled && pending && pending.type === 'pioche_sacree_picker' &&
+    String(pending.byPid || '') === String(ONLINE.playerId || '');
   var html =
     '<h3 style="margin-bottom:.25rem">🙏 Pioche sacrée</h3>' +
     '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.6rem">Jet : <span style="color:var(--gold);font-weight:900">' + Number(score) + '</span> / 100</p>' +
@@ -5192,7 +5215,7 @@ function showPiocheSacreeFromServer(score, allowed) {
       (a.length ? ('Tu peux choisir : ' + a.map(function(r){ return (RARITY_META[r] ? RARITY_META[r].label : r); }).join(', ')) : 'Raté…') +
     '</p>' +
     (a.length ? '<button class="btn btn-gold" onclick="openPiocheSacreePicker()">Choisir une carte</button>' : '') +
-    '<button class="btn btn-back" onclick="closeActionOverlay()" style="margin-left:.4rem">Fermer</button>';
+    (mustResolve ? '' : '<button class="btn btn-back" onclick="closeActionOverlay()" style="margin-left:.4rem">Fermer</button>');
   window._piocheSacree = { score: Number(score) || 0, allowed: a };
   openActionOverlay(html);
 }
