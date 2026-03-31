@@ -301,8 +301,16 @@
 
     /* ── Card Flip ── */
     /* Bigger, responsive card so description is readable (PC + mobile) */
-    .cd-scene { perspective: 800px; width: min(360px, 92vw); height: min(520px, 78vh); }
-    .cd-flipper { width: 100%; height: 100%; position: relative; transition: transform .7s cubic-bezier(.4,.2,.2,1); transform-style: preserve-3d; cursor: pointer; }
+    .cd-scene {
+      --cd-actions-h: 118px;
+      perspective: 800px;
+      width: min(360px, 92vw);
+      height: min(520px, 78vh);
+      position: relative;
+      padding-bottom: var(--cd-actions-h);
+      box-sizing: border-box;
+    }
+    .cd-flipper { width: 100%; height: calc(100% - var(--cd-actions-h)); position: relative; transition: transform .7s cubic-bezier(.4,.2,.2,1); transform-style: preserve-3d; cursor: pointer; }
     .cd-flipper.flipped { transform: rotateY(180deg); cursor: default; }
     .cd-face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; box-sizing: border-box; }
     .cd-front { background: linear-gradient(145deg, #1e1e3a, #2a2a4a); border: 2px solid rgba(124,58,237,.4); box-shadow: 0 0 40px rgba(124,58,237,.15); }
@@ -317,14 +325,24 @@
     .dc-rarity { font-size: .62rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; margin-bottom: .6rem; background: rgba(0,0,0,.35); padding: .25rem .6rem; border-radius: 999px; border: 1px solid rgba(255,255,255,.12); }
     .dc-emoji { font-size: 3.8rem; margin-bottom: .45rem; filter: drop-shadow(0 8px 18px rgba(0,0,0,.35)); }
     .dc-name { font-size: 1.35rem; font-weight: 900; margin-bottom: .5rem; padding: .4rem .8rem; border-radius: 12px; background: rgba(0,0,0,.28); border: 1px solid rgba(255,255,255,.1); }
-    .dc-desc { font-size: .92rem; color: var(--text-dim); margin-bottom: 1.05rem; line-height: 1.45; width: 100%; flex: 1; overflow: auto; }
-    .dc-actions { display: flex; gap: .7rem; justify-content: center; flex-wrap: wrap; width: 100%; margin-top: auto; padding-top: .25rem; }
+    .dc-desc { font-size: .92rem; color: var(--text-dim); margin-bottom: 1.05rem; line-height: 1.45; width: 100%; overflow: visible; }
+    /* Buttons outside the card so text can fully fit */
+    .dc-actions {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: calc(-1 * var(--cd-actions-h));
+      display: flex;
+      gap: .7rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+      padding-top: .25rem;
+    }
 
     /* Small screens: prevent card text overflow */
-    .cd-back { overflow: hidden; }
+    .cd-back { overflow: visible; }
     .dc-desc { max-height: none; padding-right: .2rem; }
-    .dc-desc::-webkit-scrollbar { width: 8px; }
-    .dc-desc::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 10px; }
 
     @media (max-height: 720px) {
       .cd-scene { height: min(460px, 76vh); }
@@ -338,6 +356,10 @@
       .dc-rarity { margin-bottom: .45rem; }
       .dc-emoji { font-size: 3rem; margin-bottom: .25rem; }
       .dc-desc { max-height: 9.5rem; }
+    }
+    @media (max-width: 420px) {
+      .cd-scene { --cd-actions-h: 150px; }
+      .dc-actions .btn { width: 100%; }
     }
     .cd-back.rarity-common { border: 2px solid #94a3b8; }
     .rarity-common .dc-rarity { color: #94a3b8; }
