@@ -1480,7 +1480,7 @@ function onlineApplyViewState(vs) {
         if (tc) tc.innerHTML = '<p class="empty-state">—</p>';
       }
 
-      if (currentPid && currentPid !== ONLINE.playerId) {
+      if (currentPid && String(currentPid) !== String(ONLINE.playerId || '')) {
         document.getElementById('gameRollBtn').style.display = '';
         document.getElementById('gameRollBtn').disabled = true;
         document.getElementById('rerollStatus').style.display = '';
@@ -1943,6 +1943,13 @@ function joinRoomOnline() {
     .then(function(snap) {
       const data = snap.val();
       if (!data || !data.state) throw new Error('room_not_found');
+      // Best-effort cleanup: if the room is stale, delete it and refuse join.
+      // (Full automatic cleanup requires a backend cron; this prevents old rooms from lingering forever.)
+      var lastAt = Number(data.lastActiveAt || 0) || 0;
+      if (lastAt && (Date.now() - lastAt) > (12 * 60 * 60 * 1000)) { // 12h
+        ref.remove().catch(function(){});
+        throw new Error('room_expired');
+      }
       const st = data.state;
       st.players = st.players || [];
       if (st.players.length >= 5) throw new Error('room_full');
@@ -1986,7 +1993,9 @@ function joinRoomOnline() {
       onlineStartRealtime(roomCode, playerId);
     })
     .catch(function(err) {
-      showToast('Firebase: ' + String(err.message || err), 'danger');
+      var msg = String(err && err.message ? err.message : err);
+      if (msg === 'room_expired') msg = 'Room expirée (inactive trop longtemps).';
+      showToast('Firebase: ' + msg, 'danger');
       document.getElementById('onlineJoinInfo').textContent = '';
     })
     .finally(function() {
@@ -5471,7 +5480,8 @@ function rollGameDice() {
     // Dice animation (client-side) + server roll (authoritative)
     var player = turnOrder[currentTurnIdx];
     var pBox = getPlayerBox(player);
-    if (!player || !pBox || pBox.length === 0) return;
+    if (!player) { showToast('Tour pas prêt (ordre de passage manquant).', 'danger'); return; }
+    if (!pBox || pBox.length === 0) { showToast('Plus aucune entité disponible.', 'danger'); return; }
 
     var diceEl = document.getElementById('gameDice');
     diceEl.classList.add('rolling');
