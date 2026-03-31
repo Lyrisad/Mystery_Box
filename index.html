@@ -300,8 +300,8 @@
     .ho-hint { font-size: .7rem; color: var(--text-dim); margin-top: .8rem; opacity: .6; }
 
     /* ── Card Flip ── */
-    /* Bigger, responsive card so description is readable (PC + mobile) */
-    .cd-scene { perspective: 800px; width: min(360px, 92vw); height: min(520px, 78vh); }
+    /* Bigger, responsive card so ALL text fits without scrolling */
+    .cd-scene { perspective: 800px; width: min(390px, 94vw); height: min(720px, 92vh); }
     .cd-flipper { width: 100%; height: 100%; position: relative; transition: transform .7s cubic-bezier(.4,.2,.2,1); transform-style: preserve-3d; cursor: pointer; }
     .cd-flipper.flipped { transform: rotateY(180deg); cursor: default; }
     .cd-face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; }
@@ -311,33 +311,30 @@
     .cd-front-title { font-size: 1.1rem; font-weight: 800; color: var(--accent-light); margin-bottom: .3rem; }
     .cd-front-hint { font-size: .75rem; color: var(--text-dim); animation: cdBlink 1.5s ease-in-out infinite; }
     @keyframes cdBlink { 0%,100% { opacity: .5; } 50% { opacity: 1; } }
-    .cd-back { transform: rotateY(180deg); background: radial-gradient(120% 120% at 30% 0%, rgba(124,58,237,.25), transparent 55%), radial-gradient(120% 120% at 70% 0%, rgba(245,158,11,.22), transparent 55%), var(--surface); text-align: center; box-shadow: inset 0 0 0 2px rgba(255,255,255,.06), inset 0 0 0 7px rgba(0,0,0,.25); }
+    .cd-back { transform: rotateY(180deg); background: radial-gradient(120% 120% at 30% 0%, rgba(124,58,237,.25), transparent 55%), radial-gradient(120% 120% at 70% 0%, rgba(245,158,11,.22), transparent 55%), var(--surface); text-align: center; box-shadow: inset 0 0 0 2px rgba(255,255,255,.06), inset 0 0 0 7px rgba(0,0,0,.25); justify-content: flex-start; }
 
     /* ── Playable Cards ── */
     .dc-rarity { font-size: .62rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; margin-bottom: .6rem; background: rgba(0,0,0,.35); padding: .25rem .6rem; border-radius: 999px; border: 1px solid rgba(255,255,255,.12); }
-    .dc-emoji { font-size: 3.8rem; margin-bottom: .45rem; filter: drop-shadow(0 8px 18px rgba(0,0,0,.35)); }
-    .dc-name { font-size: 1.35rem; font-weight: 900; margin-bottom: .5rem; padding: .4rem .8rem; border-radius: 12px; background: rgba(0,0,0,.28); border: 1px solid rgba(255,255,255,.1); }
-    .dc-desc { font-size: .92rem; color: var(--text-dim); margin-bottom: 1.05rem; line-height: 1.45; }
-    .dc-actions { display: flex; gap: .7rem; justify-content: center; flex-wrap: wrap; }
+    .dc-emoji { font-size: clamp(2.9rem, 6vh, 3.9rem); margin-bottom: .45rem; filter: drop-shadow(0 8px 18px rgba(0,0,0,.35)); }
+    .dc-name { font-size: clamp(1.05rem, 2.2vh, 1.38rem); font-weight: 900; margin-bottom: .5rem; padding: .4rem .8rem; border-radius: 12px; background: rgba(0,0,0,.28); border: 1px solid rgba(255,255,255,.1); }
+    .dc-desc { font-size: clamp(.82rem, 1.9vh, .98rem); color: var(--text-dim); margin-bottom: .9rem; line-height: 1.42; width: 100%; overflow: visible; }
+    .dc-actions { display: flex; gap: .6rem; justify-content: center; flex-wrap: wrap; width: 100%; margin-top: .2rem; }
 
     /* Small screens: prevent card text overflow */
     .cd-back { overflow: hidden; }
-    .dc-desc { max-height: 14.5rem; overflow: auto; padding-right: .2rem; }
+    .dc-desc { max-height: none; padding-right: .2rem; }
     .dc-desc::-webkit-scrollbar { width: 8px; }
     .dc-desc::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 10px; }
 
     @media (max-height: 720px) {
-      .cd-scene { height: min(460px, 76vh); }
-      .dc-emoji { font-size: 3.3rem; }
-      .dc-name { font-size: 1.18rem; margin-bottom: .4rem; }
-      .dc-desc { font-size: .86rem; line-height: 1.38; max-height: 11rem; margin-bottom: .9rem; }
+      .cd-scene { height: min(680px, 92vh); }
+      .cd-face { padding: 1.25rem; }
     }
     @media (max-height: 620px) {
-      .cd-scene { height: min(420px, 74vh); }
-      .cd-face { padding: 1.15rem; }
+      .cd-scene { height: min(640px, 92vh); }
+      .cd-face { padding: 1.1rem; }
       .dc-rarity { margin-bottom: .45rem; }
-      .dc-emoji { font-size: 3rem; margin-bottom: .25rem; }
-      .dc-desc { max-height: 9.5rem; }
+      .dc-actions .btn { padding: .6rem 1.1rem; font-size: .84rem; }
     }
     .cd-back.rarity-common { border: 2px solid #94a3b8; }
     .rarity-common .dc-rarity { color: #94a3b8; }
