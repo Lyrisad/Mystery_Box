@@ -954,13 +954,14 @@ const PLAYABLE_CARDS = [
   { id: 'chance_forcee', name: 'Chance forcée', emoji: '🍀', rarity: 'rare', type: 'active', desc: 'Ce tour, tu as +30% de chances d’obtenir un résultat favorable (selon la Personne Good/Bad), si possible.' },
   { id: 'jackpot', name: 'Jackpot', emoji: '🎰', rarity: 'rare', type: 'active', desc: 'Pioche 2 cartes jouables bonus tout de suite. Condition : tu dois les jouer ce tour, sinon elles sont perdues.' },
   { id: 'nostalgie', name: 'Nostalgie', emoji: '🕰️', rarity: 'rare', type: 'active', desc: 'Force un joueur (toi inclus) à remplacer UNE de ses cartes déjà obtenues par une nouvelle pioche dans la boîte correspondante (Personne/Action/Lieu).' },
+  { id: 'bas_les_masques', name: 'Bas les masques', emoji: '🎭', rarity: 'rare', type: 'active', desc: 'Choisis un joueur : ce tour uniquement, tu vois ses résultats (Personne/Action/Lieu), mais pas sa main.' },
   { id: 'exchange', name: 'Deal du destin', emoji: '🔄', rarity: 'epic', type: 'active', desc: 'Choisis un adversaire et risque une de tes cartes. Duel de dés (1–6) : si tu fais plus, vous échangez une carte du même round.' },
   { id: 'vol_main', name: 'Vol de main', emoji: '🃏', rarity: 'epic', type: 'active', desc: 'Choisis un joueur : vole au hasard 1 carte jouable de sa main (si il en a).' },
   { id: 'gel', name: 'Gel', emoji: '🧊', rarity: 'epic', type: 'active', desc: 'Choisis un joueur : lors de son prochain tour, il ne peut pas jouer de cartes jouables.' },
   { id: 'partage', name: 'Partage ?', emoji: '🤝', rarity: 'epic', type: 'active', desc: 'Copie l’effet d’une carte d’un adversaire et devient sa réplique (prête à être jouée ce tour). Si personne n’a de carte, devient une carte aléatoire.' },
   { id: 'infinite_reroll', name: 'Boucle temporelle', emoji: '♾️', rarity: 'legendary', type: 'active', desc: 'Relances illimitées ce tour. Les cartes relancées NE sont pas éliminées : elles retournent dans la boîte.' },
   { id: 'couronne', name: 'Couronne', emoji: '👑', rarity: 'legendary', type: 'active', desc: 'Ce tour, tu choisis ton loot parmi 3 résultats tirés au hasard.' },
-  { id: 'troisieme_oeil', name: 'Troisième œil', emoji: '🔎', rarity: 'legendary', type: 'active', desc: 'Ce tour uniquement, tu peux voir la main de tout le monde (eux ne voient rien de plus).' },
+  { id: 'troisieme_oeil', name: 'Troisième œil', emoji: '🔎', rarity: 'legendary', type: 'active', desc: 'Ce tour uniquement, tu peux voir la main + les résultats (Personne/Action/Lieu) de tout le monde (eux ne voient rien de plus).' },
   { id: 'echange_de_corps', name: 'Échange de corps', emoji: '🧬', rarity: 'legendary', type: 'active', desc: 'Choisis un joueur : vous échangez complètement vos “places” (inventaires, main, relances…). Bouclier protège aussi de ça.' },
   { id: 'blinded', name: 'Blinded', emoji: '🕶️', rarity: 'legendary', type: 'active', desc: 'Ce round, tous les joueurs (sauf protégés) ne voient pas leurs résultats de loot. Tout reste caché jusqu’au prochain round.' },
   { id: 'bad_luck', name: 'Malédiction', emoji: '🌑', rarity: 'passive', type: 'passive', desc: 'Ce tour, 25% de chance que ton résultat devienne défavorable (inversé selon ta Personne Good/Bad).', effect: 'force_bad' },
@@ -973,7 +974,7 @@ const RARITY_WEIGHTS = [
   { rarity: 'rare', weight: 25 },
   { rarity: 'passive', weight: 20 },
   { rarity: 'epic', weight: 10 },
-  { rarity: 'legendary', weight: 5 }
+  { rarity: 'legendary', weight: 6 }
 ];
 
 function drawCard() {
@@ -1020,6 +1021,7 @@ let pending = null;
 let lastPassiveDraw = null;
 let lastJackpotDraw = null;
 let revealHands = null;
+let revealResults = null;
 
 /* ═══════════════════════════════════════
    Online (Firebase Realtime Database)
@@ -1307,30 +1309,61 @@ function onlineApplyViewState(vs) {
         // On summary screen, reveal full results to everyone.
         var phaseNow = String(vs.phase || '');
         var shouldRedact = (ONLINE.enabled && phaseNow === 'game');
-        // Troisième œil: only the caster sees everyone's hands, only for their current turn.
+        // Reveal mechanics (Troisième œil / Bas les masques) are strictly scoped to the caster's current turn.
         var canSeeAllHands = false;
-        if (shouldRedact && vs.revealHands && String(vs.revealHands.pid || '') === myId) {
+        var canSeeAllResults = false;
+        var revealOnlyTargetResultsId = null;
+        var curPidNow = (Array.isArray(vs.turnOrder) ? vs.turnOrder[Number(vs.currentTurnIdx || 0) || 0] : null);
+        var isMyTurnNow = (String(curPidNow || '') === myId);
+        if (shouldRedact && isMyTurnNow && vs.revealHands && String(vs.revealHands.pid || '') === myId) {
           var curPidNow = (Array.isArray(vs.turnOrder) ? vs.turnOrder[Number(vs.currentTurnIdx || 0) || 0] : null);
           if (String(curPidNow || '') === myId &&
               Number(vs.revealHands.round || 0) === Number(vs.currentRound || 0) &&
               Number(vs.revealHands.turnIdx || 0) === Number(vs.currentTurnIdx || 0)) {
             canSeeAllHands = true;
+            canSeeAllResults = true;
+          }
+        }
+        if (shouldRedact && isMyTurnNow && vs.revealResults && String(vs.revealResults.pid || '') === myId) {
+          if (Number(vs.revealResults.round || 0) === Number(vs.currentRound || 0) &&
+              Number(vs.revealResults.turnIdx || 0) === Number(vs.currentTurnIdx || 0)) {
+            revealOnlyTargetResultsId = String(vs.revealResults.targetId || '') || null;
           }
         }
         // Keep only the hand count for facedown rendering (store count explicitly).
-        if (shouldRedact && !canSeeAllHands && p.id && String(p.id) !== myId) {
+        if (shouldRedact && p.id && String(p.id) !== myId) {
+          // Bouclier: never reveal hand/results for shielded players (even if you played reveal cards).
+          if (p.shieldedRound) {
+            p.pickCounts = [
+              (p.picks && p.picks[0]) ? p.picks[0].length : 0,
+              (p.picks && p.picks[1]) ? p.picks[1].length : 0,
+              (p.picks && p.picks[2]) ? p.picks[2].length : 0
+            ];
+            p.picks = [[], [], []];
+            var n0 = Array.isArray(p.hand) ? p.hand.length : 0;
+            p.handCount = n0;
+            p.hand = [];
+            p.drawnCard = null;
+            p.turnLog = [];
+            return p;
+          }
+          var isRevealTarget = (revealOnlyTargetResultsId && String(p.id) === String(revealOnlyTargetResultsId));
           // Hide loot results from opponents (Personne/Action/Lieu)
-          p.pickCounts = [
-            (p.picks && p.picks[0]) ? p.picks[0].length : 0,
-            (p.picks && p.picks[1]) ? p.picks[1].length : 0,
-            (p.picks && p.picks[2]) ? p.picks[2].length : 0
-          ];
-          p.picks = [[], [], []];
+          if (!canSeeAllResults && !isRevealTarget) {
+            p.pickCounts = [
+              (p.picks && p.picks[0]) ? p.picks[0].length : 0,
+              (p.picks && p.picks[1]) ? p.picks[1].length : 0,
+              (p.picks && p.picks[2]) ? p.picks[2].length : 0
+            ];
+            p.picks = [[], [], []];
+          }
 
           var n = Array.isArray(p.hand) ? p.hand.length : 0;
           p.handCount = n;
-          p.hand = [];
-          p.drawnCard = null;
+          if (!canSeeAllHands) {
+            p.hand = [];
+            p.drawnCard = null;
+          }
           // don't leak card names in history; keep public events only
           p.turnLog = [];
         }
@@ -1385,6 +1418,7 @@ function onlineApplyViewState(vs) {
     lastPassiveDraw = vs.lastPassiveDraw || null;
     lastJackpotDraw = vs.lastJackpotDraw || null;
     revealHands = vs.revealHands || null;
+    revealResults = vs.revealResults || null;
 
     // Phase → screen routing
     if (vs.phase === 'lobby') {
@@ -1643,6 +1677,7 @@ function onlineApplyViewState(vs) {
           else if (pending.type === 'partage') showPartage(mep);
           else if (pending.type === 'couronne') showCouronne(mep);
           else if (pending.type === 'echange_de_corps') showEchangeDeCorps(mep);
+          else if (pending.type === 'bas_les_masques') showBasLesMasques(mep);
           else if (pending.type === 'second_regard_choice' && pending.a && pending.b) {
             showChoiceTwo(mep, pending.a, pending.b, '👀 Second regard', 'Choisis lequel garder');
           }
@@ -2624,6 +2659,7 @@ function onlineAction(action, payload) {
         st.lastActiveCardData = { ts: Date.now() };
         return;
       }
+      if (card.id === 'bas_les_masques') { ensurePending('bas_les_masques', { card: card }); return; }
 
       // Interactive / UI choice cards -> pending
       if (card.id === 'eliminate3') { ensurePending('eliminate3', { card: card }); return; }
@@ -3035,6 +3071,21 @@ function onlineAction(action, payload) {
       }
       var pc10 = st.pending && st.pending.card ? st.pending.card : null;
       if (pc10) { st.lastActiveCardId = pc10.id || null; st.lastActiveCardPlayerId = String(p.id||''); st.lastActiveCardData = { ts: Date.now(), targetId: tid7, targetName: (t7 && t7.name) ? t7.name : '' }; }
+      clearPending();
+      return st;
+    }
+
+    if (action === 'card:bas_les_masques_resolve') {
+      if (st.phase !== 'game') return st;
+      if (!isMyTurn()) return st;
+      if (!st.pending || st.pending.type !== 'bas_les_masques') return st;
+      const p = currentPlayer();
+      var tidM = payload && payload.targetId ? String(payload.targetId) : '';
+      var tM = (st.players || []).find(function(pp) { return pp && String(pp.id || '') === tidM; }) || null;
+      if (!p || !tM || tM.shieldedRound) { clearPending(); return st; }
+      st.revealResults = { pid: String(p.id || ''), targetId: String(tM.id || ''), round: Number(st.currentRound || 0) || 0, turnIdx: Number(st.currentTurnIdx || 0) || 0, ts: Date.now() };
+      var pcM = st.pending && st.pending.card ? st.pending.card : null;
+      if (pcM) { st.lastActiveCardId = pcM.id || null; st.lastActiveCardPlayerId = String(p.id||''); st.lastActiveCardData = { ts: Date.now(), targetId: tidM, targetName: (tM && tM.name) ? tM.name : '' }; }
       clearPending();
       return st;
     }
@@ -4056,6 +4107,8 @@ function executeCard(player, card) {
     // Offline: reveal doesn't exist (no privacy filter). Just a feedback.
     showToast(card.emoji + ' Troisième œil : tu vois la main de tout le monde (online).', 'success');
     renderTurnCenter(player);
+  } else if (card.id === 'bas_les_masques') {
+    showBasLesMasques(player);
   } else if (card.id === 'echange_de_corps') {
     showEchangeDeCorps(player);
   } else if (card.id === 'blinded') {
@@ -5366,6 +5419,35 @@ function confirmEchangeDeCorps(targetId) {
   renderTurnCards(player);
   // Force handoff since "it's now the other player's turn" (same index, different identity)
   showHandoff(player);
+}
+
+/* ── Bas les masques ── */
+function showBasLesMasques(player) {
+  var others = turnOrder.filter(function(p) { return p && p.id !== player.id; });
+  var html =
+    '<h3 style="margin-bottom:.25rem">🎭 Bas les masques</h3>' +
+    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">Choisis un joueur : tu vois ses résultats (pas sa main) pendant <b>ce tour</b>.</p>' +
+    '<div class="exch-players">' +
+      others.map(function(p) {
+        return '<button class="exch-player-btn" onclick="confirmBasLesMasques(' + jsq(p.id) + ')">' +
+          '<span style="width:10px;height:10px;border-radius:50%;background:' + p.color + ';display:inline-block"></span>' +
+          esc(p.name) +
+        '</button>';
+      }).join('') +
+    '</div>' +
+    '<button class="btn btn-back" onclick="closeActionOverlay()">Annuler</button>';
+  openActionOverlay(html);
+}
+
+function confirmBasLesMasques(targetId) {
+  if (ONLINE.enabled && !ONLINE.applyingRemote) {
+    closeActionOverlay(true);
+    onlineAction('card:bas_les_masques_resolve', { targetId: targetId }).catch(function(err) { showToast(String(err.message || err), 'danger'); });
+    return;
+  }
+  // Offline: no privacy, so it has no real effect.
+  showToast('🎭 Bas les masques : effet uniquement en online.', 'success');
+  closeActionOverlay();
 }
 
 /* ── Vol de main ── */
