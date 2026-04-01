@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Mystery Box">
+  <defs>
+    <linearGradient id="mbg" x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#a78bfa"/>
+      <stop offset=".45" stop-color="#7c3aed"/>
+      <stop offset="1" stop-color="#4c1d95"/>
+    </linearGradient>
+  </defs>
+  <rect width="32" height="32" rx="8" fill="url(#mbg)"/>
+  <path fill="#0f0f1a" d="M7 11h18c.55 0 1 .45 1 1v11c0 .55-.45 1-1 1H7c-.55 0-1-.45-1-1V12c0-.55.45-1 1-1z" opacity=".95"/>
+  <path fill="none" stroke="#f59e0b" stroke-width="1.75" stroke-linecap="round" d="M6 11h20M16 6.5v4.5"/>
+  <circle cx="16" cy="18" r="2.25" fill="#f59e0b"/>
+</svg>
