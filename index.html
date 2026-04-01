@@ -174,6 +174,42 @@
     .mode-card h2 { font-size: 1.35rem; font-weight: 800; margin-bottom: .5rem; }
     .mode-card p { color: var(--text-dim); font-size: .8rem; line-height: 1.5; }
 
+    .landing-fx-test {
+      max-width: 580px;
+      margin: 1.75rem auto 0;
+      padding: 1rem 1.1rem;
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: var(--radius);
+      text-align: left;
+    }
+    .landing-fx-test > summary {
+      cursor: pointer;
+      font-weight: 700;
+      font-size: .88rem;
+      list-style: none;
+      color: var(--text-dim);
+    }
+    .landing-fx-test > summary::-webkit-details-marker { display: none; }
+    .landing-fx-test[open] > summary { color: var(--gold); margin-bottom: .35rem; }
+    .landing-fx-test-hint { font-size: .78rem; color: var(--text-dim); line-height: 1.45; margin: 0 0 .85rem; }
+    .landing-fx-test-row { display: flex; flex-wrap: wrap; align-items: center; gap: .55rem .75rem; }
+    .landing-fx-test-row label { font-size: .78rem; color: var(--text-dim); font-weight: 600; }
+    .landing-fx-test-row select {
+      flex: 1;
+      min-width: 200px;
+      padding: .55rem .75rem;
+      background: var(--surface-2);
+      border: 1.5px solid rgba(255,255,255,.1);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: .85rem;
+      font-family: inherit;
+      outline: none;
+    }
+    .landing-fx-test-row select:focus { border-color: var(--accent); }
+    .landing-fx-test-row .btn { flex-shrink: 0; }
+
     /* ── Online room mode picker ── */
     .online-mode-cards { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; margin-top: .7rem; }
     .online-mode-card { background: var(--surface); border: 2px solid rgba(255,255,255,.08); border-radius: 16px; padding: .9rem .9rem; text-align: left; cursor: pointer; transition: transform .15s, border-color .25s, box-shadow .25s; font-family: inherit; color: var(--text); display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; }
@@ -291,6 +327,376 @@
     .reveal-thumb img { width: 100%; height: 100%; object-fit: cover; }
     .reveal-name { font-size: 1.4rem; font-weight: 800; margin-bottom: 1.1rem; background: linear-gradient(135deg, #fff, var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
     .reveal-actions { display: flex; gap: .7rem; justify-content: center; flex-wrap: wrap; }
+
+    /* FX cartes : sous les modales .overlay (z-index 100) pour garder visible reveal / garder-relancer / choix ; au-dessus du jeu (topbar, docks ~10–55) ; sous toasts ~200 */
+    .card-fx-overlay {
+      position: fixed; inset: 0; z-index: 90; pointer-events: none; opacity: 0; transition: opacity .35s ease;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .card-fx-overlay.visible { opacity: 1; }
+    .card-fx-vignette { position: absolute; inset: 0; }
+    .card-fx-particles { position: absolute; inset: 0; opacity: .5; pointer-events: none; }
+    .card-fx-scanlines {
+      position: absolute; inset: 0; opacity: .1; mix-blend-mode: overlay;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.4) 2px, rgba(0,0,0,.4) 4px);
+      animation: cardFxScan 2.2s linear infinite;
+    }
+    @keyframes cardFxScan { to { transform: translateY(4px); } }
+    .card-fx-core {
+      position: relative; z-index: 2; text-align: center; padding: 1.5rem 2rem;
+      animation: cardFxCoreIn 2.45s cubic-bezier(.22, 1, .36, 1) forwards;
+    }
+    @keyframes cardFxCoreIn {
+      0% { transform: scale(.85); filter: blur(8px); opacity: 0; }
+      16% { transform: scale(1.03); filter: blur(0); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .card-fx-ornament {
+      position: absolute; left: 50%; top: 50%; width: 150px; height: 150px; margin: -75px 0 0 -75px;
+      border-radius: 50%; opacity: .85; pointer-events: none;
+    }
+    .card-fx-icon { font-size: 2.5rem; margin-bottom: .4rem; position: relative; z-index: 1; line-height: 1; }
+    .card-fx-title {
+      font-size: 1.2rem; font-weight: 900; letter-spacing: .28em; margin-bottom: .45rem; position: relative; z-index: 1;
+      text-transform: uppercase;
+    }
+    .card-fx-sub { font-size: .8rem; font-weight: 600; position: relative; z-index: 1; max-width: 22rem; margin: 0 auto; line-height: 1.35; }
+
+    /* ── sandevistan ── */
+    .card-fx--sandevistan .card-fx-vignette {
+      background: radial-gradient(ellipse 70% 55% at 50% 45%, rgba(34, 211, 238, .14) 0%, rgba(124, 58, 237, .12) 40%, rgba(0, 0, 0, .75) 100%);
+    }
+    .card-fx--sandevistan .card-fx-ornament {
+      border: 2px solid rgba(34, 211, 238, .55);
+      box-shadow: 0 0 45px rgba(34, 211, 238, .4), inset 0 0 28px rgba(124, 58, 237, .22);
+      animation: cardFxRingPulse 2s ease-in-out infinite;
+    }
+    .card-fx--sandevistan .card-fx-icon { filter: drop-shadow(0 0 14px rgba(34, 211, 238, .85)); }
+    .card-fx--sandevistan .card-fx-title { color: #a5f3fc; text-shadow: 0 0 22px rgba(34, 211, 238, .55), 2px 0 0 rgba(244, 63, 94, .3), -2px 0 0 rgba(59, 130, 246, .3); }
+    .card-fx--sandevistan .card-fx-sub { color: rgba(226, 232, 240, .88); }
+    html.card-fx-chrome--sandevistan .game-layout { animation: cardFxChromeSandevistan 2.5s ease-in-out; }
+    @keyframes cardFxChromeSandevistan {
+      0%, 100% { filter: none; }
+      50% { filter: saturate(1.22) contrast(1.06) hue-rotate(-8deg); }
+    }
+
+    /* ── blinded ── */
+    .card-fx--blinded .card-fx-vignette {
+      background: radial-gradient(ellipse at center, rgba(15, 23, 42, .2) 0%, rgba(0, 0, 0, .88) 65%, rgba(88, 28, 135, .25) 100%);
+    }
+    .card-fx--blinded .card-fx-particles {
+      background: radial-gradient(circle at 30% 40%, rgba(255,255,255,.06) 0%, transparent 50%),
+        radial-gradient(circle at 70% 60%, rgba(167, 139, 250, .08) 0%, transparent 45%);
+      animation: cardFxBlindedFog 3s ease-in-out infinite;
+    }
+    @keyframes cardFxBlindedFog { 0%, 100% { opacity: .35; } 50% { opacity: .65; } }
+    .card-fx--blinded .card-fx-scanlines { opacity: .18; }
+    .card-fx--blinded .card-fx-ornament {
+      border: 2px solid rgba(30, 41, 59, .8); box-shadow: inset 0 0 40px rgba(0,0,0,.6), 0 0 30px rgba(15, 23, 42, .9);
+      animation: cardFxBlindedLens 2.5s ease-in-out infinite;
+    }
+    @keyframes cardFxBlindedLens { 0%, 100% { transform: scale(1); opacity: .7; } 50% { transform: scale(1.06); opacity: 1; } }
+    .card-fx--blinded .card-fx-icon { filter: drop-shadow(0 0 8px rgba(0,0,0,.9)); }
+    .card-fx--blinded .card-fx-title { color: #94a3b8; letter-spacing: .4em; text-shadow: 0 0 24px rgba(148, 163, 184, .4); }
+    .card-fx--blinded .card-fx-sub { color: #64748b; }
+    html.card-fx-chrome--blinded .game-layout { animation: cardFxChromeBlinded 2.6s ease-in-out; }
+    @keyframes cardFxChromeBlinded {
+      0%, 100% { filter: none; }
+      40% { filter: grayscale(.45) contrast(1.08) brightness(.92); }
+    }
+
+    /* ── echange_de_corps ── */
+    .card-fx--echange_de_corps .card-fx-vignette {
+      background: linear-gradient(125deg, rgba(236, 72, 153, .18) 0%, rgba(0,0,0,.75) 45%, rgba(34, 211, 238, .16) 100%);
+    }
+    .card-fx--echange_de_corps .card-fx-particles {
+      background: repeating-linear-gradient(90deg, transparent, transparent 8px, rgba(236, 72, 153, .04) 8px, rgba(236, 72, 153, .04) 10px),
+        repeating-linear-gradient(0deg, transparent, transparent 8px, rgba(34, 211, 238, .05) 8px, rgba(34, 211, 238, .05) 10px);
+      animation: cardFxDnaShift 2.5s linear infinite;
+    }
+    @keyframes cardFxDnaShift { to { transform: translateX(12px) translateY(-8px); } }
+    .card-fx--echange_de_corps .card-fx-ornament {
+      border: 2px solid rgba(236, 72, 153, .55);
+      box-shadow: 0 0 36px rgba(34, 211, 238, .35), inset 0 0 24px rgba(236, 72, 153, .12);
+      animation: cardFxHelix 2.2s ease-in-out infinite;
+    }
+    @keyframes cardFxHelix { 0%, 100% { transform: rotate(0deg) scale(1); } 50% { transform: rotate(180deg) scale(1.05); } }
+    .card-fx--echange_de_corps .card-fx-title {
+      color: #f9a8d4; text-shadow: 0 0 20px rgba(236, 72, 153, .5), 3px 0 0 rgba(34, 211, 238, .35);
+    }
+    .card-fx--echange_de_corps .card-fx-sub { color: #e2e8f0; }
+    html.card-fx-chrome--echange_de_corps .game-layout { animation: cardFxChromeSwap 2.5s ease-in-out; }
+    @keyframes cardFxChromeSwap {
+      0%, 100% { filter: none; transform: none; }
+      25% { filter: hue-rotate(35deg) saturate(1.2); transform: translateX(3px); }
+      75% { filter: hue-rotate(-35deg) saturate(1.15); transform: translateX(-3px); }
+    }
+
+    /* ── troisieme_oeil ── */
+    .card-fx--troisieme_oeil .card-fx-vignette {
+      background: radial-gradient(ellipse at 50% 35%, rgba(168, 85, 247, .22) 0%, rgba(15, 23, 42, .9) 55%, rgba(88, 28, 135, .2) 100%);
+    }
+    /* Radar : couche agrandie + rotation sur ::before pour couvrir tout l’écran (évite l’effet « rectangle qui tourne ») */
+    .card-fx-overlay.card-fx--troisieme_oeil { overflow: hidden; }
+    .card-fx--troisieme_oeil .card-fx-particles {
+      background: none;
+      opacity: 1;
+    }
+    .card-fx--troisieme_oeil .card-fx-particles::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 240vmax;
+      height: 240vmax;
+      margin: -120vmax 0 0 -120vmax;
+      background: repeating-conic-gradient(from 0deg, transparent 0deg 8deg, rgba(192, 132, 252, .075) 8deg 10deg);
+      opacity: .5;
+      transform-origin: 50% 50%;
+      animation: cardFxEyeRadar 5.5s linear infinite;
+    }
+    @keyframes cardFxEyeRadar { to { transform: rotate(360deg); } }
+    .card-fx--troisieme_oeil .card-fx-ornament {
+      border: 2px solid rgba(192, 132, 252, .6);
+      box-shadow: 0 0 0 0 rgba(168, 85, 247, .4), 0 0 50px rgba(88, 28, 135, .45);
+      animation: cardFxEyePulse 1.8s ease-out infinite;
+    }
+    @keyframes cardFxEyePulse {
+      0% { box-shadow: 0 0 0 0 rgba(168, 85, 247, .5); transform: scale(1); }
+      70% { box-shadow: 0 0 0 22px rgba(168, 85, 247, 0); transform: scale(1.03); }
+      100% { transform: scale(1); }
+    }
+    .card-fx--troisieme_oeil .card-fx-icon { filter: drop-shadow(0 0 16px rgba(192, 132, 252, .9)); }
+    .card-fx--troisieme_oeil .card-fx-title { color: #e9d5ff; text-shadow: 0 0 28px rgba(168, 85, 247, .65); letter-spacing: .22em; }
+    .card-fx--troisieme_oeil .card-fx-sub { color: #ddd6fe; }
+    html.card-fx-chrome--troisieme_oeil .game-layout { animation: cardFxChromeEye 2.5s ease-in-out; }
+    @keyframes cardFxChromeEye {
+      0%, 100% { filter: none; }
+      50% { filter: brightness(1.06) contrast(1.05) drop-shadow(0 0 20px rgba(124, 58, 237, .25)); }
+    }
+
+    /* ── infinite_reroll (boucle temporelle) — ondes + grain du temps, sans rotation plein écran ── */
+    .card-fx--infinite_reroll .card-fx-vignette {
+      background:
+        radial-gradient(ellipse 85% 60% at 50% 42%, rgba(251, 191, 36, .14) 0%, transparent 55%),
+        radial-gradient(ellipse at 50% 100%, rgba(49, 46, 129, .35) 0%, transparent 42%),
+        radial-gradient(ellipse at center, rgba(15, 23, 42, .9) 0%, rgba(2, 6, 23, .97) 100%);
+    }
+    .card-fx-overlay.card-fx--infinite_reroll { overflow: hidden; }
+    .card-fx--infinite_reroll .card-fx-particles {
+      background:
+        radial-gradient(circle at 18% 28%, rgba(253, 224, 71, .08) 0%, transparent 22%),
+        radial-gradient(circle at 82% 72%, rgba(245, 158, 11, .09) 0%, transparent 26%);
+      opacity: 1;
+      animation: cardFxTimeMist 5s ease-in-out infinite;
+    }
+    @keyframes cardFxTimeMist { 0%, 100% { opacity: .75; } 50% { opacity: 1; } }
+    .card-fx--infinite_reroll .card-fx-particles::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        -28deg,
+        transparent,
+        transparent 18px,
+        rgba(251, 191, 36, .035) 18px,
+        rgba(251, 191, 36, .035) 19px
+      );
+      animation: cardFxTimeDrift 14s linear infinite;
+    }
+    @keyframes cardFxTimeDrift { to { transform: translate(28px, 20px); } }
+    .card-fx--infinite_reroll .card-fx-particles::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 85vmin;
+      height: 85vmin;
+      margin: -42.5vmin 0 0 -42.5vmin;
+      border-radius: 50%;
+      border: 1px solid rgba(253, 224, 71, .14);
+      box-shadow: 0 0 0 0 rgba(245, 158, 11, .12);
+      animation: cardFxTimeRing 2.9s ease-out infinite;
+    }
+    @keyframes cardFxTimeRing {
+      0% { transform: scale(0.45); opacity: 1; }
+      100% { transform: scale(1.5); opacity: 0; }
+    }
+    .card-fx--infinite_reroll .card-fx-scanlines { opacity: .05; mix-blend-mode: overlay; }
+    .card-fx--infinite_reroll .card-fx-ornament {
+      border-radius: 50%;
+      border: 2px solid rgba(253, 224, 71, .5);
+      box-shadow:
+        0 0 0 6px rgba(245, 158, 11, .08),
+        0 0 48px rgba(245, 158, 11, .28),
+        inset 0 0 22px rgba(255, 255, 255, .1);
+      animation: cardFxInfinitySoft 2.6s ease-in-out infinite;
+    }
+    @keyframes cardFxInfinitySoft { 0%, 100% { transform: scale(1); opacity: .88; } 50% { transform: scale(1.05); opacity: 1; } }
+    .card-fx--infinite_reroll .card-fx-icon { filter: drop-shadow(0 0 16px rgba(251, 191, 36, .9)); }
+    .card-fx--infinite_reroll .card-fx-title { color: #fef3c7; text-shadow: 0 0 22px rgba(245, 158, 11, .5); letter-spacing: .22em; }
+    .card-fx--infinite_reroll .card-fx-sub { color: #fde68a; }
+    html.card-fx-chrome--infinite_reroll .game-layout { animation: cardFxChromeTime 2.6s ease-in-out; }
+    @keyframes cardFxChromeTime {
+      0%, 100% { filter: none; }
+      50% { filter: brightness(1.05) saturate(1.1) hue-rotate(-8deg); }
+    }
+
+    /* ── couronne — halo sobre, étincelles lentes, joyau central (sans tiare ni rayons tournants) ── */
+    .card-fx--couronne .card-fx-vignette {
+      background:
+        radial-gradient(ellipse 100% 75% at 50% 18%, rgba(255, 251, 235, .32) 0%, transparent 45%),
+        radial-gradient(ellipse 70% 55% at 50% 48%, rgba(250, 204, 21, .18) 0%, transparent 58%),
+        radial-gradient(ellipse at 50% 100%, rgba(76, 29, 149, .22) 0%, transparent 50%),
+        radial-gradient(ellipse at center, rgba(15, 23, 42, .9) 0%, rgba(2, 6, 23, .98) 100%);
+    }
+    .card-fx-overlay.card-fx--couronne { overflow: hidden; }
+    .card-fx--couronne .card-fx-particles {
+      background: none;
+      opacity: 1;
+    }
+    .card-fx--couronne .card-fx-particles::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 14% 24%, rgba(255, 255, 255, .14) 0%, transparent 5%),
+        radial-gradient(circle at 88% 20%, rgba(253, 224, 71, .18) 0%, transparent 6%),
+        radial-gradient(circle at 22% 78%, rgba(250, 204, 21, .1) 0%, transparent 5%),
+        radial-gradient(circle at 78% 72%, rgba(255, 252, 240, .12) 0%, transparent 5%),
+        radial-gradient(circle at 50% 12%, rgba(253, 224, 71, .08) 0%, transparent 8%);
+      animation: cardFxCrownSparkle 4.5s ease-in-out infinite;
+    }
+    @keyframes cardFxCrownSparkle {
+      0%, 100% { opacity: .55; transform: translate(0, 0); }
+      33% { opacity: .9; transform: translate(1.5%, -1%); }
+      66% { opacity: .7; transform: translate(-1%, 1%); }
+    }
+    .card-fx--couronne .card-fx-particles::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 120% 80% at 50% 40%, transparent 30%, rgba(250, 204, 21, .04) 50%, transparent 70%);
+      animation: cardFxCrownGlow 3.2s ease-in-out infinite;
+    }
+    @keyframes cardFxCrownGlow { 0%, 100% { opacity: .6; } 50% { opacity: 1; } }
+    .card-fx--couronne .card-fx-scanlines { opacity: .04; mix-blend-mode: overlay; }
+    .card-fx--couronne .card-fx-ornament {
+      border-radius: 50%;
+      width: 152px;
+      height: 152px;
+      margin: -76px 0 0 -76px;
+      top: 50%;
+      background:
+        radial-gradient(circle at 35% 30%, rgba(255, 255, 255, .55) 0%, transparent 28%),
+        radial-gradient(circle at 50% 115%, rgba(88, 28, 135, .35) 0%, transparent 48%),
+        radial-gradient(circle at 50% 50%, rgba(253, 224, 71, .35) 0%, rgba(180, 83, 9, .45) 55%, rgba(69, 26, 3, .6) 100%);
+      border: 2px solid rgba(254, 243, 199, .75);
+      box-shadow:
+        0 0 40px rgba(250, 204, 21, .35),
+        0 0 80px rgba(124, 58, 237, .12),
+        inset 0 0 20px rgba(255, 255, 255, .25),
+        inset 0 -8px 20px rgba(120, 53, 15, .4);
+      animation: cardFxCrownSeal 3s ease-in-out infinite;
+    }
+    @keyframes cardFxCrownSeal {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 40px rgba(250, 204, 21, .35), 0 0 80px rgba(124, 58, 237, .12), inset 0 0 20px rgba(255, 255, 255, .25), inset 0 -8px 20px rgba(120, 53, 15, .4); }
+      50% { transform: scale(1.04); box-shadow: 0 0 52px rgba(250, 204, 21, .45), 0 0 100px rgba(124, 58, 237, .16), inset 0 0 26px rgba(255, 255, 255, .3), inset 0 -8px 20px rgba(120, 53, 15, .35); }
+    }
+    .card-fx--couronne .card-fx-icon {
+      filter: drop-shadow(0 0 18px rgba(250, 204, 21, .8)) drop-shadow(0 0 36px rgba(167, 139, 250, .25));
+    }
+    .card-fx--couronne .card-fx-title {
+      color: #fffbeb;
+      text-shadow: 0 0 24px rgba(250, 204, 21, .55), 0 0 40px rgba(124, 58, 237, .2);
+      letter-spacing: .3em;
+    }
+    .card-fx--couronne .card-fx-sub { color: #fef3c7; opacity: .95; }
+    html.card-fx-chrome--couronne .game-layout { animation: cardFxChromeCrown 2.6s ease-in-out; }
+    @keyframes cardFxChromeCrown {
+      0%, 100% { filter: none; }
+      50% { filter: brightness(1.06) saturate(1.08); }
+    }
+
+    /* ── flashback ── */
+    .card-fx--flashback .card-fx-vignette {
+      background: linear-gradient(180deg, rgba(251, 191, 36, .12) 0%, rgba(0, 0, 0, .82) 40%, rgba(120, 53, 15, .18) 100%);
+    }
+    .card-fx--flashback .card-fx-particles {
+      opacity: .35;
+      background: repeating-linear-gradient(-12deg, transparent, transparent 14px, rgba(251, 191, 36, .07) 14px, rgba(251, 191, 36, .07) 16px);
+      animation: cardFxRewind 1.2s linear infinite;
+    }
+    @keyframes cardFxRewind { to { transform: translateY(20px); } }
+    .card-fx--flashback .card-fx-scanlines { opacity: .14; animation-direction: reverse; }
+    .card-fx--flashback .card-fx-ornament {
+      border: 2px dashed rgba(251, 191, 36, .45);
+      animation: cardFxRewindRing 2s ease-in-out infinite;
+    }
+    @keyframes cardFxRewindRing { 0%, 100% { transform: scale(1) rotate(0deg); opacity: .6; } 50% { transform: scale(.92) rotate(-8deg); opacity: 1; } }
+    .card-fx--flashback .card-fx-title { color: #fcd34d; text-shadow: 0 0 20px rgba(245, 158, 11, .45); letter-spacing: .25em; }
+    .card-fx--flashback .card-fx-sub { color: #fde68a; }
+    html.card-fx-chrome--flashback .game-layout { animation: cardFxChromeRewind 2.8s ease-in-out; }
+    @keyframes cardFxChromeRewind {
+      0%, 100% { filter: none; transform: none; }
+      20% { filter: sepia(.35) contrast(1.05); transform: scale(.99); }
+      50% { filter: sepia(.5) hue-rotate(-10deg); transform: scale(1.01); }
+      80% { filter: sepia(.2); }
+    }
+
+    /* ── miasme ── */
+    .card-fx--miasme .card-fx-vignette {
+      background: radial-gradient(ellipse at 50% 80%, rgba(34, 197, 94, .18) 0%, rgba(0, 0, 0, .82) 50%, rgba(20, 83, 45, .35) 100%);
+    }
+    .card-fx--miasme .card-fx-particles {
+      background: radial-gradient(circle at 50% 100%, rgba(74, 222, 128, .2) 0%, transparent 55%),
+        repeating-linear-gradient(95deg, transparent, transparent 3px, rgba(34, 197, 94, .04) 3px, rgba(34, 197, 94, .04) 6px);
+      animation: cardFxToxicRise 2.5s ease-in-out infinite;
+    }
+    @keyframes cardFxToxicRise { 0%, 100% { transform: translateY(6px); opacity: .45; } 50% { transform: translateY(-4px); opacity: .75; } }
+    .card-fx--miasme .card-fx-ornament {
+      border: 2px solid rgba(74, 222, 128, .4);
+      box-shadow: inset 0 0 35px rgba(22, 101, 52, .35), 0 0 30px rgba(34, 197, 94, .2);
+      animation: cardFxBubble 1.6s ease-in-out infinite;
+    }
+    @keyframes cardFxBubble { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+    .card-fx--miasme .card-fx-icon { filter: drop-shadow(0 0 12px rgba(74, 222, 128, .7)); }
+    .card-fx--miasme .card-fx-title { color: #86efac; text-shadow: 0 0 22px rgba(34, 197, 94, .45); letter-spacing: .3em; }
+    .card-fx--miasme .card-fx-sub { color: #bbf7d0; }
+    html.card-fx-chrome--miasme .game-layout { animation: cardFxChromeToxic 2.5s ease-in-out; }
+    @keyframes cardFxChromeToxic {
+      0%, 100% { filter: none; }
+      50% { filter: hue-rotate(25deg) saturate(1.18) contrast(1.03); }
+    }
+
+    /* ── gel ── */
+    .card-fx--gel .card-fx-vignette {
+      background: radial-gradient(ellipse at 50% 40%, rgba(186, 230, 253, .2) 0%, rgba(15, 23, 42, .88) 55%, rgba(3, 105, 161, .22) 100%);
+    }
+    .card-fx--gel .card-fx-particles {
+      background: repeating-linear-gradient(105deg, transparent, transparent 11px, rgba(255,255,255,.04) 11px, rgba(255,255,255,.04) 13px);
+      animation: cardFxFrostDrift 2.8s linear infinite;
+    }
+    @keyframes cardFxFrostDrift { to { transform: translateX(-16px) translateY(8px); } }
+    .card-fx--gel .card-fx-ornament {
+      border: 2px solid rgba(125, 211, 252, .55);
+      box-shadow: 0 0 45px rgba(14, 165, 233, .3), inset 0 0 25px rgba(255, 255, 255, .08);
+      animation: cardFxFreeze 2s ease-in-out infinite;
+    }
+    @keyframes cardFxFreeze { 0%, 100% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.04); filter: brightness(1.15); } }
+    .card-fx--gel .card-fx-icon { filter: drop-shadow(0 0 14px rgba(125, 211, 252, .85)); }
+    .card-fx--gel .card-fx-title { color: #e0f2fe; text-shadow: 0 0 22px rgba(56, 189, 248, .55); letter-spacing: .34em; }
+    .card-fx--gel .card-fx-sub { color: #bae6fd; }
+    html.card-fx-chrome--gel .game-layout { animation: cardFxChromeIce 2.5s ease-in-out; }
+    @keyframes cardFxChromeIce {
+      0%, 100% { filter: none; }
+      50% { filter: saturate(.85) brightness(1.05) hue-rotate(12deg); }
+    }
+
+    @keyframes cardFxRingPulse {
+      0%, 100% { transform: scale(1); opacity: .9; }
+      50% { transform: scale(1.07); opacity: 1; }
+    }
 
     /* ── SUMMARY ── */
     .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1.2rem; }
@@ -834,6 +1240,25 @@
         <button class="btn btn-accent" type="button" onclick="openOnline()">Ouvrir le mode online</button>
       </div>
     </div>
+    <details class="landing-fx-test">
+      <summary>🎬 Tester une animation de carte</summary>
+      <p class="landing-fx-test-hint">Choisis une carte avec FX plein écran et lance la démo (sans partie).</p>
+      <div class="landing-fx-test-row">
+        <label for="landingCardFxSelect">Carte</label>
+        <select id="landingCardFxSelect">
+          <option value="sandevistan">⏱️ Sandevistan</option>
+          <option value="blinded">🕶️ Blinded</option>
+          <option value="echange_de_corps">🧬 Échange de corps</option>
+          <option value="troisieme_oeil">🔎 Troisième œil</option>
+          <option value="infinite_reroll">♾️ Boucle temporelle</option>
+          <option value="couronne">👑 Couronne</option>
+          <option value="flashback">⏪ Flashback</option>
+          <option value="miasme">☣️ Miasme</option>
+          <option value="gel">🧊 Gel</option>
+        </select>
+        <button type="button" class="btn btn-gold" onclick="runLandingCardFxTest()">Lancer l’anim</button>
+      </div>
+    </details>
   </div>
 </div>
 
@@ -1010,6 +1435,19 @@
       <span class="game-journal-chevron" id="gameJournalTabChevron">▲</span>
     </button>
     <div class="game-journal-panel" id="gameJournalPanel"></div>
+  </div>
+</div>
+
+<!-- FX plein écran cartes : hors des .screen pour rester visible depuis l’accueil (testeur) -->
+<div id="cardFxOverlay" class="card-fx-overlay" aria-hidden="true">
+  <div class="card-fx-vignette" aria-hidden="true"></div>
+  <div class="card-fx-particles" id="cardFxParticles" aria-hidden="true"></div>
+  <div class="card-fx-scanlines" aria-hidden="true"></div>
+  <div class="card-fx-core">
+    <div class="card-fx-ornament" id="cardFxOrnament"></div>
+    <div class="card-fx-icon" id="cardFxIcon"></div>
+    <div class="card-fx-title" id="cardFxTitle"></div>
+    <div class="card-fx-sub" id="cardFxSub"></div>
   </div>
 </div>
 
@@ -1216,6 +1654,7 @@ const PLAYABLE_CARDS = [
   { id: 'echange_de_corps', name: 'Échange de corps', emoji: '🧬', rarity: 'legendary', type: 'active', desc: 'Choisis un joueur : vous échangez complètement vos “places” (inventaires, main, relances…). Bouclier protège aussi de ça.' },
   { id: 'blinded', name: 'Blinded', emoji: '🕶️', rarity: 'legendary', type: 'active', desc: 'Ce round, tous les joueurs (sauf protégés) ne voient pas leurs résultats de loot. Tout reste caché jusqu’au prochain round.' },
   { id: 'flashback', name: 'FlashBack', emoji: '⏪', rarity: 'legendary', type: 'active', desc: 'Tout le monde revient au round 1 et doit recommencer à piocher, les cartes jouables ne sont pas éliminées.' },
+  { id: 'sandevistan', name: 'Sandevistan', emoji: '⏱️', rarity: 'legendary', type: 'active', desc: 'Ralentis le temps : vole au hasard 1 carte jouable dans la main de chaque adversaire (s’il en a), et tu gagnes la Bénédiction pour ce tour.' },
   { id: 'bad_luck', name: 'Malédiction', emoji: '🌑', rarity: 'passive', type: 'passive', desc: 'Ce tour, 25% de chance que ton résultat devienne défavorable (inversé selon ta Personne Good/Bad).', effect: 'force_bad' },
   { id: 'good_luck', name: 'Bénédiction', emoji: '✨', rarity: 'passive', type: 'passive', desc: 'Ce tour, 25% de chance que ton résultat devienne favorable (inversé selon ta Personne Good/Bad).', effect: 'force_good' },
   { id: 'shield', name: 'Bouclier', emoji: '🛡️', rarity: 'passive', type: 'passive', desc: 'Protection jusqu’à la fin du round : tu es immunisé contre Échange, Blinded et Échange de corps.', effect: 'shield' }
@@ -1226,8 +1665,22 @@ const RARITY_WEIGHTS = [
   { rarity: 'rare', weight: 25 },
   { rarity: 'passive', weight: 20 },
   { rarity: 'epic', weight: 10 },
-  { rarity: 'legendary', weight: 6 }
+  { rarity: 'legendary', weight: 5 }
 ];
+
+/** Cartes avec FX plein écran (journal / synchro online utilise lastActiveCardId) */
+var CARD_PLAY_FX_CARD_IDS = ['sandevistan', 'blinded', 'echange_de_corps', 'troisieme_oeil', 'infinite_reroll', 'couronne', 'flashback', 'miasme', 'gel'];
+var CARD_PLAY_FX_LABELS = {
+  sandevistan: { icon: '⏱️', title: 'SANDEVISTAN' },
+  blinded: { icon: '🕶️', title: 'BLINDED' },
+  echange_de_corps: { icon: '🧬', title: 'ÉCHANGE DE CORPS' },
+  troisieme_oeil: { icon: '🔎', title: 'TROISIÈME ŒIL' },
+  infinite_reroll: { icon: '♾️', title: 'BOUCLE TEMPORELLE' },
+  couronne: { icon: '👑', title: 'COURONNE' },
+  flashback: { icon: '⏪', title: 'FLASHBACK' },
+  miasme: { icon: '☣️', title: 'MIASME' },
+  gel: { icon: '🧊', title: 'GEL' }
+};
 
 function drawCard() {
   var roll = Math.random() * 100;
@@ -1316,6 +1769,7 @@ const ONLINE = {
   lastSeenActiveKey: null,
   lastSeenPendingKey: null,
   lastSeenGlobalPlayKey: null,
+  lastSeenCardFxKey: null,
   lastSeenPassiveDrawKey: null,
   lastSeenDrawnCardId: null,
   lastSeenJackpotDrawKey: null,
@@ -1670,6 +2124,18 @@ function onlineApplyViewState(vs) {
           return (players || []).find(function(p) { return p && String(p.id || '') === spid; });
         })
         .filter(Boolean);
+    } else if (vs.turnOrder && typeof vs.turnOrder === 'object') {
+      // RTDB peut renvoyer les tableaux comme {0: id, 1: id, ...}
+      ONLINE.turnOrderIds = Object.keys(vs.turnOrder)
+        .filter(function(k) { return String(Number(k)) === k; })
+        .sort(function(a, b) { return Number(a) - Number(b); })
+        .map(function(k) { return vs.turnOrder[k]; });
+      turnOrder = ONLINE.turnOrderIds
+        .map(function(pid) {
+          var spid = String(pid || '');
+          return (players || []).find(function(p) { return p && String(p.id || '') === spid; });
+        })
+        .filter(Boolean);
     } else {
       ONLINE.turnOrderIds = [];
     }
@@ -1937,6 +2403,23 @@ function onlineApplyViewState(vs) {
         if (jk && ONLINE.lastSeenJackpotDrawKey !== jk) {
           ONLINE.lastSeenJackpotDrawKey = jk;
           showJackpotDraw(lastJackpotDraw.cards);
+        }
+      }
+
+      // FX plein écran (légendaires + Gel + Miasme) pour tous quand la carte est résolue côté serveur
+      var fxTsNum = lastActiveCardData && lastActiveCardData.ts != null && lastActiveCardData.ts !== ''
+        ? Number(lastActiveCardData.ts) : NaN;
+      if (ONLINE.enabled && lastActiveCardId && lastActiveCardData && !isNaN(fxTsNum) && fxTsNum > 0 &&
+          CARD_PLAY_FX_CARD_IDS.indexOf(String(lastActiveCardId)) >= 0) {
+        var fxk = String(fxTsNum) + '|' + String(lastActiveCardPlayerId || '') + '|' + String(lastActiveCardId);
+        if (fxk && ONLINE.lastSeenCardFxKey !== fxk) {
+          ONLINE.lastSeenCardFxKey = fxk;
+          triggerCardPlayFx(String(lastActiveCardId), lastActiveCardData);
+          if (lastActiveCardId === 'sandevistan' && String(lastActiveCardPlayerId || '') === String(ONLINE.playerId || '')) {
+            var scTo = Number(lastActiveCardData.stolenCount);
+            if (!isFinite(scTo)) scTo = 0;
+            showToast('⏱️ Sandevistan ! ' + (scTo > 0 ? scTo + ' carte(s) volée(s). ' : '') + 'Bénédiction active ce tour.', 'success');
+          }
         }
       }
 
@@ -3152,7 +3635,9 @@ function onlineAction(action, payload) {
     }
 
     function ensurePending(type, extra) {
-      st.pending = Object.assign({ type: type, byPid: String(currentPid() || ''), ts: Date.now() }, extra || {});
+      var actor = currentPlayer();
+      var by = (actor && actor.id != null) ? String(actor.id) : String(currentPid() || '');
+      st.pending = Object.assign({ type: type, byPid: by, ts: Date.now() }, extra || {});
     }
 
     function clearPending() {
@@ -3237,6 +3722,30 @@ function onlineAction(action, payload) {
         st.blindedBy = p.name || '';
         st.blindedByPid = String(p.id || '');
         publishCardPlay(st, p, card, {});
+        return;
+      }
+
+      if (card.id === 'sandevistan') {
+        p.hand = p.hand || [];
+        var stolenSv = 0;
+        (st.players || []).forEach(function(pp) {
+          if (!pp) return;
+          if (String(pp.id || '') === String(p.id || '')) return;
+          if (!Array.isArray(pp.hand) || pp.hand.length === 0) return;
+          var ix = Math.floor(Math.random() * pp.hand.length);
+          var stc = pp.hand.splice(ix, 1)[0];
+          if (stc) {
+            p.hand.push(JSON.parse(JSON.stringify(stc)));
+            stolenSv++;
+          }
+        });
+        var glSv = PLAYABLE_CARDS.find(function(c) { return c && c.id === 'good_luck'; });
+        if (glSv) {
+          applyPassiveEffect(p, glSv);
+          pushTurnLog(p, glSv, 'activated');
+        }
+        var noteSv = stolenSv > 0 ? (String(stolenSv) + ' vol(s) + Bénédiction') : 'Bénédiction (aucune carte à voler)';
+        publishCardPlay(st, p, card, { ts: Date.now(), stolenCount: stolenSv, note: noteSv });
         return;
       }
 
@@ -3659,10 +4168,23 @@ function onlineAction(action, payload) {
       if (st.phase !== 'game') return st;
       if (!isMyTurn()) return st;
       if (!st.pending || st.pending.type !== 'echange_de_corps') return st;
+      if (String(st.pending.byPid || '') !== String(ONLINE.playerId || '')) return st;
       const p = currentPlayer();
       var tid7 = payload && payload.targetId ? String(payload.targetId) : '';
       var t7 = (st.players || []).find(function(pp) { return pp && String(pp.id || '') === tid7; }) || null;
-      if (!p || !t7 || t7.shieldedRound) { clearPending(); return st; }
+      function refundEchangeCard() {
+        if (!st.pending || !st.pending.card || !p) return;
+        p.hand = p.hand || [];
+        p.hand.push(JSON.parse(JSON.stringify(st.pending.card)));
+        if (p.turnLog && p.turnLog.length && p.turnLog[0] && st.pending.card.id && p.turnLog[0].id === st.pending.card.id) {
+          p.turnLog.shift();
+        }
+      }
+      if (!p || !t7 || t7.shieldedRound) {
+        refundEchangeCard();
+        clearPending();
+        return st;
+      }
       // Échange de corps: swap the "body" (inventory/state) but keep identities (id/name/color).
       // This way each device still plays the same playerId, but with the other's stuff.
       function normalizePlayerAfterSwap(pp) {
@@ -3685,7 +4207,8 @@ function onlineAction(action, payload) {
         if (typeof pp.goodBoost !== 'number') pp.goodBoost = Number(pp.goodBoost || 0) || 0;
         if (typeof pp.badLootBoost !== 'number') pp.badLootBoost = Number(pp.badLootBoost || 0) || 0;
         if (typeof pp.ticketCaisseNextRare !== 'boolean') pp.ticketCaisseNextRare = false;
-        if (pp.pariMinableGuess != null && pp.pariMinableGuess !== 'pair' && pp.pariMinableGuess !== 'impair') pp.pariMinableGuess = null;
+        // Firebase interdit undefined : après swap, la valeur peut être undefined si absente chez l'autre joueur
+        if (pp.pariMinableGuess !== 'pair' && pp.pariMinableGuess !== 'impair') pp.pariMinableGuess = null;
         pp.pariMinableFlash = sanitizePariMinableFlash(pp.pariMinableFlash);
         if (!Array.isArray(pp.turnLog)) pp.turnLog = [];
         if (!Array.isArray(pp.publicTurnLog)) pp.publicTurnLog = [];
@@ -3731,18 +4254,31 @@ function onlineAction(action, payload) {
       normalizePlayerAfterSwap(t7);
       // Also swap their "seat" in turn order so the target takes your current turn slot.
       // Example: if it was your turn (currentTurnIdx points to you), after swap it's the target's turn.
-      if (Array.isArray(st.turnOrder) && st.turnOrder.length) {
+      var toEch = st.turnOrder;
+      var toArr = [];
+      if (Array.isArray(toEch)) toArr = toEch.slice();
+      else if (toEch && typeof toEch === 'object') {
+        toArr = Object.keys(toEch)
+          .filter(function(k) { return String(Number(k)) === k; })
+          .sort(function(a, b) { return Number(a) - Number(b); })
+          .map(function(k) { return toEch[k]; });
+      }
+      if (toArr.length) {
         var pidA = String(p.id || '');
         var pidB = String(t7.id || '');
-        var ia = st.turnOrder.findIndex(function(x) { return String(x || '') === pidA; });
-        var ib = st.turnOrder.findIndex(function(x) { return String(x || '') === pidB; });
+        var ia = toArr.findIndex(function(x) { return String(x || '') === pidA; });
+        var ib = toArr.findIndex(function(x) { return String(x || '') === pidB; });
         if (ia >= 0 && ib >= 0 && ia !== ib) {
-          var tmpId = st.turnOrder[ia];
-          st.turnOrder[ia] = st.turnOrder[ib];
-          st.turnOrder[ib] = tmpId;
+          var tmpId2 = toArr[ia];
+          toArr[ia] = toArr[ib];
+          toArr[ib] = tmpId2;
+          st.turnOrder = toArr;
         }
       }
       var pc10 = st.pending && st.pending.card ? st.pending.card : null;
+      if (!pc10 || !pc10.id) {
+        pc10 = PLAYABLE_CARDS.find(function(c) { return c && c.id === 'echange_de_corps'; }) || null;
+      }
       if (pc10) {
         st.lastActiveCardId = pc10.id || null;
         st.lastActiveCardPlayerId = String(p.id||'');
@@ -3778,7 +4314,8 @@ function onlineAction(action, payload) {
       if (!isMyTurn()) return st;
       const p = currentPlayer();
       if (!p) return st;
-      if (!st.pending || String(st.pending.byPid || '') !== String(currentPid() || '')) return st;
+      // byPid = joueur qui doit résoudre le pending (souvent currentPid, mais on évite les écarts string/turnOrder)
+      if (!st.pending || String(st.pending.byPid || '') !== String(ONLINE.playerId || '')) return st;
       // Some cards (Above average / Pioche sacrée) must be resolved: no cancel-to-reroll exploit.
       if (st.pending && (st.pending.type === 'above_average_picker' || st.pending.type === 'pioche_sacree_picker')) {
         clearPending();
@@ -3990,6 +4527,76 @@ function updateRevealPariStrip(player) {
   strip.className = 'reveal-pari-strip ' + (fl.win ? 'reveal-pari-strip--win' : 'reveal-pari-strip--lose');
   strip.innerHTML = '🎯 Dé <b>' + fl.die + '</b>/' + fl.n + ' (face ' + faceFr + ') · Pari ' + gFr + '<br>' +
     (fl.win ? '✅ Gagné — +1 relance' : '❌ Perdu — −1 relance');
+}
+
+function clearCardFxChromeClasses() {
+  CARD_PLAY_FX_CARD_IDS.forEach(function(id) {
+    document.documentElement.classList.remove('card-fx-chrome--' + id);
+  });
+}
+
+function triggerCardPlayFx(cardId, data) {
+  var id = String(cardId || '');
+  if (CARD_PLAY_FX_CARD_IDS.indexOf(id) < 0) return;
+  var cfg = CARD_PLAY_FX_LABELS[id];
+  if (!cfg) return;
+  var ov = document.getElementById('cardFxOverlay');
+  if (!ov) return;
+  var d = data || {};
+  var subText = '';
+  if (id === 'sandevistan') {
+    var n = typeof d.stolenCount === 'number' ? d.stolenCount : -1;
+    if (n > 0) subText = n + ' carte' + (n > 1 ? 's' : '') + ' absorbée' + (n > 1 ? 's' : '') + ' · flux neural max';
+    else if (n === 0) subText = 'Aucune main adverse · Bénédiction quand même';
+    else subText = 'Temps ralenti · Bénédiction';
+  } else if (id === 'blinded') {
+    subText = 'Les adversaires ne verront pas leur loot au prochain tour';
+  } else if (id === 'echange_de_corps') {
+    subText = d.targetName ? ('Corps inversé avec ' + String(d.targetName)) : 'Identités et places échangées';
+  } else if (id === 'troisieme_oeil') {
+    subText = 'Visibilité totale : mains et loot de tous';
+  } else if (id === 'infinite_reroll') {
+    subText = 'Relances illimitées · les cartes relancées restent dans la boîte';
+  } else if (id === 'couronne') {
+    subText = 'Tu choisis ton loot parmi 3 tirages';
+  } else if (id === 'flashback') {
+    subText = 'Retour au round 1 · tout le monde repart à zéro';
+  } else if (id === 'miasme') {
+    subText = 'Tes adversaires subissent +35% de loot défavorable';
+  } else if (id === 'gel') {
+    subText = d.targetName ? (String(d.targetName) + ' ne pourra pas jouer de cartes au prochain tour') : 'Prochain tour gelé pour la cible';
+  }
+  document.getElementById('cardFxIcon').textContent = cfg.icon;
+  document.getElementById('cardFxTitle').textContent = cfg.title;
+  document.getElementById('cardFxSub').textContent = subText;
+  ov.className = 'card-fx-overlay card-fx--' + id;
+  clearCardFxChromeClasses();
+  document.documentElement.classList.add('card-fx-chrome--' + id);
+  ov.classList.add('visible');
+  ov.setAttribute('aria-hidden', 'false');
+  var dur = id === 'flashback' ? 2900 : 2650;
+  window.clearTimeout(window._cardFxTimeout);
+  window._cardFxTimeout = window.setTimeout(function() {
+    ov.classList.remove('visible');
+    ov.setAttribute('aria-hidden', 'true');
+    ov.className = 'card-fx-overlay';
+    clearCardFxChromeClasses();
+  }, dur);
+}
+
+/** Données factices pour sous-titres des FX (test accueil) */
+function cardFxTesterMockData(cardId) {
+  var id = String(cardId || '');
+  if (id === 'sandevistan') return { stolenCount: 2 };
+  if (id === 'echange_de_corps') return { targetName: 'Joueur test' };
+  if (id === 'gel') return { targetName: 'Cible test' };
+  return {};
+}
+
+function runLandingCardFxTest() {
+  var sel = document.getElementById('landingCardFxSelect');
+  if (!sel || !sel.value) return;
+  triggerCardPlayFx(sel.value, cardFxTesterMockData(sel.value));
 }
 
 function esc(s) {
@@ -4629,6 +5236,7 @@ function advanceRound() {
 }
 
 function applyFlashbackLocal(caster, card) {
+  triggerCardPlayFx('flashback', {});
   currentRound = 0;
   currentTurnIdx = 0;
   initRoundBox();
@@ -5023,6 +5631,7 @@ function executeCard(player, card) {
       var prev = Number(pp.badLootBoost || 0) || 0;
       pp.badLootBoost = Math.min(0.98, prev + 0.35);
     });
+    triggerCardPlayFx('miasme', {});
     showToast(card.emoji + ' Miasme : tes adversaires subissent +35% de loot défavorable (ce tour).', 'danger');
     renderTurnCenter(player);
   } else if (card.id === 'nostalgie') {
@@ -5039,11 +5648,13 @@ function executeCard(player, card) {
     showPartage(player);
   } else if (card.id === 'infinite_reroll') {
     player.infiniteReroll = true;
+    triggerCardPlayFx('infinite_reroll', {});
     showToast(card.emoji + ' Relance infinie activée !', 'success');
     renderTurnCenter(player);
   } else if (card.id === 'couronne') {
     showCouronne(player);
   } else if (card.id === 'troisieme_oeil') {
+    triggerCardPlayFx('troisieme_oeil', {});
     // Offline: reveal doesn't exist (no privacy filter). Just a feedback.
     showToast(card.emoji + ' Troisième œil : tu vois la main de tout le monde (online).', 'success');
     renderTurnCenter(player);
@@ -5060,7 +5671,30 @@ function executeCard(player, card) {
     });
     blindedBy = player.name;
     blindedByPid = String(player.id || '');
+    triggerCardPlayFx('blinded', {});
     showToast(card.emoji + ' Blinded ! Loot caché pour le prochain tour des adversaires.', 'danger');
+    renderTurnCenter(player);
+  } else if (card.id === 'sandevistan') {
+    player.hand = player.hand || [];
+    var stolenOff = 0;
+    turnOrder.forEach(function(pp) {
+      if (!pp || pp.id === player.id) return;
+      if (!pp.hand || !pp.hand.length) return;
+      var j = Math.floor(Math.random() * pp.hand.length);
+      var st0 = pp.hand.splice(j, 1)[0];
+      if (st0) {
+        player.hand.push(JSON.parse(JSON.stringify(st0)));
+        stolenOff++;
+      }
+    });
+    var glOff = PLAYABLE_CARDS.find(function(c) { return c && c.id === 'good_luck'; });
+    if (glOff) {
+      player.activePassives = player.activePassives || [];
+      player.activePassives.push('force_good');
+      addTurnLog(player, glOff, 'activated');
+    }
+    triggerCardPlayFx('sandevistan', { stolenCount: stolenOff });
+    showToast(card.emoji + ' Sandevistan ! ' + (stolenOff ? stolenOff + ' carte(s) volée(s). ' : '') + 'Bénédiction active ce tour.', 'success');
     renderTurnCenter(player);
   } else if (card.id === 'flashback') {
     applyFlashbackLocal(player, card);
@@ -6531,6 +7165,7 @@ function confirmGel(targetId) {
   var target = turnOrder.find(function(p) { return p.id === targetId; });
   if (!target) return;
   target.frozenTurns = Math.max(target.frozenTurns || 0, 1);
+  triggerCardPlayFx('gel', { targetName: target.name });
   showToast('🧊 ' + target.name + ' est gelé pour son prochain tour !', 'danger');
   closeActionOverlay();
   renderSidebar();
@@ -6864,6 +7499,7 @@ function confirmEchangeDeCorps(targetId) {
   player.color = target.color;
   target.color = tmpColor;
 
+  triggerCardPlayFx('echange_de_corps', { targetName: target.name });
   showToast('🧬 Échange de corps : pseudos inversés !', 'success');
   closeActionOverlay();
   renderSidebar();
@@ -6984,6 +7620,7 @@ function confirmCouronne(i) {
   }
   if (player.pariMinableGuess) player.pariMinableGuess = null;
   player.pariMinableFlash = null;
+  triggerCardPlayFx('couronne', {});
   currentEntity = pick;
   closeActionOverlay();
   setTimeout(function() { showReveal(false); }, 150);
