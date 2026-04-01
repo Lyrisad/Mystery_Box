@@ -81,6 +81,27 @@
     .btn-accent { background: linear-gradient(135deg, var(--accent), #6d28d9); color: #fff; box-shadow: 0 4px 14px var(--accent-glow); }
     .btn-gold { background: linear-gradient(135deg, var(--gold), #d97706); color: #fff; box-shadow: 0 4px 14px var(--gold-glow); font-size: .95rem; padding: .85rem 1.8rem; }
     .btn-gold:disabled { opacity: .4; cursor: not-allowed; box-shadow: none; }
+    .btn-autofill {
+      background: rgba(255,255,255,.03);
+      color: var(--text);
+      border: 1px solid rgba(245,158,11,.28);
+      box-shadow: none;
+      padding: .5rem .75rem;
+      border-radius: 12px;
+      font-weight: 800;
+      letter-spacing: .02em;
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+    }
+    .btn-autofill:hover:not(:disabled) {
+      transform: none;
+      background: rgba(245,158,11,.08);
+      border-color: rgba(245,158,11,.45);
+      box-shadow: 0 0 0 4px rgba(245,158,11,.06);
+    }
+    .btn-autofill:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
+    .btn-autofill .spark { filter: none; opacity: .9; }
     /* Chance forcée : bouton lancer le dé (joueur actif avec goodBoost) */
     .btn.btn-gold.game-roll-btn--luck {
       background: linear-gradient(135deg, #34d399, #059669);
@@ -1331,6 +1352,10 @@
           <button type="button" class="gb-pill gb-good active" data-gb="true" onclick="selectGoodBad(true)">Good Choice</button>
           <button type="button" class="gb-pill gb-bad" data-gb="false" onclick="selectGoodBad(false)">Bad Choice</button>
         </div>
+        <div class="add-form" style="margin-bottom:.55rem">
+          <button type="button" class="btn btn-autofill" id="autoFillEntitiesBtn" onclick="autoFillEntitiesPreset()"><span class="spark">✨</span> Remplissage auto</button>
+          <button type="button" class="btn btn-min btn-min-danger" id="clearEntitiesBtn" onclick="clearAllEntities()">Clear</button>
+        </div>
         <form class="add-form" id="entityForm">
           <input type="text" id="entityNameInput" placeholder="Nom de la célébrité…" autocomplete="off" />
           <label class="file-label" id="fileLabel">
@@ -1805,6 +1830,18 @@ function genPlayerId() {
   return 'p_' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(2, 6);
 }
 
+function getClientToken() {
+  try {
+    var t = localStorage.getItem('mb_clientToken');
+    if (t && String(t).length >= 12) return String(t);
+    t = 'ct_' + Math.random().toString(36).slice(2, 12) + Date.now().toString(36).slice(2, 8);
+    localStorage.setItem('mb_clientToken', t);
+    return t;
+  } catch (_) {
+    return 'ct_' + Math.random().toString(36).slice(2, 12) + Date.now().toString(36).slice(2, 8);
+  }
+}
+
 function roomRef(roomCode) {
   firebaseEnsureInit();
   return __db.ref('rooms/' + String(roomCode).toUpperCase());
@@ -1923,6 +1960,20 @@ function onlineApplyViewState(vs) {
     }
     if (Array.isArray(vs.players)) {
       var myId = String(ONLINE.playerId || '');
+      // If host kicked this device, do not auto-repair/rejoin.
+      var ct = getClientToken();
+      if (vs.kickedTokens && typeof vs.kickedTokens === 'object' && vs.kickedTokens[ct]) {
+        ONLINE.enabled = false;
+        ONLINE.roomCode = null;
+        ONLINE.playerId = null;
+        ONLINE.version = 0;
+        onlineClearSession();
+        onlineStopRealtime();
+        newGame();
+        showToast('Tu as été kick de la room.', 'danger');
+        showScreen('screenLanding');
+        return;
+      }
       var hasMe = (myId && vs.players.some(function(pp) { return pp && String(pp.id || '') === myId; }));
       if (ONLINE.enabled && !hasMe && !ONLINE.repairingMembership) {
         ONLINE.repairingMembership = true;
@@ -1943,6 +1994,7 @@ function onlineApplyViewState(vs) {
                 id: newId,
                 name: nm,
                 color: color,
+                clientToken: getClientToken(),
                 picks: [[],[],[]],
                 rerollsLeft: 1,
                 hand: [],
@@ -2692,6 +2744,7 @@ function createRoomOnline(m) {
   const name = (document.getElementById('onlineHostName').value || '').trim() || 'Hôte';
   const roomCode = genRoomCode();
   const playerId = genPlayerId();
+  const clientToken = getClientToken();
   const color = COLORS[0];
 
   var btns = Array.from(document.querySelectorAll('#screenOnline button[onclick^="createRoomOnline"]'));
@@ -2720,6 +2773,7 @@ function createRoomOnline(m) {
       id: playerId,
       name: name,
       color: color,
+      clientToken: clientToken,
       picks: [[],[],[]],
       rerollsLeft: 1,
       hand: [],
@@ -2809,6 +2863,7 @@ function joinRoomOnline() {
   }
 
   const playerId = genPlayerId();
+  const clientToken = getClientToken();
   const ref = roomRef(roomCode);
 
   ref.get()
@@ -2823,6 +2878,7 @@ function joinRoomOnline() {
         throw new Error('room_expired');
       }
       const st = data.state;
+      if (st.kickedTokens && typeof st.kickedTokens === 'object' && st.kickedTokens[clientToken]) throw new Error('kicked');
       st.players = st.players || [];
       if (st.players.length >= 5) throw new Error('room_full');
       if (typeof st.pending === 'undefined') st.pending = null;
@@ -2831,6 +2887,7 @@ function joinRoomOnline() {
         id: playerId,
         name: name,
         color: color,
+        clientToken: clientToken,
         picks: [[],[],[]],
         rerollsLeft: 1,
         hand: [],
@@ -2871,6 +2928,7 @@ function joinRoomOnline() {
     .catch(function(err) {
       var msg = String(err && err.message ? err.message : err);
       if (msg === 'room_expired') msg = 'Room expirée (inactive trop longtemps).';
+      if (msg === 'kicked') msg = 'Tu as été kick de cette room.';
       showToast('Firebase: ' + msg, 'danger');
       document.getElementById('onlineJoinInfo').textContent = '';
     })
@@ -3001,6 +3059,24 @@ function onlineAction(action, payload) {
       if (!st.players || !st.players.length || String(st.players[0].id || '') !== String(ONLINE.playerId || '')) return st;
       if (st.phase !== 'lobby') return st;
       st.entities = (st.entities || []).filter(function(e) { return e.id !== payload.id; });
+      return st;
+    }
+    if (action === 'host:kickPlayer') {
+      if (!st.players || !st.players.length || String(st.players[0].id || '') !== String(ONLINE.playerId || '')) return st;
+      if (st.phase !== 'lobby') return st;
+      var tid = String(payload && payload.id || '');
+      if (!tid) return st;
+      if (st.players && st.players[0] && String(st.players[0].id || '') === tid) return st; // never kick host
+      var tp = (st.players || []).find(function(pp) { return pp && String(pp.id || '') === tid; }) || null;
+      var tTok = tp && tp.clientToken ? String(tp.clientToken) : '';
+      st.kickedTokens = st.kickedTokens || {};
+      if (tTok) st.kickedTokens[tTok] = Date.now();
+      st.players = (st.players || []).filter(function(pp) { return pp && String(pp.id || '') !== tid; });
+      // ensure no stale order references
+      st.turnOrder = (st.turnOrder || []).filter(function(x) { return String(x || '') !== tid; });
+      if (typeof st.orderPhaseIdx !== 'undefined') {
+        st.orderPhaseIdx = Math.min(Number(st.orderPhaseIdx || 0), Math.max(0, (st.players || []).length - 1));
+      }
       return st;
     }
     if (action === 'host:startOrder') {
@@ -4707,6 +4783,327 @@ var CAT_META = {
 var selectedCat = 'celebrite';
 var selectedGood = true;
 
+var PRESET_GOOD_CELEB = [
+  'Sydney Sweeney',
+  'Megan Fox',
+  'Emily Ratajkowski',
+  'Kendall Jenner',
+  'Kylie Jenner',
+  'Emma Watson',
+  'Ester Expósito',
+  'Jessica Alba',
+  'Jennifer Lawrence',
+  'Monica Bellucci',
+  'Madison Beer',
+  'Julia Roberts',
+  'Angelina Jolie',
+  'Margot Robbie',
+  'Ariana Grande',
+  'Bella Hadid',
+  'Mia Khalifa',
+  'Cara Delevingne',
+  'Scarlett Johansson',
+  'Amber Heard',
+  'Emma Stone',
+  'Sandra Bullock',
+  'Natalie Portman',
+  'Gal Gadot',
+  'Emilia Clarke',
+  'Selena Gomez',
+  'Angèle (chanteuse)',
+  'Ana de Armas',
+  'Zendaya',
+  'Alexa Demie'
+];
+
+var PRESET_BAD_CELEB = [
+  'Mimie Mathy',
+  'Pierre Ménès',
+  'Brigitte Macron',
+  'Donald Trump',
+  'Marion Maréchal',
+  'Gérard Depardieu',
+  'Kim Jong-un',
+  'Jean-Luc Mélenchon',
+  'Jeffrey Epstein',
+  'Muriel Robin',
+  'Éric Zemmour',
+  'Franck Ribéry'
+];
+
+var PRESET_BAD_OTHER = [
+  { name: 'Un squatteur atteint de gale', image: 'images_personnages/SquatteurGaleux.png' },
+  { name: 'Un SDF sous crack', image: 'images_personnages/SDF_sous_crack.png' },
+  { name: 'Une grand-mère de 89 ans', image: 'images_personnages/GrandMère.png' },
+  { name: 'Un siamois gay', image: 'images_personnages/SiamoisGay.png' },
+  { name: 'Une prostituée de fin de service', image: 'images_personnages/Prostituée.png' },
+  { name: 'Un gamin de 12 ans', image: 'images_personnages/Gamin.png' },
+  { name: 'Un punk à chien sous 8.6', image: 'images_personnages/Punk_a_Chien.png' },
+  { name: 'Ta propre mère', image: 'images_personnages/TaPropreMère.png' },
+  { name: 'Le Père Fouras (Fort Boyard)', image: 'images_personnages/PèreFouras.png' },
+  { name: 'Un gros BBC bien veineux', image: 'images_personnages/UnGrosBBC.png' },
+  { name: 'Un sosie de toi-même gay', image: null },
+  { name: 'Un paraplégique', image: 'images_personnages/Paraplégique.png' },
+  { name: 'Un nain avec une énorme queue', image: 'images_personnages/NainGrosseQueue.png' },
+  { name: 'Une pro-LGBTQ pas rasée pas lavée', image: 'images_personnages/LGBTQ.png' },
+  { name: 'Morgane MakeUp', image: 'images_personnages/MorganeMakeUp.png' },
+  { name: 'Hawa', image: 'images_personnages/Hawa.png' },
+  { name: 'Un proctologue amateur', image: 'images_personnages/PronctologueAmateur.png' },
+  { name: 'Cadavre', image: 'images_personnages/Cadavre.png' }
+];
+
+function pickRandomUnique(list, n) {
+  var src = (Array.isArray(list) ? list.slice() : []).filter(Boolean);
+  // Fisher–Yates shuffle
+  for (var i = src.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = src[i]; src[i] = src[j]; src[j] = t;
+  }
+  return src.slice(0, Math.max(0, Math.min(n, src.length)));
+}
+
+function mixGoodBadSequence(goodItems, badItems) {
+  var g = goodItems.slice();
+  var b = badItems.slice();
+  var out = [];
+  var last = null;
+  var streak = 0;
+  while (g.length || b.length) {
+    var canG = g.length > 0;
+    var canB = b.length > 0;
+    if (!canG) { out.push(b.pop()); last = 'b'; streak = (last === 'b') ? (streak + 1) : 1; continue; }
+    if (!canB) { out.push(g.pop()); last = 'g'; streak = (last === 'g') ? (streak + 1) : 1; continue; }
+
+    var forceSwitch = streak >= 2;
+    var pickG;
+    if (forceSwitch) {
+      pickG = last === 'b';
+    } else {
+      // Bias toward the side that has more remaining to keep balance smooth
+      var wG = g.length + 0.01;
+      var wB = b.length + 0.01;
+      pickG = Math.random() < (wG / (wG + wB));
+      if (last === 'g' && streak === 1 && pickG && b.length) pickG = Math.random() < 0.55 ? false : true;
+      if (last === 'b' && streak === 1 && !pickG && g.length) pickG = Math.random() < 0.55 ? true : false;
+    }
+    if (pickG) {
+      out.push(g.pop());
+      streak = (last === 'g') ? (streak + 1) : 1;
+      last = 'g';
+    } else {
+      out.push(b.pop());
+      streak = (last === 'b') ? (streak + 1) : 1;
+      last = 'b';
+    }
+  }
+  return out;
+}
+
+function onlineHostAddEntity(entityToSend) {
+  if (!ONLINE.enabled) return Promise.resolve();
+  if (!onlineIsHost()) return Promise.reject(new Error('not host'));
+
+  var tmpId = 'tmp_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+  ONLINE.optimistic.entities = ONLINE.optimistic.entities || [];
+  ONLINE.optimistic.entities.push({
+    tmpId: tmpId,
+    name: entityToSend.name,
+    category: entityToSend.category,
+    good: !!entityToSend.good,
+    image: entityToSend.image || null,
+    createdAtMs: Date.now()
+  });
+  entities = (entities || []).concat([{ id: tmpId, name: entityToSend.name, category: entityToSend.category, good: !!entityToSend.good, image: entityToSend.image || null }]);
+  renderSetup();
+
+  return onlineAction('host:addEntity', {
+    name: entityToSend.name,
+    category: entityToSend.category,
+    good: !!entityToSend.good,
+    image: entityToSend.image || null
+  }).catch(function(err) {
+    ONLINE.optimistic.entities = (ONLINE.optimistic.entities || []).filter(function(o) { return o && o.tmpId !== tmpId; });
+    entities = (entities || []).filter(function(e) { return e && String(e.id || '') !== String(tmpId); });
+    renderSetup();
+    throw err;
+  });
+}
+
+function autoFillEntitiesPreset() {
+  var btn = document.getElementById('autoFillEntitiesBtn');
+  if (ONLINE.enabled && !onlineIsHost()) return showToast('Seul l’hôte peut utiliser le remplissage auto.', 'danger');
+  if (btn) btn.disabled = true;
+
+  // Replace existing list to avoid messy mixes
+  entities = [];
+  if (ONLINE.enabled) {
+    ONLINE.optimistic.entities = [];
+    ONLINE.optimistic.deletedTmpIds = {};
+  }
+  renderSetup();
+
+  var good = pickRandomUnique(PRESET_GOOD_CELEB, 15).map(function(name) {
+    return { name: name, category: 'celebrite', good: true };
+  });
+
+  var badCelebCount = Math.min(15, PRESET_BAD_CELEB.length);
+  var badCeleb = pickRandomUnique(PRESET_BAD_CELEB, Math.min(8, badCelebCount)).map(function(name) {
+    return { name: name, category: 'celebrite', good: false };
+  });
+  var badOther = pickRandomUnique(PRESET_BAD_OTHER, 15 - badCeleb.length).map(function(it) {
+    var nm = (it && typeof it === 'object') ? it.name : String(it || '');
+    var img = (it && typeof it === 'object') ? (it.image || null) : null;
+    return { name: nm, category: 'autre', good: false, image: img };
+  });
+  var bad = badCeleb.concat(badOther);
+  // If preset lists are too short, pad with remaining from the other list
+  if (bad.length < 15) {
+    var extraCeleb = pickRandomUnique(PRESET_BAD_CELEB.filter(function(n) { return badCeleb.every(function(x) { return x.name !== n; }); }), 15 - bad.length)
+      .map(function(name) { return { name: name, category: 'celebrite', good: false }; });
+    bad = bad.concat(extraCeleb).slice(0, 15);
+  }
+
+  var sequence = mixGoodBadSequence(good, bad);
+
+  var status = document.getElementById('imgStatus');
+  if (status) status.innerHTML = '<span class="spinner"></span> Remplissage auto…';
+
+  // Sequential to avoid spamming wiki/api and online host actions
+  var p = Promise.resolve();
+  sequence.forEach(function(it, idx) {
+    p = p.then(function() {
+      var entity = { id: Date.now() + '_' + idx, name: it.name, image: it.image || null, category: it.category, good: !!it.good };
+      var needsWiki = it.category !== 'autre';
+      var addOne = function() {
+        if (ONLINE.enabled) return onlineHostAddEntity(entity);
+        entities.push(entity);
+        renderSetup();
+        return Promise.resolve();
+      };
+      if (needsWiki) {
+        return autoFetchImage(it.name).then(function(url) {
+          entity.image = url;
+        }).catch(function() {
+          entity.image = null;
+        }).then(addOne);
+      }
+      return addOne();
+    });
+  });
+
+  p.then(function() {
+    if (status) status.innerHTML = '✅ Remplissage auto terminé';
+    setTimeout(function() { if (status) status.innerHTML = ''; }, 1800);
+  }).catch(function(err) {
+    showToast(String(err && (err.message || err) || 'Erreur'), 'danger');
+  }).finally(function() {
+    if (btn) btn.disabled = false;
+  });
+}
+
+function clearAllEntities() {
+  var btn = document.getElementById('clearEntitiesBtn');
+  if (ONLINE.enabled && !onlineIsHost()) return showToast('Seul l’hôte peut vider les entités.', 'danger');
+  if (!entities || !entities.length) return;
+  confirmUi({
+    title: 'Vider les entités ?',
+    body: 'Cette action supprime <b>toutes</b> les entités de la partie.',
+    confirmLabel: 'Vider',
+    cancelLabel: 'Annuler',
+    danger: true,
+    onConfirm: function() {
+      if (btn) btn.disabled = true;
+
+      if (!ONLINE.enabled) {
+        entities = [];
+        renderSetup();
+        if (btn) btn.disabled = false;
+        return;
+      }
+
+      // Online host: remove one by one (server source of truth)
+      var ids = (entities || []).map(function(e) { return e && e.id; }).filter(function(id) { return id !== undefined && id !== null; });
+      ONLINE.optimistic.entities = [];
+      ONLINE.optimistic.deletedTmpIds = {};
+      entities = [];
+      renderSetup();
+
+      var p = Promise.resolve();
+      ids.forEach(function(id) {
+        p = p.then(function() {
+          return onlineAction('host:removeEntity', { id: id }).catch(function() { /* ignore individual failures */ });
+        });
+      });
+      p.finally(function() {
+        if (btn) btn.disabled = false;
+      });
+    }
+  });
+}
+
+var __confirmUiState = null;
+function confirmUi(opts) {
+  opts = opts || {};
+  __confirmUiState = {
+    onConfirm: typeof opts.onConfirm === 'function' ? opts.onConfirm : function() {},
+    onCancel: typeof opts.onCancel === 'function' ? opts.onCancel : function() {}
+  };
+  var title = String(opts.title || 'Confirmer');
+  var body = String(opts.body || '');
+  var confirmLabel = String(opts.confirmLabel || 'OK');
+  var cancelLabel = String(opts.cancelLabel || 'Annuler');
+  var danger = !!opts.danger;
+
+  var html =
+    '<h3 style="margin-bottom:.35rem">' + esc(title) + '</h3>' +
+    (body ? '<p style="color:var(--text-dim);font-size:.82rem;line-height:1.45;margin-bottom:.95rem">' + body + '</p>' : '') +
+    '<div style="display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap">' +
+      '<button type="button" class="btn btn-min" onclick="confirmUiCancel()">' + esc(cancelLabel) + '</button>' +
+      '<button type="button" class="btn ' + (danger ? 'btn-danger-fill' : 'btn-gold') + '" onclick="confirmUiOk()">' + esc(confirmLabel) + '</button>' +
+    '</div>';
+  openActionOverlay(html);
+}
+
+function confirmUiCancel() {
+  var st = __confirmUiState;
+  __confirmUiState = null;
+  closeActionOverlay(true);
+  try { if (st && st.onCancel) st.onCancel(); } catch (_) {}
+}
+
+function confirmUiOk() {
+  var st = __confirmUiState;
+  __confirmUiState = null;
+  closeActionOverlay(true);
+  try { if (st && st.onConfirm) st.onConfirm(); } catch (_) {}
+}
+
+function kickPlayerOnline(pid, pname) {
+  if (!ONLINE.enabled) return;
+  if (!onlineIsHost()) return showToast('Seul l’hôte peut kick.', 'danger');
+  var myId = String(ONLINE.playerId || '');
+  var targetId = String(pid || '');
+  if (!targetId || targetId === myId) return;
+  // Safer: only during lobby
+  var ph = (ONLINE.prev && ONLINE.prev.phase) ? String(ONLINE.prev.phase) : '';
+  if (ph && ph !== 'lobby') {
+    showToast('Kick disponible uniquement dans le lobby.', 'danger');
+    return;
+  }
+  confirmUi({
+    title: 'Kick ce joueur ?',
+    body: 'Le joueur <b>' + esc(String(pname || '')) + '</b> sera retiré de la room.',
+    confirmLabel: 'Kick',
+    cancelLabel: 'Annuler',
+    danger: true,
+    onConfirm: function() {
+      onlineAction('host:kickPlayer', { id: targetId }).catch(function(err) {
+        showToast(String(err && (err.message || err) || err), 'danger');
+      });
+    }
+  });
+}
+
 function selectGoodBad(val) {
   selectedGood = val;
   document.querySelectorAll('.gb-pill').forEach(function(b) { b.classList.toggle('active', String(b.dataset.gb) === String(val)); });
@@ -4970,11 +5367,15 @@ function renderSetup() {
 
   document.getElementById('playerCounter').textContent = players.length + ' / 5';
   document.getElementById('playersList').innerHTML = players.map(function(p) {
+    var isMe = String(p.id || '') === String(ONLINE.playerId || '');
+    var isHost = ONLINE.enabled && players && players[0] && String(players[0].id || '') === String(p.id || '');
     return '<span class="player-chip">' +
       '<span class="dot" style="background:' + p.color + '"></span>' +
       '<span class="name">' + esc(p.name) + '</span>' +
-      (ONLINE.enabled && onlineIsHost() && String(p.id || '') === String(ONLINE.playerId || '') ? '<span class="tag">HOST</span>' : '') +
-      (ONLINE.enabled ? '' : '<button class="btn-sm" onclick="removePlayer(' + p.id + ')">✕</button>') +
+      (ONLINE.enabled && isHost ? '<span class="tag">HOST</span>' : '') +
+      (ONLINE.enabled
+        ? (onlineIsHost() && !isMe ? '<button class="btn-sm" style="background:rgba(239,68,68,.15);color:var(--danger)" onclick="kickPlayerOnline(' + jsq(p.id) + ',' + jsq(p.name) + ')">Kick</button>' : '')
+        : '<button class="btn-sm" onclick="removePlayer(' + p.id + ')">✕</button>') +
     '</span>';
   }).join('');
 
@@ -4996,6 +5397,16 @@ function renderSetup() {
     if (pf) pf.style.display = 'none';
     document.getElementById('startBtn').disabled = !(ok && onlineIsHost());
     document.getElementById('startHint').textContent = ok ? (onlineIsHost() ? 'Prêt: lance la partie pour tout le monde.' : 'En attente que l’hôte lance la partie…') : 'En online: l’hôte doit ajouter au moins 1 entité.';
+    var af = document.getElementById('autoFillEntitiesBtn');
+    if (af) {
+      af.style.display = onlineIsHost() ? '' : 'none';
+      af.disabled = !onlineIsHost();
+    }
+      var clr = document.getElementById('clearEntitiesBtn');
+      if (clr) {
+        clr.style.display = onlineIsHost() ? '' : 'none';
+        clr.disabled = !onlineIsHost();
+      }
   } else {
     var pf2 = document.getElementById('playerForm');
     if (pf2) pf2.style.display = '';
@@ -5003,6 +5414,10 @@ function renderSetup() {
     document.querySelector('#playerForm button[type=\"submit\"]').disabled = false;
     document.getElementById('startBtn').disabled = !ok;
     document.getElementById('startHint').textContent = ok ? '' : 'Ajoute au moins 1 joueur et 1 entité';
+    var af2 = document.getElementById('autoFillEntitiesBtn');
+    if (af2) { af2.style.display = ''; af2.disabled = false; }
+      var clr2 = document.getElementById('clearEntitiesBtn');
+      if (clr2) { clr2.style.display = ''; clr2.disabled = false; }
   }
 }
 
