@@ -831,6 +831,7 @@
     /* Dock journal + réactions (bas de l’écran jeu, online) */
     #screenGame.active > .app { padding-bottom: 3.25rem; }
     #screenGame.active.game-dock-extra > .app { padding-bottom: 6.45rem; }
+    #screenGame.active.game-dock-reactions-collapsed > .app { padding-bottom: 4.35rem; }
     .game-reaction-dock {
       position: fixed;
       left: 50%;
@@ -846,6 +847,29 @@
       pointer-events: none;
     }
     .game-reaction-dock.is-visible { display: flex; }
+    .game-reaction-dock.is-collapsed { gap: .25rem; }
+    .game-reaction-tab {
+      pointer-events: auto;
+      font-family: inherit;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.32);
+      color: rgba(255,255,255,.92);
+      border-radius: 999px;
+      padding: .32rem .6rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      box-shadow: 0 8px 24px rgba(0,0,0,.35);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      font-weight: 900;
+      font-size: .72rem;
+      letter-spacing: .02em;
+      user-select: none;
+    }
+    .game-reaction-tab:hover { border-color: rgba(245, 158, 11, .35); background: rgba(245, 158, 11, .10); }
+    .game-reaction-chevron { opacity: .9; font-size: .78rem; line-height: 1; }
     .game-reaction-inner {
       pointer-events: auto;
       display: flex;
@@ -859,6 +883,7 @@
       background: var(--surface-2);
       box-shadow: 0 8px 32px rgba(0,0,0,.4);
     }
+    .game-reaction-dock.is-collapsed .game-reaction-inner { display: none; }
     .game-reaction-label {
       width: 100%;
       text-align: center;
@@ -1375,6 +1400,10 @@
     </div>
   </div>
   <div class="game-reaction-dock" id="gameReactionDock" aria-label="Réactions rapides">
+    <button type="button" class="game-reaction-tab" id="gameReactionTab" onclick="toggleGameReactionDock()" aria-expanded="true">
+      <span>🙂 Réactions</span>
+      <span class="game-reaction-chevron" id="gameReactionTabChevron">▼</span>
+    </button>
     <div class="game-reaction-inner" id="gameReactionInner"></div>
   </div>
   <div id="reactionBurstLayer" aria-hidden="true"></div>
@@ -5887,26 +5916,61 @@ function processNewReactionEffects() {
 function updateReactionDock() {
   var dock = document.getElementById('gameReactionDock');
   var inner = document.getElementById('gameReactionInner');
+  var tab = document.getElementById('gameReactionTab');
+  var chevron = document.getElementById('gameReactionTabChevron');
   var gameScreen = document.getElementById('screenGame');
   if (!dock || !inner || !gameScreen) return;
   var isGame = gameScreen.classList.contains('active');
   if (ONLINE.enabled && isGame) {
-    gameScreen.classList.add('game-dock-extra');
+    var isOpen = getGameReactionDockOpen();
+    gameScreen.classList.toggle('game-dock-extra', isOpen);
+    gameScreen.classList.toggle('game-dock-reactions-collapsed', !isOpen);
     dock.classList.add('is-visible');
+    dock.classList.toggle('is-collapsed', !isOpen);
+    if (tab) tab.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    if (chevron) chevron.textContent = isOpen ? '▼' : '▲';
     var myId = String(ONLINE.playerId || '');
     var used = Number(reactionTurnCounts[myId] || 0);
     var left = Math.max(0, 5 - used);
     var meta = '<div class="game-reaction-meta">Réactions · ' + left + ' / 5 ce tour de table</div>';
     var label = '<div class="game-reaction-label">Réagir</div>';
-    inner.innerHTML = label + GAME_REACTION_PRESETS.map(function(p) {
-      var dis = left <= 0 ? ' disabled' : '';
-      return '<button type="button" class="game-reaction-btn"' + dis + ' title="' + esc(p.emoji) + '" aria-label="Réaction ' + esc(p.id) + '" onclick="sendGameReaction(' + jsq(p.id) + ')">' + p.emoji + '</button>';
-    }).join('') + meta;
+    if (isOpen) {
+      inner.innerHTML = label + GAME_REACTION_PRESETS.map(function(p) {
+        var dis = left <= 0 ? ' disabled' : '';
+        return '<button type="button" class="game-reaction-btn"' + dis + ' title="' + esc(p.emoji) + '" aria-label="Réaction ' + esc(p.id) + '" onclick="sendGameReaction(' + jsq(p.id) + ')">' + p.emoji + '</button>';
+      }).join('') + meta;
+    } else {
+      inner.innerHTML = '';
+    }
   } else {
     dock.classList.remove('is-visible');
     gameScreen.classList.remove('game-dock-extra');
+    gameScreen.classList.remove('game-dock-reactions-collapsed');
+    dock.classList.remove('is-collapsed');
+    if (tab) tab.setAttribute('aria-expanded', 'false');
+    if (chevron) chevron.textContent = '▲';
     inner.innerHTML = '';
   }
+}
+
+function getGameReactionDockOpen() {
+  try {
+    var v = localStorage.getItem('mb_reactionDockOpen');
+    if (v === null) return false;
+    return v !== '0';
+  } catch (_) {
+    return false;
+  }
+}
+
+function setGameReactionDockOpen(open) {
+  try { localStorage.setItem('mb_reactionDockOpen', open ? '1' : '0'); } catch (_) {}
+}
+
+function toggleGameReactionDock() {
+  var open = getGameReactionDockOpen();
+  setGameReactionDockOpen(!open);
+  updateReactionDock();
 }
 
 function sendGameReaction(id) {
