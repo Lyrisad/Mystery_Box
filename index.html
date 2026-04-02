@@ -290,6 +290,30 @@
       75%  { transform: rotate(-4deg) scale(1.02); }
       100% { transform: rotate(0) scale(1); }
     }
+    #rollModPill {
+      margin: .15rem auto 0;
+      max-width: 360px;
+      padding: .36rem .62rem;
+      border-radius: 999px;
+      text-align: center;
+      font-weight: 900;
+      font-size: .78rem;
+      letter-spacing: .2px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      box-shadow: 0 10px 26px rgba(0,0,0,.25);
+    }
+    #rollModPill.is-bonus {
+      background: rgba(16,185,129,.10);
+      border-color: rgba(16,185,129,.22);
+      color: rgba(236, 253, 245, .98);
+    }
+    #rollModPill.is-malus {
+      background: rgba(239,68,68,.10);
+      border-color: rgba(239,68,68,.22);
+      color: rgba(254, 242, 242, .98);
+    }
     .range-info { color: var(--text-dim); font-size: .8rem; }
     .reroll-status { color: var(--gold); font-size: .82rem; font-weight: 600; white-space: pre-line; }
 
@@ -1055,6 +1079,109 @@
     .pgl-dock-txt b { color: var(--text); font-weight: 800; }
     .pgl-dock-m { font-size: .74rem; font-weight: 700; color: var(--text); }
     .pgl-dock-empty { margin: 0; padding: .85rem 1rem; text-align: center; font-size: .78rem; color: var(--text-dim); }
+    
+    /* ── Game Chat Dock (online) ── */
+    .game-chat-dock {
+      position: fixed;
+      right: .6rem;
+      bottom: .6rem;
+      width: min(92vw, 360px);
+      z-index: 56;
+      display: none;
+      flex-direction: column;
+      align-items: stretch;
+      padding-bottom: env(safe-area-inset-bottom, 0);
+      pointer-events: none;
+    }
+    .game-chat-dock.is-visible { display: flex; }
+    .game-chat-tab {
+      pointer-events: auto;
+      align-self: flex-end;
+      display: inline-flex;
+      align-items: center;
+      gap: .45rem;
+      padding: .45rem .75rem;
+      margin: 0;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: linear-gradient(180deg, rgba(36, 36, 56, .97), rgba(22, 22, 34, .99));
+      box-shadow: 0 10px 34px rgba(0,0,0,.42);
+      font-size: .76rem;
+      font-weight: 850;
+      color: var(--text);
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .game-chat-tab:hover { background: linear-gradient(180deg, rgba(44, 44, 68, .98), rgba(26, 26, 40, .99)); }
+    .game-chat-count {
+      font-size: .65rem;
+      font-weight: 900;
+      padding: .12rem .4rem;
+      border-radius: 999px;
+      background: rgba(59, 130, 246, .18);
+      color: #93c5fd;
+      border: 1px solid rgba(59, 130, 246, .35);
+    }
+    .game-chat-chevron { font-size: .62rem; opacity: .75; margin-left: .1rem; }
+    .game-chat-panel {
+      pointer-events: auto;
+      margin-top: .45rem;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .25s ease;
+      background: rgba(12, 12, 20, .97);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 14px;
+      box-shadow: 0 14px 44px rgba(0,0,0,.55);
+    }
+    .game-chat-dock.is-open .game-chat-panel {
+      max-height: min(44vh, 360px);
+      overflow: hidden;
+    }
+    .chat-wrap { display: grid; grid-template-rows: 1fr auto; height: min(44vh, 360px); }
+    .chat-list {
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: .65rem .7rem;
+      display: flex;
+      flex-direction: column;
+      gap: .45rem;
+    }
+    /* custom scrollbar (chat) */
+    .chat-list { scrollbar-width: thin; scrollbar-color: rgba(245,158,11,.35) rgba(255,255,255,.06); }
+    .chat-list::-webkit-scrollbar { width: 10px; }
+    .chat-list::-webkit-scrollbar-track { background: rgba(255,255,255,.05); border-radius: 999px; }
+    .chat-list::-webkit-scrollbar-thumb { background: linear-gradient(180deg, rgba(245,158,11,.55), rgba(124,58,237,.45)); border-radius: 999px; border: 2px solid rgba(12,12,20,.97); }
+    .chat-list::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, rgba(245,158,11,.75), rgba(124,58,237,.6)); }
+    .chat-item { display: flex; gap: .45rem; align-items: flex-start; }
+    .chat-dot { width: 9px; height: 9px; border-radius: 50%; margin-top: .35rem; flex-shrink: 0; box-shadow: 0 0 0 3px rgba(255,255,255,.04); }
+    .chat-bubble { min-width: 0; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 12px; padding: .45rem .55rem; }
+    .chat-meta { font-size: .62rem; color: var(--text-dim); font-weight: 800; display: flex; gap: .4rem; align-items: baseline; }
+    .chat-meta b { color: var(--text); font-weight: 900; max-width: 11rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .chat-text { font-size: .78rem; color: rgba(255,255,255,.92); line-height: 1.25; word-break: break-word; }
+    .chat-empty { margin: 0; padding: 1rem .9rem; text-align: center; font-size: .78rem; color: var(--text-dim); }
+    .chat-inputbar {
+      border-top: 1px solid rgba(255,255,255,.08);
+      padding: .55rem .6rem;
+      display: flex;
+      gap: .45rem;
+      align-items: center;
+      background: rgba(0,0,0,.22);
+    }
+    .chat-inputbar input {
+      flex: 1;
+      min-width: 0;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.12);
+      color: var(--text);
+      border-radius: 12px;
+      padding: .5rem .65rem;
+      font-family: inherit;
+      font-size: .82rem;
+      outline: none;
+    }
+    .chat-inputbar input:focus { border-color: rgba(59,130,246,.55); box-shadow: 0 0 0 4px rgba(59,130,246,.12); }
+    .chat-send { padding: .5rem .7rem; font-size: .78rem; border-radius: 12px; }
     .sb-passive-badges { display: flex; gap: .2rem; flex-wrap: wrap; margin-top: .45rem; }
     .sb-passive-badge { font-size: .55rem; padding: .1rem .3rem; border-radius: 6px; background: rgba(110,231,183,.12); color: #6ee7b7; font-weight: 600; }
 
@@ -1062,6 +1189,23 @@
     .hand-panel { margin-top: .5rem; display: flex; gap: .5rem; flex-wrap: wrap; justify-content: center; }
     .hand-card-btn { background: var(--surface-2); border: 1.5px solid rgba(255,255,255,.1); border-radius: 10px; padding: .4rem .7rem; cursor: pointer; font-family: inherit; color: var(--text); font-size: .75rem; font-weight: 600; display: flex; align-items: center; gap: .3rem; transition: border-color .2s, transform .15s; }
     .hand-card-btn:hover { border-color: var(--gold); transform: translateY(-2px); }
+    .hand-card-btn.must-play {
+      border-color: rgba(245,158,11,.9) !important;
+      box-shadow: 0 0 0 4px rgba(245,158,11,.12);
+      position: relative;
+    }
+    .hand-card-btn .mp-badge {
+      font-size: .58rem;
+      font-weight: 950;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: .12rem .35rem;
+      border-radius: 999px;
+      border: 1px solid rgba(239,68,68,.40);
+      background: rgba(239,68,68,.16);
+      color: #fca5a5;
+      margin-left: .25rem;
+    }
 
     /* ── Eliminate overlay ── */
     .elim-card { background: var(--surface); border: 2px solid var(--danger); border-radius: 20px; padding: 1.5rem; text-align: center; max-width: 500px; width: 95%; max-height: 85vh; overflow-y: auto; transform: scale(.8); transition: transform .4s cubic-bezier(.34,1.56,.64,1); }
@@ -1082,6 +1226,7 @@
     .exch-player-btn:hover { border-color: #a855f7; }
     .exch-player-btn.selected { border-color: #a855f7; background: rgba(168,85,247,.1); }
     .exch-player-btn.shielded { opacity: .35; pointer-events: none; }
+    .exch-player-btn.disabled { opacity: .38; pointer-events: none; filter: grayscale(.25); }
     .exch-picks { display: flex; gap: .4rem; flex-wrap: wrap; justify-content: center; margin: .8rem 0; }
     .exch-pick-btn { background: var(--surface-2); border: 2px solid rgba(255,255,255,.08); border-radius: 8px; padding: .4rem .6rem; cursor: pointer; font-family: inherit; color: var(--text); font-size: .72rem; font-weight: 600; transition: all .2s; }
     .exch-pick-btn:hover { border-color: #a855f7; }
@@ -1090,6 +1235,8 @@
     .exch-duel-side { text-align: center; }
     .exch-duel-dice { width: 70px; height: 70px; background: var(--surface-2); border: 2px solid rgba(255,255,255,.08); border-radius: 14px; display: grid; place-items: center; font-size: 2rem; font-weight: 900; color: var(--gold); margin: .3rem auto; }
     .exch-duel-dice.rolling { animation: diceShake .1s infinite; }
+    .exch-duel-dice.bam { animation: diceBam .18s ease-out; border-color: rgba(245,158,11,.35); box-shadow: 0 0 0 5px rgba(245,158,11,.10); }
+    @keyframes diceBam { 0% { transform: scale(1.18); } 100% { transform: scale(1); } }
     .exch-vs { font-size: 1.5rem; font-weight: 900; color: var(--text-dim); }
 
     /* ── Generic Action/Choice overlay ── */
@@ -1403,6 +1550,7 @@
             <h2 id="turnText"></h2>
           </div>
           <div class="dice-display" id="gameDice">?</div>
+          <div id="rollModPill" style="display:none"></div>
           <p class="range-info" id="gameRange"></p>
           <button class="btn btn-gold" id="gameRollBtn" onclick="rollGameDice()">🎲 Lancer le dé</button>
           <p class="reroll-status" id="rerollStatus" style="display:none"></p>
@@ -1432,6 +1580,14 @@
     <div class="game-reaction-inner" id="gameReactionInner"></div>
   </div>
   <div id="reactionBurstLayer" aria-hidden="true"></div>
+  <div class="game-chat-dock" id="gameChatDock" aria-label="Chat">
+    <button type="button" class="game-chat-tab" id="gameChatTab" onclick="toggleGameChatDock()">
+      <span>💬 Chat</span>
+      <span class="game-chat-count" id="gameChatCount" style="display:none">0</span>
+      <span class="game-chat-chevron" id="gameChatTabChevron">▲</span>
+    </button>
+    <div class="game-chat-panel" id="gameChatPanel"></div>
+  </div>
   <div class="game-journal-dock" id="gameJournalDock" style="display:none" aria-label="Journal public">
     <button type="button" class="game-journal-tab" id="gameJournalTab" onclick="toggleGameJournalDock()">
       <span>📜 Journal</span>
@@ -1735,12 +1891,17 @@ let lastActiveCardData = null;
 let pending = null;
 let lastPassiveDraw = null;
 let lastJackpotDraw = null;
+let lastTicketDraw = null;
+let lastTicketDrawBatch = null;
+let lastPremeditationReward = null;
 let revealHands = null;
 let revealResults = null;
 /** @type {Array} Journal public synchronisé (Firebase), même entrées pour tous les clients */
 let publicGameLog = [];
 /** @type {Array} Réactions prédéfinies (online, phase jeu) */
 let reactionFeed = [];
+/** @type {Array} Chat synchronisé (Firebase) */
+let chatFeed = [];
 /** Compteur réactions / joueur pour le tour de table courant (clé round:turnIdx) */
 let reactionTurnCounts = {};
 
@@ -1759,6 +1920,23 @@ const ONLINE = {
   lastOrderSig: null,
   lastLobbySig: null,
   turnOrderIds: [],
+  chatSeenTs: 0,
+  lastSeenExchangeKey: null,
+  lastSeenExchangeTargetKey: null,
+  lastSeenPartageTargetKey: null,
+  lastSeenVolMainTargetKey: null,
+  lastSeenPartageCasterKey: null,
+  lastSeenVolMainCasterKey: null,
+  lastSeenNostalgieTargetKey: null,
+  lastSeenSandevistanCasterKey: null,
+  lastSeenSandevistanVictimKey: null,
+  lastSeenTicketDrawKey: null,
+  lastSeenPremeditationRewardKey: null,
+  lastSeenPetitSabotageTargetKey: null,
+  lastSeenBasLesMasquesTargetKey: null,
+  lastSeenGelTargetKey: null,
+  lastSeenEchangeCorpsTargetKey: null,
+  delayedModalTimers: {},
   listeners: {
     roomRef: null,
     offRoom: null,
@@ -2008,8 +2186,11 @@ function onlineApplyViewState(vs) {
                 doublePiocheArmed: false,
                 curatedPoolIds: null,
                 goodBoost: 0,
+                goodBoostCount: 0,
                 badLootBoost: 0,
+                badLootBoostCount: 0,
                 ticketCaisseNextRare: false,
+                ticketCaisseNextRareCount: 0,
                 pariMinableGuess: null,
                 pariMinableFlash: null,
                 turnLog: [],
@@ -2054,8 +2235,15 @@ function onlineApplyViewState(vs) {
         if (typeof p.frozenTurns !== 'number') p.frozenTurns = 0;
         if (typeof p.blindedTurns !== 'number') p.blindedTurns = 0;
         if (typeof p.goodBoost !== 'number') p.goodBoost = 0;
+        if (typeof p.goodBoostCount !== 'number') p.goodBoostCount = Number(p.goodBoostCount || 0) || 0;
+        if (Number(p.goodBoost || 0) > 0 && p.goodBoostCount < 1) p.goodBoostCount = 1;
         if (typeof p.badLootBoost !== 'number') p.badLootBoost = 0;
-        if (typeof p.ticketCaisseNextRare !== 'boolean') p.ticketCaisseNextRare = false;
+        if (typeof p.badLootBoostCount !== 'number') p.badLootBoostCount = Number(p.badLootBoostCount || 0) || 0;
+        if (Number(p.badLootBoost || 0) > 0 && p.badLootBoostCount < 1) p.badLootBoostCount = 1;
+        if (typeof p.ticketCaisseNextRare !== 'boolean') p.ticketCaisseNextRare = !!p.ticketCaisseNextRare;
+        if (typeof p.ticketCaisseNextRareCount !== 'number') p.ticketCaisseNextRareCount = Number(p.ticketCaisseNextRareCount || 0) || 0;
+        if (p.ticketCaisseNextRare && p.ticketCaisseNextRareCount < 1) p.ticketCaisseNextRareCount = 1;
+        p.ticketCaisseNextRare = false;
         if (p.pariMinableGuess != null && p.pariMinableGuess !== 'pair' && p.pariMinableGuess !== 'impair') p.pariMinableGuess = null;
         p.pariMinableFlash = sanitizePariMinableFlash(p.pariMinableFlash);
         if (typeof p.rollRaw !== 'number') p.rollRaw = 0;
@@ -2194,6 +2382,9 @@ function onlineApplyViewState(vs) {
     }
     lastPassiveDraw = vs.lastPassiveDraw || null;
     lastJackpotDraw = vs.lastJackpotDraw || null;
+    lastTicketDraw = vs.lastTicketDraw || null;
+    lastTicketDrawBatch = vs.lastTicketDrawBatch || null;
+    lastPremeditationReward = vs.lastPremeditationReward || null;
     revealHands = vs.revealHands || null;
     revealResults = vs.revealResults || null;
     if (ONLINE.enabled) {
@@ -2208,8 +2399,21 @@ function onlineApplyViewState(vs) {
       } else {
         publicGameLog = [];
       }
+      var vch = vs.chatFeed || vs.chatMessages || vs.chat;
+      if (Array.isArray(vch)) {
+        chatFeed = vch.slice();
+      } else if (vch && typeof vch === 'object') {
+        chatFeed = Object.keys(vch)
+          .filter(function(k) { return String(Number(k)) === k; })
+          .sort(function(a, b) { return Number(a) - Number(b); })
+          .map(function(k) { return vch[k]; })
+          .filter(Boolean);
+      } else {
+        chatFeed = [];
+      }
     } else {
       publicGameLog = [];
+      chatFeed = [];
     }
 
     if (ONLINE.enabled && vs.phase === 'game' && lastActiveCardId === 'premeditation' && lastActiveCardData &&
@@ -2220,6 +2424,176 @@ function onlineApplyViewState(vs) {
         var rwg = lastActiveCardData.revealGood ? 'Good' : 'Bad';
         var rnm = lastActiveCardData.revealName || '…';
         showToast('🧠 Raté : « ' + rnm + ' » était ' + rwg + '.', 'danger');
+      }
+    }
+
+    if (ONLINE.enabled && vs.phase === 'game' && lastActiveCardId === 'exchange' && lastActiveCardData &&
+        String(lastActiveCardPlayerId || '') === String(ONLINE.playerId || '')) {
+      var exKey = String(lastActiveCardData.ts || 0) + '|' + String(lastActiveCardData.targetId || '');
+      if (exKey && ONLINE.lastSeenExchangeKey !== exKey) {
+        ONLINE.lastSeenExchangeKey = exKey;
+        var won = Number(lastActiveCardData.roll1 || 0) > Number(lastActiveCardData.roll2 || 0);
+        if (won && lastActiveCardData.swapped) {
+          var a = lastActiveCardData.mine || 'ta carte';
+          var b = lastActiveCardData.theirs || 'sa carte';
+          showToast('🔄 Échange réussi : ' + a + ' ↔ ' + b, 'success');
+        } else if (won && !lastActiveCardData.swapped) {
+          showToast('🔄 Gagné, mais aucun échange possible.', 'danger');
+        } else {
+          showToast('🔄 Raté : aucun échange.', 'danger');
+        }
+      }
+    }
+
+    // Target feedback: let the opponent know an exchange was attempted / succeeded.
+    if (ONLINE.enabled && vs.phase === 'game' && lastActiveCardId === 'exchange' && lastActiveCardData &&
+        String(lastActiveCardData.targetId || '') === String(ONLINE.playerId || '')) {
+      var exTKey = 't|' + String(lastActiveCardData.ts || 0) + '|' + String(lastActiveCardPlayerId || '');
+      if (exTKey && ONLINE.lastSeenExchangeTargetKey !== exTKey) {
+        ONLINE.lastSeenExchangeTargetKey = exTKey;
+        var caster = (players || []).find(function(pp) { return pp && String(pp.id || '') === String(lastActiveCardPlayerId || ''); }) || null;
+        var casterName = caster && caster.name ? String(caster.name) : 'Un joueur';
+        // If the user is in another forced overlay/pending choice, prefer toast.
+        var ao = document.getElementById('actionOverlay');
+        var canModal = !(ao && ao.classList.contains('visible'));
+        if (canModal) showExchangeTargetModal(casterName, lastActiveCardData);
+        else {
+          var risk = lastActiveCardData.mine || 'une carte';
+          showToast('🔄 ' + casterName + ' a tenté de t’échanger ' + esc(risk) + '.', 'danger');
+        }
+      }
+    }
+
+    if (ONLINE.enabled && vs.phase === 'game' && lastActiveCardId === 'partage' && lastActiveCardData &&
+        String(lastActiveCardData.targetId || '') === String(ONLINE.playerId || '')) {
+      var pKey = String(lastActiveCardData.ts || 0) + '|' + String(lastActiveCardPlayerId || '');
+      if (pKey && ONLINE.lastSeenPartageTargetKey !== pKey) {
+        ONLINE.lastSeenPartageTargetKey = pKey;
+        if (!lastActiveCardData.randomFallback && lastActiveCardData.copiedObj && lastActiveCardData.copiedObj.name) {
+          var casterP = (players || []).find(function(pp) { return pp && String(pp.id || '') === String(lastActiveCardPlayerId || ''); }) || null;
+          var cn = casterP && casterP.name ? String(casterP.name) : 'Un joueur';
+          showTargetCardEventModal('🤝 Partage ?', '<b>' + esc(cn) + '</b> a copié une carte de ta main.', lastActiveCardData.copiedObj, true);
+        }
+      }
+    }
+
+    if (ONLINE.enabled && vs.phase === 'game' && lastActiveCardId === 'vol_main' && lastActiveCardData &&
+        String(lastActiveCardData.targetId || '') === String(ONLINE.playerId || '')) {
+      var vKey = String(lastActiveCardData.ts || 0) + '|' + String(lastActiveCardPlayerId || '');
+      if (vKey && ONLINE.lastSeenVolMainTargetKey !== vKey) {
+        ONLINE.lastSeenVolMainTargetKey = vKey;
+        if (lastActiveCardData.stolenObj && lastActiveCardData.stolenObj.name) {
+          var casterV = (players || []).find(function(pp) { return pp && String(pp.id || '') === String(lastActiveCardPlayerId || ''); }) || null;
+          var cn2 = casterV && casterV.name ? String(casterV.name) : 'Un joueur';
+          showTargetCardEventModal('🃏 Vol de main', '<b>' + esc(cn2) + '</b> t’a dérobé une carte.', lastActiveCardData.stolenObj, true);
+        }
+      }
+    }
+
+    if (ONLINE.enabled && vs.phase === 'game' && lastActiveCardId === 'petit_sabotage' && lastActiveCardData &&
+        String(lastActiveCardData.targetId || '') === String(ONLINE.playerId || '')) {
+      var sbk = 'sb|' + String(lastActiveCardData.ts || 0) + '|' + String(lastActiveCardPlayerId || '');
+      if (sbk && ONLINE.lastSeenPetitSabotageTargetKey !== sbk) {
+        ONLINE.lastSeenPetitSabotageTargetKey = sbk;
+        var casterSb = (players || []).find(function(pp) { return pp && String(pp.id || '') === String(lastActiveCardPlayerId || ''); }) || null;
+        var cnSb = casterSb && casterSb.name ? String(casterSb.name) : 'Un joueur';
+        showSabotageTargetModal(cnSb, lastActiveCardData);
+      }
+    }
+
+    if (ONLINE.enabled && vs.phase === 'game' && lastActiveCardId === 'bas_les_masques' && lastActiveCardData &&
+        String(lastActiveCardData.targetId || '') === String(ONLINE.playerId || '')) {
+      var bmk = 'bm|' + String(lastActiveCardData.ts || 0) + '|' + String(lastActiveCardPlayerId || '');
+      if (bmk && ONLINE.lastSeenBasLesMasquesTargetKey !== bmk) {
+        ONLINE.lastSeenBasLesMasquesTargetKey = bmk;
+        var casterBm = (players || []).find(function(pp) { return pp && String(pp.id || '') === String(lastActiveCardPlayerId || ''); }) || null;
+        var cnBm = casterBm && casterBm.name ? String(casterBm.name) : 'Un joueur';
+        showTargetCardEventModal(
+          '🎭 Bas les masques',
+          '<b>' + esc(cnBm) + '</b> a lancé <b>Bas les masques</b> sur vous : il peut voir vos résultats <b>Personne / Action / Lieu</b> pendant ce tour (pas votre main).',
+          { emoji: '🎭', name: 'Bas les masques' },
+          true
+        );
+      }
+    }
+
+    if (ONLINE.enabled && vs.phase === 'game' && lastActiveCardId === 'gel' && lastActiveCardData &&
+        String(lastActiveCardData.targetId || '') === String(ONLINE.playerId || '')) {
+      var gk = 'g|' + String(lastActiveCardData.ts || 0) + '|' + String(lastActiveCardPlayerId || '');
+      if (gk && ONLINE.lastSeenGelTargetKey !== gk) {
+        ONLINE.lastSeenGelTargetKey = gk;
+        var casterG = (players || []).find(function(pp) { return pp && String(pp.id || '') === String(lastActiveCardPlayerId || ''); }) || null;
+        var cnG = casterG && casterG.name ? String(casterG.name) : 'Un joueur';
+        (function(tsSnap, casterNameSnap) {
+          queueModalAfterCardFx('gel|' + String(tsSnap), function() {
+            // still same event?
+            if (String(lastActiveCardId || '') !== 'gel') return;
+            if (!lastActiveCardData || String(lastActiveCardData.ts || 0) !== String(tsSnap)) return;
+            showTargetCardEventModal(
+              '🧊 Gel',
+              '<b>' + esc(casterNameSnap) + '</b> a lancé <b>Gel</b> sur vous : vous ne pourrez pas jouer de cartes jouables à votre prochain tour.',
+              { emoji: '🧊', name: 'Gel' },
+              true
+            );
+          });
+        })(String(lastActiveCardData.ts || 0), cnG);
+      }
+    }
+
+    if (ONLINE.enabled && vs.phase === 'game' && lastActiveCardId === 'echange_de_corps' && lastActiveCardData &&
+        String(lastActiveCardData.targetId || '') === String(ONLINE.playerId || '')) {
+      var ek = 'ec|' + String(lastActiveCardData.ts || 0) + '|' + String(lastActiveCardPlayerId || '');
+      if (ek && ONLINE.lastSeenEchangeCorpsTargetKey !== ek) {
+        ONLINE.lastSeenEchangeCorpsTargetKey = ek;
+        var casterE = (players || []).find(function(pp) { return pp && String(pp.id || '') === String(lastActiveCardPlayerId || ''); }) || null;
+        var cnE = casterE && casterE.name ? String(casterE.name) : 'Un joueur';
+        (function(tsSnap2, casterNameSnap2) {
+          queueModalAfterCardFx('ec|' + String(tsSnap2), function() {
+            if (String(lastActiveCardId || '') !== 'echange_de_corps') return;
+            if (!lastActiveCardData || String(lastActiveCardData.ts || 0) !== String(tsSnap2)) return;
+            showTargetCardEventModal(
+              '🧬 Échange de corps',
+              '<b>' + esc(casterNameSnap2) + '</b> a lancé <b>Échange de corps</b> sur vous : vos inventaires / mains / relances ont été échangés.<br>' +
+              '⚡ Comme c’était son tour de jouer et que vous avez échangé… <b>c’est à vous de jouer maintenant</b>.',
+              { emoji: '🧬', name: 'Échange de corps' },
+              true
+            );
+          });
+        })(String(lastActiveCardData.ts || 0), cnE);
+      }
+    }
+
+    // Caster feedback: show which card you gained.
+    if (ONLINE.enabled && vs.phase === 'game' && lastActiveCardId === 'partage' && lastActiveCardData &&
+        String(lastActiveCardPlayerId || '') === String(ONLINE.playerId || '')) {
+      var pcKey = 'pc|' + String(lastActiveCardData.ts || 0);
+      if (pcKey && ONLINE.lastSeenPartageCasterKey !== pcKey) {
+        ONLINE.lastSeenPartageCasterKey = pcKey;
+        if (lastActiveCardData.gainedObj && lastActiveCardData.gainedObj.name) {
+          showGainedCardModal('🤝 Partage ?', 'Carte obtenue', lastActiveCardData.gainedObj);
+        }
+      }
+    }
+
+    if (ONLINE.enabled && vs.phase === 'game' && lastActiveCardId === 'vol_main' && lastActiveCardData &&
+        String(lastActiveCardPlayerId || '') === String(ONLINE.playerId || '')) {
+      var vcKey = 'vc|' + String(lastActiveCardData.ts || 0);
+      if (vcKey && ONLINE.lastSeenVolMainCasterKey !== vcKey) {
+        ONLINE.lastSeenVolMainCasterKey = vcKey;
+        if (lastActiveCardData.stolenObj && lastActiveCardData.stolenObj.name) {
+          showGainedCardModal('🃏 Vol de main', 'Carte obtenue', lastActiveCardData.stolenObj);
+        }
+      }
+    }
+
+    if (ONLINE.enabled && vs.phase === 'game' && lastActiveCardId === 'nostalgie' && lastActiveCardData &&
+        String(lastActiveCardData.targetId || '') === String(ONLINE.playerId || '')) {
+      var nk = 'n|' + String(lastActiveCardData.ts || 0) + '|' + String(lastActiveCardPlayerId || '');
+      if (nk && ONLINE.lastSeenNostalgieTargetKey !== nk) {
+        ONLINE.lastSeenNostalgieTargetKey = nk;
+        var casterN = (players || []).find(function(pp) { return pp && String(pp.id || '') === String(lastActiveCardPlayerId || ''); }) || null;
+        var cn3 = casterN && casterN.name ? String(casterN.name) : 'Un joueur';
+        showNostalgieTargetModal(cn3, lastActiveCardData);
       }
     }
 
@@ -2437,6 +2811,34 @@ function onlineApplyViewState(vs) {
         }
       }
 
+      // Ticket de caisse: show gained card modal(s) on next turn draw
+      if (ONLINE.enabled && lastTicketDrawBatch && String(lastTicketDrawBatch.pid || '') === String(ONLINE.playerId || '') &&
+          Array.isArray(lastTicketDrawBatch.cards) && lastTicketDrawBatch.cards.length) {
+        var tbKey = String(lastTicketDrawBatch.ts || 0) + '|n' + String(lastTicketDrawBatch.cards.length);
+        if (tbKey && ONLINE.lastSeenTicketDrawKey !== tbKey) {
+          ONLINE.lastSeenTicketDrawKey = tbKey;
+          if (lastTicketDrawBatch.cards.length === 1) showGainedCardModal('🧾 Ticket de caisse', 'Carte obtenue', lastTicketDrawBatch.cards[0]);
+          else showGainedCardsModal('🧾 Ticket de caisse', 'Cartes obtenues', lastTicketDrawBatch.cards);
+        }
+      } else if (ONLINE.enabled && lastTicketDraw && String(lastTicketDraw.pid || '') === String(ONLINE.playerId || '') && lastTicketDraw.card && lastTicketDraw.card.id) {
+        // Backward compat
+        var tkKey = String(lastTicketDraw.card.id) + '|' + String(lastTicketDraw.ts || 0);
+        if (tkKey && ONLINE.lastSeenTicketDrawKey !== tkKey) {
+          ONLINE.lastSeenTicketDrawKey = tkKey;
+          showGainedCardModal('🧾 Ticket de caisse', 'Carte obtenue', lastTicketDraw.card);
+        }
+      }
+
+      // Préméditation: if reward is a card, show it
+      if (ONLINE.enabled && lastPremeditationReward && String(lastPremeditationReward.pid || '') === String(ONLINE.playerId || '') &&
+          lastPremeditationReward.card && lastPremeditationReward.card.id) {
+        var prKey = String(lastPremeditationReward.card.id) + '|' + String(lastPremeditationReward.ts || 0);
+        if (prKey && ONLINE.lastSeenPremeditationRewardKey !== prKey) {
+          ONLINE.lastSeenPremeditationRewardKey = prKey;
+          showGainedCardModal('🧠 Préméditation', 'Carte obtenue', lastPremeditationReward.card);
+        }
+      }
+
       // FX plein écran (légendaires + Gel + Miasme) pour tous quand la carte est résolue côté serveur
       var fxTsNum = lastActiveCardData && lastActiveCardData.ts != null && lastActiveCardData.ts !== ''
         ? Number(lastActiveCardData.ts) : NaN;
@@ -2450,6 +2852,34 @@ function onlineApplyViewState(vs) {
             var scTo = Number(lastActiveCardData.stolenCount);
             if (!isFinite(scTo)) scTo = 0;
             showToast('⏱️ Sandevistan ! ' + (scTo > 0 ? scTo + ' carte(s) volée(s). ' : '') + 'Bénédiction active ce tour.', 'success');
+          }
+        }
+      }
+
+      // Sandevistan details (modals)
+      if (ONLINE.enabled && vs.phase === 'game' && lastActiveCardId === 'sandevistan' && lastActiveCardData) {
+        // Caster sees all gained cards
+        if (String(lastActiveCardPlayerId || '') === String(ONLINE.playerId || '')) {
+          var sk = 's|' + String(lastActiveCardData.ts || 0);
+          if (sk && ONLINE.lastSeenSandevistanCasterKey !== sk) {
+            ONLINE.lastSeenSandevistanCasterKey = sk;
+            if (Array.isArray(lastActiveCardData.gainedCards) && lastActiveCardData.gainedCards.length) {
+              showGainedCardsModal('⏱️ Sandevistan', 'Cartes récupérées', lastActiveCardData.gainedCards);
+            }
+          }
+        }
+        // Victim sees which card was stolen from them (if any)
+        if (lastActiveCardData.stolenByTarget && typeof lastActiveCardData.stolenByTarget === 'object') {
+          var myPid = String(ONLINE.playerId || '');
+          var mine = lastActiveCardData.stolenByTarget[myPid] || null;
+          if (mine && mine.name) {
+            var vk2 = 'sv|' + String(lastActiveCardData.ts || 0) + '|' + String(lastActiveCardPlayerId || '');
+            if (vk2 && ONLINE.lastSeenSandevistanVictimKey !== vk2) {
+              ONLINE.lastSeenSandevistanVictimKey = vk2;
+              var casterS = (players || []).find(function(pp) { return pp && String(pp.id || '') === String(lastActiveCardPlayerId || ''); }) || null;
+              var casterNameS = casterS && casterS.name ? String(casterS.name) : 'Un joueur';
+              showTargetCardEventModal('⏱️ Sandevistan', '<b>' + esc(casterNameS) + '</b> t’a volé une carte.', mine, true);
+            }
           }
         }
       }
@@ -2561,7 +2991,12 @@ function onlineApplyViewState(vs) {
       var exOv = document.getElementById('exchangeOverlay');
       if (ONLINE.enabled && exOv && exOv.classList.contains('visible')) {
         if (!pending || pending.type !== 'exchange' || String(pending.byPid || '') !== String(ONLINE.playerId || '')) {
-          closeExchange(true);
+          // If server already resolved the exchange, show the real outcome instead of closing instantly.
+          if (lastActiveCardId === 'exchange' && lastActiveCardData && String(lastActiveCardPlayerId || '') === String(ONLINE.playerId || '')) {
+            showExchangeServerOutcome(lastActiveCardData);
+          } else {
+            closeExchange(true);
+          }
         }
       }
     } else if (vs.phase === 'summary') {
@@ -2576,6 +3011,7 @@ function onlineApplyViewState(vs) {
   } finally {
     ONLINE.applyingRemote = false;
     updateGameJournalDock();
+    updateGameChatDock();
     updateReactionDock();
     processNewReactionEffects();
   }
@@ -2624,33 +3060,29 @@ function showJackpotDraw(cards) {
   // Always show exactly 2 slots (Jackpot), but be defensive.
   var c1 = cards[0] || null;
   var c2 = cards[1] || null;
-  var html =
+  function cardBox(c) {
+    if (!c) return '';
+    var em = c.emoji ? String(c.emoji) : '🃏';
+    var nm = c.name ? String(c.name) : '';
+    var isPassive = String(c.type || '') === 'passive';
+    var tag = isPassive
+      ? '<span class="jackpot-tag passive">passive · auto</span>'
+      : '<span class="jackpot-tag temp">à jouer ce tour</span>';
+    return '<div style="width:260px;max-width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.10);border-radius:14px;padding:.75rem .8rem;text-align:center">' +
+      '<div style="font-size:1.85rem;line-height:1;margin-bottom:.35rem">' + esc(em) + '</div>' +
+      '<div style="font-weight:900;font-size:.95rem;line-height:1.15">' + esc(nm) + '</div>' +
+      '<div style="margin-top:.55rem">' + tag + '</div>' +
+    '</div>';
+  }
+  openActionOverlay(
     '<h3 style="margin-bottom:.25rem">🎰 Jackpot</h3>' +
-    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.9rem">Tes 2 cartes bonus apparaissent devant toi</p>' +
-    '<div class="jackpot-stage is-columns">' +
-      (c1 ? (
-        '<div class="jackpot-card is-left">' +
-          cardMiniHtml(c1) +
-          '<div class="jackpot-meta">' +
-            ((c1.type === 'passive')
-              ? '<span class="jackpot-tag passive">passive · auto</span>'
-              : '<span class="jackpot-tag temp">à jouer ce tour</span>') +
-          '</div>' +
-        '</div>'
-      ) : '') +
-      (c2 ? (
-        '<div class="jackpot-card is-right" style="animation-delay:.06s">' +
-          cardMiniHtml(c2) +
-          '<div class="jackpot-meta">' +
-            ((c2.type === 'passive')
-              ? '<span class="jackpot-tag passive">passive · auto</span>'
-              : '<span class="jackpot-tag temp">à jouer ce tour</span>') +
-          '</div>' +
-        '</div>'
-      ) : '') +
+    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.25rem">Cartes bonus obtenues</p>' +
+    '<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:.6rem;margin-top:.8rem">' +
+      cardBox(c1) +
+      cardBox(c2) +
     '</div>' +
-    '<button class="btn btn-gold" onclick="closeActionOverlay()">OK</button>';
-  openActionOverlay(html);
+    '<div style="margin-top:1rem;text-align:center"><button class="btn btn-gold" onclick="closeActionOverlay(true)">OK</button></div>'
+  );
 }
 
 function startOrderRollAnim(pid) {
@@ -2768,7 +3200,10 @@ function createRoomOnline(m) {
     entities: [],
     pending: null,
     lastPassiveDraw: null,
-      lastJackpotDraw: null,
+    lastJackpotDraw: null,
+    lastTicketDraw: null,
+    lastTicketDrawBatch: null,
+    lastPremeditationReward: null,
     players: [{
       id: playerId,
       name: name,
@@ -2787,8 +3222,11 @@ function createRoomOnline(m) {
       doublePiocheArmed: false,
       curatedPoolIds: null,
       goodBoost: 0,
+      goodBoostCount: 0,
       badLootBoost: 0,
+      badLootBoostCount: 0,
       ticketCaisseNextRare: false,
+      ticketCaisseNextRareCount: 0,
       pariMinableGuess: null,
       pariMinableFlash: null,
       turnLog: [],
@@ -2816,6 +3254,7 @@ function createRoomOnline(m) {
     lastPassiveDraw: null,
     lastJackpotDraw: null,
     publicGameLog: [],
+    chatFeed: [],
     reactionFeed: [],
     reactionTurnKey: '0:0',
     reactionTurnCounts: {}
@@ -2901,8 +3340,11 @@ function joinRoomOnline() {
         doublePiocheArmed: false,
         curatedPoolIds: null,
         goodBoost: 0,
+        goodBoostCount: 0,
         badLootBoost: 0,
+        badLootBoostCount: 0,
         ticketCaisseNextRare: false,
+        ticketCaisseNextRareCount: 0,
         pariMinableGuess: null,
         pariMinableFlash: null,
         turnLog: [],
@@ -2943,15 +3385,20 @@ function onlineAction(action, payload) {
   return ref.transaction(function(st) {
     if (!st) return st;
     function applyPassiveForceServerTx(player, rolledEntity) {
-      if (Number(st.currentRound || 0) === 0) return rolledEntity;
       var personPick = player.picks && player.picks[0] && player.picks[0].length ? player.picks[0][0] : null;
       var hasForceBad = (player.activePassives || []).indexOf('force_bad') >= 0;
       var hasForceGood = (player.activePassives || []).indexOf('force_good') >= 0;
       if (!hasForceBad && !hasForceGood) return rolledEntity;
       if (Math.random() > 0.25) return rolledEntity;
       var wantGood;
-      if (hasForceBad) wantGood = personPick && !personPick.good ? true : false;
-      else wantGood = personPick && !personPick.good ? false : true;
+      var roundNum = Number(st.currentRound || 0) || 0;
+      if (roundNum === 0) {
+        // Round 1 = Personne: force_good => want GOOD, force_bad => want BAD
+        wantGood = hasForceGood ? true : false;
+      } else {
+        if (hasForceBad) wantGood = personPick && !personPick.good ? true : false;
+        else wantGood = personPick && !personPick.good ? false : true;
+      }
       var pb = getPlayerBoxFromState(player);
       var filtered = pb.filter(function(e) { return typeof e.good === 'boolean' && e.good === wantGood && e.id !== rolledEntity.id; });
       if (!filtered.length) return rolledEntity;
@@ -2960,11 +3407,17 @@ function onlineAction(action, payload) {
     function applyGoodBoostServerTx(player, rolledEntity) {
       var gb = Number(player.goodBoost || 0) || 0;
       if (gb <= 0) return rolledEntity;
-      if (Number(st.currentRound || 0) === 0) return rolledEntity;
       if (Math.random() > gb) return rolledEntity;
-      var personPick = player.picks && player.picks[0] && player.picks[0].length ? player.picks[0][0] : null;
-      if (!personPick || typeof personPick.good !== 'boolean') return rolledEntity;
-      var wantGood = !!personPick.good;
+      var roundNum = Number(st.currentRound || 0) || 0;
+      var wantGood;
+      if (roundNum === 0) {
+        // Round 1 = Personne: "favorable" means GOOD personne.
+        wantGood = true;
+      } else {
+        var personPick = player.picks && player.picks[0] && player.picks[0].length ? player.picks[0][0] : null;
+        if (!personPick || typeof personPick.good !== 'boolean') return rolledEntity;
+        wantGood = !!personPick.good;
+      }
       var pb = getPlayerBoxFromState(player);
       var filtered = pb.filter(function(e) { return typeof e.good === 'boolean' && e.good === wantGood && e.id !== rolledEntity.id; });
       if (!filtered.length) return rolledEntity;
@@ -2973,11 +3426,17 @@ function onlineAction(action, payload) {
     function applyBadLootBoostServerTx(player, rolledEntity) {
       var bb = Math.min(0.98, Number(player.badLootBoost || 0) || 0);
       if (bb <= 0) return rolledEntity;
-      if (Number(st.currentRound || 0) === 0) return rolledEntity;
       if (Math.random() > bb) return rolledEntity;
-      var personPick = player.picks && player.picks[0] && player.picks[0].length ? player.picks[0][0] : null;
-      if (!personPick || typeof personPick.good !== 'boolean') return rolledEntity;
-      var wantUnfavorable = !personPick.good;
+      var roundNum = Number(st.currentRound || 0) || 0;
+      var wantUnfavorable;
+      if (roundNum === 0) {
+        // Round 1 = Personne: "unfavorable" means BAD personne.
+        wantUnfavorable = false;
+      } else {
+        var personPick = player.picks && player.picks[0] && player.picks[0].length ? player.picks[0][0] : null;
+        if (!personPick || typeof personPick.good !== 'boolean') return rolledEntity;
+        wantUnfavorable = !personPick.good;
+      }
       var pb = getPlayerBoxFromState(player);
       var filtered = pb.filter(function(e) { return typeof e.good === 'boolean' && e.good === wantUnfavorable && e.id !== rolledEntity.id; });
       if (!filtered.length) return rolledEntity;
@@ -3014,7 +3473,11 @@ function onlineAction(action, payload) {
       st.lastActiveCardData = null;
       st.lastPassiveDraw = null;
       st.lastJackpotDraw = null;
+      st.lastTicketDraw = null;
+      st.lastTicketDrawBatch = null;
+      st.lastPremeditationReward = null;
       st.publicGameLog = [];
+      st.chatFeed = [];
       st.reactionFeed = [];
       st.reactionTurnKey = null;
       st.reactionTurnCounts = {};
@@ -3033,8 +3496,11 @@ function onlineAction(action, payload) {
         p.doublePiocheArmed = false;
         p.curatedPoolIds = null;
         p.goodBoost = 0;
+        p.goodBoostCount = 0;
         p.badLootBoost = 0;
+        p.badLootBoostCount = 0;
         p.ticketCaisseNextRare = false;
+        p.ticketCaisseNextRareCount = 0;
         p.pariMinableGuess = null;
         p.pariMinableFlash = null;
         p.turnLog = [];
@@ -3122,6 +3588,9 @@ function onlineAction(action, payload) {
       st.lastActiveCardData = null;
       st.lastPassiveDraw = null;
       st.lastJackpotDraw = null;
+      st.lastTicketDraw = null;
+      st.lastTicketDrawBatch = null;
+      st.lastPremeditationReward = null;
       st.revealHands = null;
       st.revealResults = null;
       var rmStart = (typeof ROUND_META !== 'undefined' && ROUND_META[0]) ? ROUND_META[0] : null;
@@ -3224,8 +3693,11 @@ function onlineAction(action, payload) {
         pp.secondLookUsed = false;
         pp.doublePiocheArmed = false;
         pp.goodBoost = 0;
+        pp.goodBoostCount = 0;
         pp.badLootBoost = 0;
+        pp.badLootBoostCount = 0;
         pp.ticketCaisseNextRare = false;
+        pp.ticketCaisseNextRareCount = 0;
         pp.pariMinableGuess = null;
         pp.pariMinableFlash = null;
         pp.activePassives = [];
@@ -3350,19 +3822,32 @@ function onlineAction(action, payload) {
       // IMPORTANT: do not decrement frozenTurns at start of the turn.
       // Frozen means "can't play cards during your next turn", so we decrement at end of that turn.
       resetTurnFlags();
-      if (p.ticketCaisseNextRare) {
+      var tkN = 0;
+      if (typeof p.ticketCaisseNextRareCount === 'number') tkN = Number(p.ticketCaisseNextRareCount || 0) || 0;
+      if (p.ticketCaisseNextRare) tkN = Math.max(tkN, 1);
+      if (tkN > 0) {
         p.ticketCaisseNextRare = false;
-        var rareTk = drawRandomRareCardCopy();
-        if (rareTk) {
+        p.ticketCaisseNextRareCount = 0;
+        var tkCards = [];
+        var tkTs = Date.now();
+        for (var tki = 0; tki < tkN; tki++) {
+          var rareTk = drawRandomRareCardCopy();
+          if (!rareTk) continue;
+          tkCards.push(rareTk);
           p.hand = p.hand || [];
           if (rareTk.type === 'passive') {
             applyPassiveEffect(p, rareTk);
             pushTurnLog(p, rareTk, 'activated');
-            st.lastPassiveDraw = { pid: String(p.id || ''), card: rareTk, ts: Date.now() };
+            st.lastPassiveDraw = { pid: String(p.id || ''), card: rareTk, ts: tkTs + tki };
           } else {
             p.hand.push(rareTk);
             pushTurnLog(p, rareTk, 'gained');
           }
+        }
+        if (tkCards.length) {
+          // Backward compat: keep lastTicketDraw as last card
+          st.lastTicketDraw = { pid: String(p.id || ''), card: tkCards[tkCards.length - 1], ts: tkTs, passive: (tkCards[tkCards.length - 1] && tkCards[tkCards.length - 1].type === 'passive') };
+          st.lastTicketDrawBatch = { pid: String(p.id || ''), cards: tkCards, ts: tkTs };
         }
       }
       // 1 playable card per ROUND (not per turn)
@@ -3521,6 +4006,7 @@ function onlineAction(action, payload) {
         p.hand = p.hand.filter(function(c) { return !(c && c.mustPlayThisTurn && String(c.id || '') !== 'partage'); });
       }
       p.badLootBoost = 0;
+      p.badLootBoostCount = 0;
       p.pariMinableGuess = null;
       p.pariMinableFlash = null;
       if (p.frozenTurns && p.frozenTurns > 0) p.frozenTurns--;
@@ -3729,7 +4215,9 @@ function onlineAction(action, payload) {
         return;
       }
       if (card.id === 'chance_forcee') {
-        p.goodBoost = Math.max(p.goodBoost || 0, 0.30);
+        if (typeof p.goodBoostCount !== 'number') p.goodBoostCount = Number(p.goodBoostCount || 0) || 0;
+        p.goodBoostCount = (Number(p.goodBoostCount) || 0) + 1;
+        p.goodBoost = Math.min(0.98, (Number(p.goodBoostCount) || 0) * 0.30);
         publishCardPlay(st, p, card, {});
         return;
       }
@@ -3737,6 +4225,8 @@ function onlineAction(action, payload) {
         (st.players || []).forEach(function(pp) {
           if (!pp) return;
           if (String(pp.id || '') === String(p.id || '')) return;
+          if (typeof pp.badLootBoostCount !== 'number') pp.badLootBoostCount = Number(pp.badLootBoostCount || 0) || 0;
+          pp.badLootBoostCount = (Number(pp.badLootBoostCount) || 0) + 1;
           var prev = Number(pp.badLootBoost || 0) || 0;
           pp.badLootBoost = Math.min(0.98, prev + 0.35);
         });
@@ -3783,6 +4273,8 @@ function onlineAction(action, payload) {
       if (card.id === 'sandevistan') {
         p.hand = p.hand || [];
         var stolenSv = 0;
+        var gained = [];
+        var stolenByTarget = {};
         (st.players || []).forEach(function(pp) {
           if (!pp) return;
           if (String(pp.id || '') === String(p.id || '')) return;
@@ -3790,7 +4282,10 @@ function onlineAction(action, payload) {
           var ix = Math.floor(Math.random() * pp.hand.length);
           var stc = pp.hand.splice(ix, 1)[0];
           if (stc) {
-            p.hand.push(JSON.parse(JSON.stringify(stc)));
+            var copyStc = JSON.parse(JSON.stringify(stc));
+            p.hand.push(copyStc);
+            gained.push({ id: copyStc.id || null, name: copyStc.name || '', emoji: copyStc.emoji || null, rarity: copyStc.rarity || null });
+            stolenByTarget[String(pp.id || '')] = { id: copyStc.id || null, name: copyStc.name || '', emoji: copyStc.emoji || null, rarity: copyStc.rarity || null };
             stolenSv++;
           }
         });
@@ -3800,7 +4295,7 @@ function onlineAction(action, payload) {
           pushTurnLog(p, glSv, 'activated');
         }
         var noteSv = stolenSv > 0 ? (String(stolenSv) + ' vol(s) + Bénédiction') : 'Bénédiction (aucune carte à voler)';
-        publishCardPlay(st, p, card, { ts: Date.now(), stolenCount: stolenSv, note: noteSv });
+        publishCardPlay(st, p, card, { ts: Date.now(), stolenCount: stolenSv, note: noteSv, gainedCards: gained, stolenByTarget: stolenByTarget });
         return;
       }
 
@@ -3816,7 +4311,9 @@ function onlineAction(action, payload) {
       if (card.id === 'bas_les_masques') { ensurePending('bas_les_masques', { card: card }); return; }
 
       if (card.id === 'ticket_caisse') {
-        p.ticketCaisseNextRare = true;
+        p.ticketCaisseNextRare = false;
+        if (typeof p.ticketCaisseNextRareCount !== 'number') p.ticketCaisseNextRareCount = Number(p.ticketCaisseNextRareCount || 0) || 0;
+        p.ticketCaisseNextRareCount = (Number(p.ticketCaisseNextRareCount) || 0) + 1;
         publishCardPlay(st, p, card, {});
         return;
       }
@@ -4055,7 +4552,13 @@ function onlineAction(action, payload) {
       if (pc5) {
         st.lastActiveCardId = pc5.id || null;
         st.lastActiveCardPlayerId = String(p.id||'');
-        st.lastActiveCardData = { ts: Date.now(), targetId: tid2, targetName: (t2 && t2.name) ? t2.name : '' };
+        st.lastActiveCardData = {
+          ts: Date.now(),
+          targetId: tid2,
+          targetName: (t2 && t2.name) ? t2.name : '',
+          stolenName: stolen && stolen.name ? String(stolen.name) : '',
+          stolenObj: stolen ? { id: stolen.id || null, name: stolen.name || '', emoji: stolen.emoji || null, rarity: stolen.rarity || null } : null
+        };
         logPublicCardPlayed(st, p, pc5, { targetId: tid2, targetName: (t2 && t2.name) ? t2.name : '' });
       }
       clearPending();
@@ -4073,11 +4576,21 @@ function onlineAction(action, payload) {
       var anyHave = others.some(function(pp) { return pp.hand && pp.hand.length > 0; });
       if (!anyHave) {
         var rnd = drawCard();
-        rnd.mustPlayThisTurn = true;
         p.hand = p.hand || [];
         p.hand.push(rnd);
         var pcPart0 = PLAYABLE_CARDS.find(function(c) { return c && c.id === 'partage'; });
-        if (pcPart0) publishCardPlay(st, p, pcPart0, { randomFallback: true });
+        if (pcPart0) {
+          publishCardPlay(st, p, pcPart0, { randomFallback: true });
+          st.lastActiveCardId = pcPart0.id || null;
+          st.lastActiveCardPlayerId = String(p.id || '');
+          st.lastActiveCardData = {
+            ts: Date.now(),
+            targetId: '',
+            targetName: '',
+            randomFallback: true,
+            gainedObj: rnd ? { id: rnd.id || null, name: rnd.name || '', emoji: rnd.emoji || null, rarity: rnd.rarity || null } : null
+          };
+        }
         clearPending();
         return st;
       }
@@ -4098,19 +4611,34 @@ function onlineAction(action, payload) {
       p.hand = p.hand || [];
       var pc6 = st.pending && st.pending.card ? st.pending.card : null;
       var emptyHand = !Array.isArray(t3.hand) || t3.hand.length === 0;
+      var gained = null;
       if (emptyHand) {
         var rndP = drawCard();
-        rndP.mustPlayThisTurn = true;
         p.hand.push(rndP);
+        gained = rndP;
         if (pc6) publishCardPlay(st, p, pc6, { targetId: tid3, targetName: (t3 && t3.name) ? t3.name : '', randomFallback: true });
       } else {
         var src = t3.hand[Math.floor(Math.random() * t3.hand.length)];
         if (src) {
           var copy3 = JSON.parse(JSON.stringify(src));
-          copy3.mustPlayThisTurn = true;
           p.hand.push(copy3);
+          gained = copy3;
         }
         if (pc6) publishCardPlay(st, p, pc6, { targetId: tid3, targetName: (t3 && t3.name) ? t3.name : '' });
+      }
+      // Also expose data for target feedback (modal)
+      if (pc6) {
+        st.lastActiveCardId = pc6.id || null;
+        st.lastActiveCardPlayerId = String(p.id || '');
+        st.lastActiveCardData = {
+          ts: Date.now(),
+          targetId: tid3,
+          targetName: (t3 && t3.name) ? t3.name : '',
+          randomFallback: !!emptyHand,
+          copiedName: (!emptyHand && src && src.name) ? String(src.name) : '',
+          copiedObj: (!emptyHand && src) ? { id: src.id || null, name: src.name || '', emoji: src.emoji || null, rarity: src.rarity || null } : null,
+          gainedObj: gained ? { id: gained.id || null, name: gained.name || '', emoji: gained.emoji || null, rarity: gained.rarity || null } : null
+        };
       }
       clearPending();
       return st;
@@ -4125,23 +4653,34 @@ function onlineAction(action, payload) {
       var tid4 = payload && payload.targetId ? String(payload.targetId) : '';
       var t4 = (st.players || []).find(function(pp) { return pp && String(pp.id || '') === tid4; }) || null;
       if (!p || !t4) { clearPending(); return st; }
+      var destroyedCard = null;
+      var removedEntity = null;
+      var when = null;
       if (mode === 'reroll') {
-        t4.rerollsLeft = Math.max(0, Number(t4.rerollsLeft || 0) - 1);
+        var beforeR = Number(t4.rerollsLeft || 0) || 0;
+        t4.rerollsLeft = Math.max(0, beforeR - 1);
       } else if (mode === 'explode') {
-        if (Array.isArray(t4.hand) && t4.hand.length) t4.hand.splice(Math.floor(Math.random() * t4.hand.length), 1);
+        if (Array.isArray(t4.hand) && t4.hand.length) {
+          var ixE = Math.floor(Math.random() * t4.hand.length);
+          var gone = t4.hand.splice(ixE, 1)[0];
+          if (gone) destroyedCard = { id: gone.id || null, name: gone.name || '', emoji: gone.emoji || null, rarity: gone.rarity || null };
+        }
       } else {
         // ban one from target personal box: now if they play after you this round; else next round
         var myIdx = Number(st.currentTurnIdx || 0);
         var order = (st.turnOrder || []).map(function(x){return String(x||'');});
         var tIdx = order.indexOf(String(t4.id || ''));
         if (tIdx > myIdx) {
+          when = 'now';
           var tBox = getPlayerBoxFromState(t4);
           if (tBox.length) {
             var victim = tBox[Math.floor(Math.random() * tBox.length)];
             t4.banned = Array.isArray(t4.banned) ? t4.banned : [];
             t4.banned.push(victim.id);
+            removedEntity = victim ? { id: victim.id, name: victim.name, image: victim.image || null, emoji: victim.emoji || null, category: victim.category || null, good: (typeof victim.good === 'boolean' ? victim.good : null) } : null;
           }
         } else {
+          when = 'next_round';
           t4.pendingSabotageBan = (Number(t4.pendingSabotageBan || 0) || 0) + 1;
         }
       }
@@ -4150,7 +4689,15 @@ function onlineAction(action, payload) {
       if (pc7 && pSab) {
         st.lastActiveCardId = pc7.id || null;
         st.lastActiveCardPlayerId = String(currentPid()||'');
-        st.lastActiveCardData = { ts: Date.now(), targetId: tid4, targetName: (t4 && t4.name) ? t4.name : '', mode: mode };
+        st.lastActiveCardData = {
+          ts: Date.now(),
+          targetId: tid4,
+          targetName: (t4 && t4.name) ? t4.name : '',
+          mode: mode,
+          when: when,
+          destroyedCard: destroyedCard,
+          removedEntity: removedEntity
+        };
         logPublicCardPlayed(st, pSab, pc7, { targetId: tid4, targetName: (t4 && t4.name) ? t4.name : '', note: mode });
       }
       clearPending();
@@ -4169,8 +4716,9 @@ function onlineAction(action, payload) {
       if (!t5.picks || !Array.isArray(t5.picks[rr]) || !(pi >= 0 && pi < t5.picks[rr].length)) { clearPending(); return st; }
       var old = t5.picks[rr][pi];
       var remain = remainingPoolForRound(rr, old && old.id);
+      var neu = null;
       if (remain.length) {
-        var neu = remain[Math.floor(Math.random() * remain.length)];
+        neu = remain[Math.floor(Math.random() * remain.length)];
         t5.picks[rr][pi] = neu;
       }
       var pc8 = st.pending && st.pending.card ? st.pending.card : null;
@@ -4178,7 +4726,14 @@ function onlineAction(action, payload) {
       if (pc8 && pNos) {
         st.lastActiveCardId = pc8.id || null;
         st.lastActiveCardPlayerId = String(currentPid()||'');
-        st.lastActiveCardData = { ts: Date.now(), targetId: tid5, targetName: (t5 && t5.name) ? t5.name : '', round: rr };
+        st.lastActiveCardData = {
+          ts: Date.now(),
+          targetId: tid5,
+          targetName: (t5 && t5.name) ? t5.name : '',
+          round: rr,
+          oldObj: old ? { id: old.id, name: old.name, image: old.image || null, emoji: old.emoji || null, category: old.category || null, good: (typeof old.good === 'boolean' ? old.good : null) } : null,
+          newObj: neu ? { id: neu.id, name: neu.name, image: neu.image || null, emoji: neu.emoji || null, category: neu.category || null, good: (typeof neu.good === 'boolean' ? neu.good : null) } : null
+        };
         logPublicCardPlayed(st, pNos, pc8, { targetId: tid5, targetName: (t5 && t5.name) ? t5.name : '', note: 'round ' + String(rr + 1) });
       }
       clearPending();
@@ -4198,24 +4753,106 @@ function onlineAction(action, payload) {
       if (!p.picks || !Array.isArray(p.picks[rr2]) || !(pi2 >= 0 && pi2 < p.picks[rr2].length)) { clearPending(); return st; }
       var roll1 = Math.floor(Math.random() * 6) + 1;
       var roll2 = Math.floor(Math.random() * 6) + 1;
-      if (roll1 > roll2) {
-        var their = (t6.picks && Array.isArray(t6.picks[rr2]) && t6.picks[rr2].length) ? t6.picks[rr2][Math.floor(Math.random() * t6.picks[rr2].length)] : null;
-        if (their) {
-          var mine = p.picks[rr2][pi2];
-          // swap in-place
-          p.picks[rr2][pi2] = their;
-          var tIdx2 = t6.picks[rr2].findIndex(function(e) { return e && e.id === their.id; });
-          if (tIdx2 >= 0) t6.picks[rr2][tIdx2] = mine;
+      var didSwap = false;
+      var myNameBefore = '';
+      var theirNameBefore = '';
+      var mineObj = null;
+      var theirObj = null;
+      var theirCandidateObj = null;
+      // Always capture the card we risked (even if we lose).
+      var minePick = p.picks[rr2][pi2];
+      myNameBefore = minePick && minePick.name ? String(minePick.name) : '';
+      mineObj = minePick
+        ? { id: minePick.id, name: minePick.name, image: minePick.image || null, emoji: minePick.emoji || null, category: minePick.category || null, good: (typeof minePick.good === 'boolean' ? minePick.good : null) }
+        : null;
+      var tArr = (t6.picks && Array.isArray(t6.picks[rr2])) ? t6.picks[rr2] : [];
+      var tDefinedIdxs = [];
+      for (var di = 0; di < tArr.length; di++) if (tArr[di]) tDefinedIdxs.push(di);
+      var theirCandidate = tDefinedIdxs.length ? tArr[tDefinedIdxs[Math.floor(Math.random() * tDefinedIdxs.length)]] : null;
+      theirCandidateObj = theirCandidate
+        ? { id: theirCandidate.id, name: theirCandidate.name, image: theirCandidate.image || null, emoji: theirCandidate.emoji || null, category: theirCandidate.category || null, good: (typeof theirCandidate.good === 'boolean' ? theirCandidate.good : null) }
+        : null;
+
+      if (roll1 > roll2 && theirCandidate) {
+        theirNameBefore = theirCandidate && theirCandidate.name ? String(theirCandidate.name) : '';
+        theirObj = theirCandidateObj;
+        // swap in-place
+        p.picks[rr2][pi2] = theirCandidate;
+        var tIdx2 = tArr.findIndex(function(e) { return e && e.id === theirCandidate.id; });
+        if (tIdx2 >= 0) {
+          tArr[tIdx2] = minePick;
+          didSwap = true;
         }
       }
       var pc9 = st.pending && st.pending.card ? st.pending.card : null;
       if (pc9) {
         st.lastActiveCardId = pc9.id || null;
         st.lastActiveCardPlayerId = String(p.id||'');
-        st.lastActiveCardData = { ts: Date.now(), targetId: tid6, targetName: (t6 && t6.name) ? t6.name : '' };
+        st.lastActiveCardData = {
+          ts: Date.now(),
+          targetId: tid6,
+          targetName: (t6 && t6.name) ? t6.name : '',
+          round: rr2,
+          roll1: roll1,
+          roll2: roll2,
+          swapped: !!didSwap,
+          mine: myNameBefore,
+          theirs: theirNameBefore,
+          mineObj: mineObj,
+          theirsObj: theirObj,
+          theirsCandidateObj: theirCandidateObj
+        };
         logPublicCardPlayed(st, p, pc9, { targetId: tid6, targetName: (t6 && t6.name) ? t6.name : '' });
       }
       clearPending();
+      return st;
+    }
+
+    if (action === 'chat:send') {
+      // Chat is not tied to turn order: sender is the client issuing the transaction.
+      var pidC = String(ONLINE.playerId || '');
+      if (!pidC) return st;
+      var pC = (st.players || []).find(function(pp) { return pp && String(pp.id || '') === pidC; }) || null;
+      if (!pC) return st;
+      var txtC = String(payload && payload.text != null ? payload.text : '').trim();
+      if (!txtC) return st;
+      if (txtC.length > 240) txtC = txtC.slice(0, 240);
+
+      // secret debug commands (do not log to chat feed)
+      if (txtC.indexOf('/give_') === 0) {
+        if (String(st.phase || '') !== 'game') return st;
+        var raw = String(txtC.slice('/give_'.length) || '').trim();
+        if (!raw) return st;
+        var query = raw.replace(/_/g, ' ');
+        function norm(s) {
+          try { return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim(); }
+          catch (_) { return String(s || '').toLowerCase().trim(); }
+        }
+        var nq = norm(query);
+        var found = null;
+        for (var ci = 0; ci < (PLAYABLE_CARDS || []).length; ci++) {
+          var c = PLAYABLE_CARDS[ci];
+          if (!c) continue;
+          if (norm(c.id) === nq || norm(c.name) === nq) { found = c; break; }
+        }
+        if (!found) {
+          // allow partial match on name
+          for (var ci2 = 0; ci2 < (PLAYABLE_CARDS || []).length; ci2++) {
+            var c2 = PLAYABLE_CARDS[ci2];
+            if (!c2 || !c2.name) continue;
+            if (norm(c2.name).indexOf(nq) >= 0) { found = c2; break; }
+          }
+        }
+        if (found) {
+          pC.hand = Array.isArray(pC.hand) ? pC.hand : [];
+          pC.hand.push(JSON.parse(JSON.stringify(found)));
+        }
+        return st;
+      }
+
+      st.chatFeed = Array.isArray(st.chatFeed) ? st.chatFeed : [];
+      st.chatFeed.push({ ts: Date.now(), pid: String(pidC), pname: String(pC.name || 'Joueur'), text: txtC });
+      if (st.chatFeed.length > 220) st.chatFeed.splice(0, st.chatFeed.length - 220);
       return st;
     }
 
@@ -4260,8 +4897,15 @@ function onlineAction(action, payload) {
         if (typeof pp.doublePiocheArmed !== 'boolean') pp.doublePiocheArmed = !!pp.doublePiocheArmed;
         if (pp.curatedPoolIds === undefined) pp.curatedPoolIds = null;
         if (typeof pp.goodBoost !== 'number') pp.goodBoost = Number(pp.goodBoost || 0) || 0;
+        if (typeof pp.goodBoostCount !== 'number') pp.goodBoostCount = Number(pp.goodBoostCount || 0) || 0;
+        if (Number(pp.goodBoost || 0) > 0 && pp.goodBoostCount < 1) pp.goodBoostCount = 1;
         if (typeof pp.badLootBoost !== 'number') pp.badLootBoost = Number(pp.badLootBoost || 0) || 0;
-        if (typeof pp.ticketCaisseNextRare !== 'boolean') pp.ticketCaisseNextRare = false;
+        if (typeof pp.badLootBoostCount !== 'number') pp.badLootBoostCount = Number(pp.badLootBoostCount || 0) || 0;
+        if (Number(pp.badLootBoost || 0) > 0 && pp.badLootBoostCount < 1) pp.badLootBoostCount = 1;
+        if (typeof pp.ticketCaisseNextRare !== 'boolean') pp.ticketCaisseNextRare = !!pp.ticketCaisseNextRare;
+        if (typeof pp.ticketCaisseNextRareCount !== 'number') pp.ticketCaisseNextRareCount = Number(pp.ticketCaisseNextRareCount || 0) || 0;
+        if (pp.ticketCaisseNextRare && pp.ticketCaisseNextRareCount < 1) pp.ticketCaisseNextRareCount = 1;
+        pp.ticketCaisseNextRare = false;
         // Firebase interdit undefined : après swap, la valeur peut être undefined si absente chez l'autre joueur
         if (pp.pariMinableGuess !== 'pair' && pp.pariMinableGuess !== 'impair') pp.pariMinableGuess = null;
         pp.pariMinableFlash = sanitizePariMinableFlash(pp.pariMinableFlash);
@@ -4288,8 +4932,11 @@ function onlineAction(action, payload) {
         'doublePiocheArmed',
         'curatedPoolIds',
         'goodBoost',
+        'goodBoostCount',
         'badLootBoost',
+        'badLootBoostCount',
         'ticketCaisseNextRare',
+        'ticketCaisseNextRareCount',
         'pariMinableGuess',
         'pariMinableFlash',
         'turnLog',
@@ -4518,6 +5165,7 @@ function onlineAction(action, payload) {
           p.hand = p.hand || [];
           p.hand.push(pickRr);
           pushTurnLog(p, pickRr, 'gained');
+          st.lastPremeditationReward = { pid: String(p.id || ''), card: pickRr, ts: Date.now() };
         }
         appendPublicGameLog(st, {
           ts: Date.now(),
@@ -5435,7 +6083,7 @@ function goToTurnOrder() {
     p.hand = []; p.drawnCard = null; p.activePassives = [];
     p.shieldedRound = false; p.infiniteReroll = false; p.banned = [];
     p.secondLookArmed = false; p.secondLookUsed = false; p.doublePiocheArmed = false;
-    p.curatedPoolIds = null; p.goodBoost = 0; p.badLootBoost = 0; p.ticketCaisseNextRare = false; p.pariMinableGuess = null; p.pariMinableFlash = null; p.frozenTurns = 0; p.pendingSabotageBan = 0;
+    p.curatedPoolIds = null; p.goodBoost = 0; p.goodBoostCount = 0; p.badLootBoost = 0; p.badLootBoostCount = 0; p.ticketCaisseNextRare = false; p.ticketCaisseNextRareCount = 0; p.pariMinableGuess = null; p.pariMinableFlash = null; p.frozenTurns = 0; p.pendingSabotageBan = 0;
   });
 
   if (players.length <= 1) {
@@ -5640,7 +6288,8 @@ function applyFlashbackLocal(caster, card) {
     p.secondLookArmed = false;
     p.secondLookUsed = false;
     p.doublePiocheArmed = false;
-    p.goodBoost = 0;
+      p.goodBoost = 0;
+      p.goodBoostCount = 0;
     p.badLootBoost = 0;
     p.ticketCaisseNextRare = false;
     p.pariMinableGuess = null;
@@ -5672,6 +6321,8 @@ function beginTurn() {
   player.doublePiocheArmed = false;
   player.curatedPoolIds = null;
   player.goodBoost = 0;
+  player.goodBoostCount = 0;
+  player.badLootBoostCount = 0;
   player.turnLog = [];
   // IMPORTANT: do not decrement frozenTurns at start of the turn.
   // Frozen means "can't play cards during your next turn", so we decrement at end of that turn.
@@ -5714,21 +6365,34 @@ function dismissHandoff() {
     renderInventory(player);
     renderTurnCards(player);
 
-    if (!ONLINE.enabled && player.ticketCaisseNextRare) {
-      player.ticketCaisseNextRare = false;
-      var rareTc = drawRandomRareCardCopy();
-      if (rareTc) {
-        if (rareTc.type === 'passive') {
-          applyPassiveCard(player, rareTc);
-        } else {
-          player.hand = player.hand || [];
-          player.hand.push(rareTc);
-          addTurnLog(player, rareTc, 'drawn');
-          showToast('🧾 Ticket de caisse : « ' + rareTc.name + ' » !', 'success');
+    if (!ONLINE.enabled) {
+      var tkN = 0;
+      if (typeof player.ticketCaisseNextRareCount === 'number') tkN = Number(player.ticketCaisseNextRareCount || 0) || 0;
+      if (player.ticketCaisseNextRare) tkN = Math.max(tkN, 1);
+      if (tkN > 0) {
+        player.ticketCaisseNextRare = false;
+        player.ticketCaisseNextRareCount = 0;
+        var tkCards = [];
+        for (var tki = 0; tki < tkN; tki++) {
+          var rareTc = drawRandomRareCardCopy();
+          if (!rareTc) continue;
+          tkCards.push(rareTc);
+          if (rareTc.type === 'passive') {
+            applyPassiveCard(player, rareTc);
+          } else {
+            player.hand = player.hand || [];
+            player.hand.push(rareTc);
+            addTurnLog(player, rareTc, 'drawn');
+          }
         }
+        if (tkCards.length === 1) {
+          showToast('🧾 Ticket de caisse : « ' + tkCards[0].name + ' » !', 'success');
+        } else if (tkCards.length > 1) {
+          showGainedCardsModal('🧾 Ticket de caisse', 'Cartes obtenues', tkCards);
+        }
+        renderSidebar();
+        renderTurnCenter(player);
       }
-      renderSidebar();
-      renderTurnCenter(player);
     }
 
     // Après FlashBack (offline) : même logique qu’en online — 2 cartes sur 4
@@ -5975,7 +6639,9 @@ function executeCard(player, card) {
   } else if (card.id === 'above_average') {
     showAboveAverage(player);
   } else if (card.id === 'ticket_caisse') {
-    player.ticketCaisseNextRare = true;
+    player.ticketCaisseNextRare = false;
+    if (typeof player.ticketCaisseNextRareCount !== 'number') player.ticketCaisseNextRareCount = Number(player.ticketCaisseNextRareCount || 0) || 0;
+    player.ticketCaisseNextRareCount = (Number(player.ticketCaisseNextRareCount) || 0) + 1;
     showToast(card.emoji + ' Rare aléatoire au prochain tour !', 'success');
     renderTurnCenter(player);
   } else if (card.id === 'pari_minable') {
@@ -6001,12 +6667,17 @@ function executeCard(player, card) {
     premeditationOfflineCtx = { player: player, premCard: card, candidate: candPr };
     showPremeditationGuessUI();
   } else if (card.id === 'chance_forcee') {
-    player.goodBoost = Math.max(player.goodBoost || 0, 0.30);
-    showToast(card.emoji + ' Chance forcée : +30% favorable', 'success');
+    if (typeof player.goodBoostCount !== 'number') player.goodBoostCount = Number(player.goodBoostCount || 0) || 0;
+    player.goodBoostCount = (Number(player.goodBoostCount) || 0) + 1;
+    player.goodBoost = Math.min(0.98, (Number(player.goodBoostCount) || 0) * 0.30);
+    var pct = Math.round((Number(player.goodBoost) || 0) * 100);
+    showToast(card.emoji + ' Chance forcée : +' + pct + '% favorable', 'success');
     renderTurnCenter(player);
   } else if (card.id === 'miasme') {
     turnOrder.forEach(function(pp) {
       if (!pp || pp.id === player.id) return;
+      if (typeof pp.badLootBoostCount !== 'number') pp.badLootBoostCount = Number(pp.badLootBoostCount || 0) || 0;
+      pp.badLootBoostCount = (Number(pp.badLootBoostCount) || 0) + 1;
       var prev = Number(pp.badLootBoost || 0) || 0;
       pp.badLootBoost = Math.min(0.98, prev + 0.35);
     });
@@ -6423,6 +7094,168 @@ function updateGameJournalDock() {
   }
 }
 
+function getChatSeenKey() {
+  return 'mb_chatSeenTs_' + String(ONLINE.roomCode || '');
+}
+
+function loadChatSeenTs() {
+  try {
+    var k = getChatSeenKey();
+    var v = Number(localStorage.getItem(k) || 0) || 0;
+    ONLINE.chatSeenTs = v;
+  } catch (_) {
+    ONLINE.chatSeenTs = 0;
+  }
+}
+
+function saveChatSeenTs(ts) {
+  ONLINE.chatSeenTs = Number(ts) || 0;
+  try { localStorage.setItem(getChatSeenKey(), String(ONLINE.chatSeenTs || 0)); } catch (_) {}
+}
+
+function renderGameChatDockInner() {
+  var list = Array.isArray(chatFeed) ? chatFeed.slice() : [];
+  var rows = '';
+  if (!list.length) {
+    rows = '<p class="chat-empty">Aucun message. Dis bonjour !</p>';
+  } else {
+    rows = '<div class="chat-list" id="chatList">' + list.map(function(m) {
+      if (!m) return '';
+      var t = new Date(Number(m.ts) || Date.now());
+      var timeStr = t.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+      var pid = String(m.pid || '');
+      var p = (players || []).find(function(pp) { return pp && String(pp.id || '') === pid; }) || null;
+      var color = p && p.color ? p.color : 'rgba(148,163,184,.9)';
+      return '<div class="chat-item">' +
+        '<span class="chat-dot" style="background:' + color + '"></span>' +
+        '<div class="chat-bubble">' +
+          '<div class="chat-meta"><b>' + esc(String(m.pname || 'Joueur')) + '</b><span>' + esc(timeStr) + '</span></div>' +
+          '<div class="chat-text">' + esc(String(m.text || '')) + '</div>' +
+        '</div>' +
+      '</div>';
+    }).join('') + '</div>';
+  }
+  var input =
+    '<div class="chat-inputbar">' +
+      '<input id="gameChatInput" type="text" maxlength="240" placeholder="Écrire un message…" autocomplete="off" onkeydown="onChatInputKeyDown(event)" />' +
+      '<button type="button" class="btn btn-accent chat-send" onclick="sendChatMessage()">Envoyer</button>' +
+    '</div>';
+  return '<div class="chat-wrap">' + rows + input + '</div>';
+}
+
+function scrollChatToBottom() {
+  var listEl = document.getElementById('chatList');
+  if (!listEl) return;
+  // Force bottom without visible jump
+  listEl.scrollTop = listEl.scrollHeight;
+  try {
+    requestAnimationFrame(function() {
+      try { listEl.scrollTop = listEl.scrollHeight; } catch (_) {}
+    });
+  } catch (_) {}
+}
+
+function onChatInputKeyDown(ev) {
+  ev = ev || window.event;
+  var key = ev.key || ev.keyCode;
+  if (key === 'Enter' || key === 13) {
+    if (ev.preventDefault) ev.preventDefault();
+    sendChatMessage();
+    try {
+      // keep typing without extra click
+      var inp = document.getElementById('gameChatInput');
+      if (inp) inp.focus();
+    } catch (_) {}
+    return false;
+  }
+}
+
+function toggleGameChatDock() {
+  var d = document.getElementById('gameChatDock');
+  if (!d) return;
+  d.classList.toggle('is-open');
+  var isOpen = d.classList.contains('is-open');
+  var ch = document.getElementById('gameChatTabChevron');
+  if (ch) ch.textContent = isOpen ? '▼' : '▲';
+  if (isOpen) {
+    // mark seen up to latest
+    var lastTs = 0;
+    (chatFeed || []).forEach(function(m) { var ts = Number(m && m.ts) || 0; if (ts > lastTs) lastTs = ts; });
+    saveChatSeenTs(lastTs);
+    updateGameChatDock();
+    setTimeout(function() {
+      var inp = document.getElementById('gameChatInput');
+      if (inp) inp.focus();
+      scrollChatToBottom();
+    }, 0);
+  } else {
+    updateGameChatDock();
+  }
+}
+
+function updateGameChatDock() {
+  var dock = document.getElementById('gameChatDock');
+  if (!dock) return;
+  var gameScreen = document.getElementById('screenGame');
+  var isGame = gameScreen && gameScreen.classList.contains('active');
+  if (ONLINE.enabled && isGame) {
+    dock.classList.add('is-visible');
+    if (!ONLINE.chatSeenTs) loadChatSeenTs();
+    var unseen = 0;
+    (chatFeed || []).forEach(function(m) {
+      var ts = Number(m && m.ts) || 0;
+      if (ts > (ONLINE.chatSeenTs || 0) && String(m.pid || '') !== String(ONLINE.playerId || '')) unseen++;
+    });
+    var badge = document.getElementById('gameChatCount');
+    if (badge) {
+      badge.style.display = unseen > 0 ? '' : 'none';
+      badge.textContent = String(unseen);
+    }
+    var panel = document.getElementById('gameChatPanel');
+    if (panel && dock.classList.contains('is-open')) {
+      // Prevent re-rendering while typing (would reset input)
+      var last = (chatFeed && chatFeed.length) ? chatFeed[chatFeed.length - 1] : null;
+      var sig = String((chatFeed && chatFeed.length) || 0) + '|' + String(last && last.ts || 0);
+      var inp = document.getElementById('gameChatInput');
+      var isTyping = !!(inp && document.activeElement === inp);
+      if (inp) ONLINE.chatDraft = String(inp.value || '');
+      if (!ONLINE.lastChatSig || sig !== ONLINE.lastChatSig || !isTyping) {
+        ONLINE.lastChatSig = sig;
+        panel.innerHTML = renderGameChatDockInner();
+        var inp2 = document.getElementById('gameChatInput');
+        if (inp2 && typeof ONLINE.chatDraft === 'string') inp2.value = ONLINE.chatDraft;
+      }
+      scrollChatToBottom();
+    } else if (panel) {
+      panel.innerHTML = '';
+    }
+  } else {
+    dock.classList.remove('is-visible');
+    dock.classList.remove('is-open');
+    var ch2 = document.getElementById('gameChatTabChevron');
+    if (ch2) ch2.textContent = '▲';
+    var badge2 = document.getElementById('gameChatCount');
+    if (badge2) { badge2.style.display = 'none'; badge2.textContent = '0'; }
+    var panel2 = document.getElementById('gameChatPanel');
+    if (panel2) panel2.innerHTML = '';
+  }
+}
+
+function sendChatMessage() {
+  if (!ONLINE.enabled) return;
+  var inp = document.getElementById('gameChatInput');
+  if (!inp) return;
+  var txt = String(inp.value || '').trim();
+  if (!txt) return;
+  ONLINE.chatDraft = '';
+  inp.value = '';
+  onlineAction('chat:send', { text: txt }).catch(function(err) {
+    showToast(String(err && (err.message || err) || err), 'danger');
+  });
+  // keep focus even if UI re-renders on realtime update
+  try { inp.focus(); } catch (_) {}
+}
+
 function openPublicGameJournal() {
   var body =
     '<p style="color:var(--text-dim);font-size:.82rem;margin-bottom:.75rem;text-align:left">Même historique pour tous les joueurs. <b>Plus récent en haut.</b> Cartes jouées et cibles annoncées seulement — pas les mains adverses.</p>' +
@@ -6509,12 +7342,28 @@ function renderTurnCenter(player) {
   document.getElementById('turnDot').style.background = player.color;
   document.getElementById('turnText').innerHTML = 'C\'est au tour de <span style="color:' + player.color + '">' + esc(player.name) + '</span>';
   var dice = document.getElementById('gameDice');
+  var pill = document.getElementById('rollModPill');
   dice.textContent = '?';
   dice.classList.remove('rolling');
   if (player.pariMinableGuess === 'pair' || player.pariMinableGuess === 'impair') {
     dice.classList.add('dice-display--pari-pending');
   } else {
     dice.classList.remove('dice-display--pari-pending');
+  }
+  if (pill) {
+    pill.style.display = 'none';
+    pill.className = '';
+    pill.textContent = '';
+    var gb = Number(player.goodBoost || 0) || 0;
+    var bb = Math.min(0.98, Number(player.badLootBoost || 0) || 0);
+    if (gb > 0 || bb > 0) {
+      var parts = [];
+      if (gb > 0) parts.push('🍀 +' + Math.round(gb * 100) + '% favorable');
+      if (bb > 0) parts.push('☣️ +' + Math.round(bb * 100) + '% défavorable');
+      pill.textContent = parts.join(' · ');
+      pill.className = (bb > 0 && gb <= 0) ? 'is-malus' : (gb > 0 && bb <= 0 ? 'is-bonus' : '');
+      pill.style.display = '';
+    }
   }
   var pBox = getPlayerBox(player);
   document.getElementById('gameRange').textContent = 'Fourchette : 1 – ' + pBox.length;
@@ -6552,21 +7401,40 @@ function renderTurnCenter(player) {
     handArea.className = 'hand-panel';
     handArea.innerHTML = handOwner.hand.map(function(c, i) {
       var rm = RARITY_META[c.rarity];
+      var mp = c && c.mustPlayThisTurn;
+      var mpBadge = mp ? '<span class="mp-badge">Ce tour</span>' : '';
       return '<button class="hand-card-btn" ' +
         (disabledAll ? 'disabled style="opacity:.5;cursor:not-allowed;border-color:rgba(255,255,255,.08)"' : 'onclick="previewHandCard(' + i + ')" data-tip="' + esc(c.desc) + '" style="border-color:' + rm.color + '"') +
+        (mp ? ' data-mp="1"' : '') +
         '>' +
-        '<span>' + c.emoji + '</span> ' + c.name +
+        '<span>' + c.emoji + '</span> ' + c.name + mpBadge +
       '</button>';
     }).join('');
+    // add class after render (avoid mixing with disabled style strings)
+    setTimeout(function() {
+      try {
+        Array.from(handArea.querySelectorAll('.hand-card-btn[data-mp=\"1\"]')).forEach(function(b) { b.classList.add('must-play'); });
+      } catch (_) {}
+    }, 0);
   } else if (!ONLINE.enabled && player.hand.length > 0) {
     handArea.className = 'hand-panel';
     handArea.innerHTML = player.hand.map(function(c, i) {
       var rm = RARITY_META[c.rarity];
       var disabled = player.frozenTurns && player.frozenTurns > 0;
+      var mp = c && c.mustPlayThisTurn;
+      var mpBadge = mp ? '<span class="mp-badge">Ce tour</span>' : '';
       return '<button class="hand-card-btn" ' + (disabled ? 'disabled style="opacity:.5;cursor:not-allowed;border-color:rgba(255,255,255,.08)"' : 'onclick="previewHandCard(' + i + ')" data-tip="' + esc(c.desc) + '" style="border-color:' + rm.color + '"') + '>' +
-        '<span>' + c.emoji + '</span> ' + c.name +
+        '<span>' + c.emoji + '</span> ' + c.name + mpBadge +
       '</button>';
     }).join('');
+    setTimeout(function() {
+      try {
+        Array.from(handArea.querySelectorAll('.hand-card-btn')).forEach(function(b, idx) {
+          var c = player.hand[idx];
+          if (c && c.mustPlayThisTurn) b.classList.add('must-play');
+        });
+      } catch (_) {}
+    }, 0);
   } else {
     handArea.innerHTML = '';
     handArea.className = '';
@@ -6587,8 +7455,13 @@ function renderTurnCenter(player) {
     statusLines.push('🎯 Pari minable : ' + (player.pariMinableGuess === 'pair' ? 'Pair' : 'Impair') + ' — lance le dé (+1 ou −1 relance).');
   }
   var ticketViewer = ONLINE.enabled ? me : player;
-  if (ticketViewer && ticketViewer.ticketCaisseNextRare) {
-    statusLines.push('🧾 Ticket : une carte Rare t’attend au début de ton prochain tour.');
+  var tkCnt = 0;
+  if (ticketViewer) {
+    tkCnt = (typeof ticketViewer.ticketCaisseNextRareCount === 'number' ? (Number(ticketViewer.ticketCaisseNextRareCount || 0) || 0) : 0);
+    if (ticketViewer.ticketCaisseNextRare) tkCnt = Math.max(tkCnt, 1);
+  }
+  if (tkCnt > 0) {
+    statusLines.push('🧾 Ticket : ' + tkCnt + ' carte' + (tkCnt > 1 ? 's' : '') + ' Rare' + (tkCnt > 1 ? 's' : '') + ' t’attend' + (tkCnt > 1 ? 'ent' : '') + ' au début de ton prochain tour.');
   }
   if (statusLines.length) {
     statusEl.style.display = '';
@@ -6601,7 +7474,12 @@ function renderSidebar() {
   document.getElementById('gameSidebar').innerHTML = turnOrder.map(function(p, i) {
     var cls = 'sidebar-player';
     if (isCurrent(p, i)) cls += ' is-current';
-    if (p && p.ticketCaisseNextRare) cls += ' has-ticket-pending';
+    var tkP = 0;
+    if (p) {
+      tkP = (typeof p.ticketCaisseNextRareCount === 'number' ? (Number(p.ticketCaisseNextRareCount || 0) || 0) : 0);
+      if (p.ticketCaisseNextRare) tkP = Math.max(tkP, 1);
+    }
+    if (tkP > 0) cls += ' has-ticket-pending';
     if (p && (p.pariMinableGuess === 'pair' || p.pariMinableGuess === 'impair')) cls += ' has-pari-pending';
     var myId0 = String(ONLINE.playerId || '');
     var isMe0 = ONLINE.enabled ? (p && String(p.id || '') === myId0) : true;
@@ -6680,12 +7558,23 @@ function renderSidebar() {
     }
 
     var fxIcons = '';
-    if (Number(p.goodBoost || 0) > 0) {
-      fxIcons += '<span class="sb-fx-icon" title="Chance forcée : +chances de loot favorable">🍀</span>';
+    var gbP = Number(p.goodBoost || 0) || 0;
+    var gbCnt = (typeof p.goodBoostCount === 'number' ? (Number(p.goodBoostCount || 0) || 0) : 0);
+    if (gbP > 0 && gbCnt < 1) gbCnt = 1;
+    if (gbP > 0) {
+      var pctG = Math.round(gbP * 100);
+      fxIcons += '<span class="sb-fx-icon" title="Chance forcée : +' + pctG + '% de loot favorable (ce tour)">🍀' +
+        (gbCnt > 1 ? '<span style="margin-left:.2rem;font-size:.68rem;font-weight:900;opacity:.9">x' + gbCnt + '</span>' : '') +
+      '</span>';
     }
-    if (Number(p.badLootBoost || 0) > 0) {
-      var pctM = Math.round((Number(p.badLootBoost) || 0) * 100);
-      fxIcons += '<span class="sb-fx-icon" title="Miasme : +' + pctM + '% de chances de loot défavorable (ce tour)">☣️</span>';
+    var bbP = Number(p.badLootBoost || 0) || 0;
+    var bbCnt = (typeof p.badLootBoostCount === 'number' ? (Number(p.badLootBoostCount || 0) || 0) : 0);
+    if (bbP > 0 && bbCnt < 1) bbCnt = 1;
+    if (bbP > 0) {
+      var pctM = Math.round(bbP * 100);
+      fxIcons += '<span class="sb-fx-icon" title="Miasme : +' + pctM + '% de chances de loot défavorable (ce tour)">☣️' +
+        (bbCnt > 1 ? '<span style="margin-left:.2rem;font-size:.68rem;font-weight:900;opacity:.9">x' + bbCnt + '</span>' : '') +
+      '</span>';
     }
     if (p.frozenTurns && p.frozenTurns > 0) {
       fxIcons += '<span class="sb-fx-icon" title="Gel : impossible de jouer des cartes jouables ce tour">🧊</span>';
@@ -6693,8 +7582,10 @@ function renderSidebar() {
     if ((p.blindedTurns && p.blindedTurns > 0) && !p.shieldedRound) {
       fxIcons += '<span class="sb-fx-icon" title="Blinded : résultat de loot caché">🕶️</span>';
     }
-    if (p.ticketCaisseNextRare) {
-      fxIcons += '<span class="sb-fx-icon sb-fx-ticket" title="Ticket de caisse : une carte Rare au début du prochain tour">🧾</span>';
+    if (tkP > 0) {
+      fxIcons += '<span class="sb-fx-icon sb-fx-ticket" title="Ticket de caisse : ' + tkP + ' carte' + (tkP > 1 ? 's' : '') + ' Rare' + (tkP > 1 ? 's' : '') + ' au début du prochain tour">🧾' +
+        (tkP > 1 ? '<span style="margin-left:.2rem;font-size:.68rem;font-weight:900;opacity:.9">x' + tkP + '</span>' : '') +
+      '</span>';
     }
     if (p.pariMinableGuess === 'pair' || p.pariMinableGuess === 'impair') {
       fxIcons += '<span class="sb-fx-icon sb-fx-pari" title="Pari minable : ' + (p.pariMinableGuess === 'pair' ? 'Pair' : 'Impair') + ' — lance le dé">🎯</span>';
@@ -6839,6 +7730,8 @@ function confirmEliminate() {
 var exchTarget = null;
 var exchRound = -1;
 var exchPickIdx = -1;
+var exchRollIv = null;
+var exchAwaitingServer = false;
 
 function showExchange(player) {
   exchTarget = null;
@@ -6923,22 +7816,46 @@ function startExchDuel() {
 
   var d1 = document.getElementById('exchDice1');
   var d2 = document.getElementById('exchDice2');
+  // clear previous anim if any
+  if (exchRollIv) { try { clearInterval(exchRollIv); } catch (_) {} }
+  exchRollIv = null;
+  exchAwaitingServer = false;
+
+  // Online: roll forever until server result arrives.
+  if (ONLINE.enabled && !ONLINE.applyingRemote) {
+    var resultEl = document.getElementById('exchResult');
+    if (resultEl) resultEl.innerHTML = '<p style="color:var(--text-dim);font-weight:700;margin-top:.5rem">Résolution en cours…</p>';
+    exchAwaitingServer = true;
+    exchRollIv = setInterval(function() {
+      if (d1) d1.textContent = Math.floor(Math.random() * 6) + 1;
+      if (d2) d2.textContent = Math.floor(Math.random() * 6) + 1;
+    }, 70);
+    var tid = exchTarget && exchTarget.id != null ? exchTarget.id : null;
+    onlineAction('card:exchange_resolve', { targetId: tid, round: exchRound, pickIdx: exchPickIdx }).catch(function(err) {
+      try { if (exchRollIv) clearInterval(exchRollIv); } catch (_) {}
+      exchRollIv = null;
+      exchAwaitingServer = false;
+      showToast(String(err.message || err), 'danger');
+      if (resultEl) {
+        resultEl.innerHTML = '<p style="color:var(--danger);font-weight:700;margin-top:.5rem">Erreur…</p>' +
+          '<button class="btn btn-gold" onclick="closeExchange(true)" style="margin-top:.8rem">Fermer</button>';
+      }
+    });
+    return;
+  }
+
+  // Offline: resolve locally after a short roll animation.
   var ticks = 0;
   var total = 20 + Math.floor(Math.random() * 8);
   var roll1 = Math.floor(Math.random() * 6) + 1;
   var roll2 = Math.floor(Math.random() * 6) + 1;
-  // Online: the server will resolve; we only show the animation.
-  if (ONLINE.enabled) {
-    roll1 = Math.floor(Math.random() * 6) + 1;
-    roll2 = Math.floor(Math.random() * 6) + 1;
-  }
-
-  var iv = setInterval(function() {
+  exchRollIv = setInterval(function() {
     d1.textContent = Math.floor(Math.random() * 6) + 1;
     d2.textContent = Math.floor(Math.random() * 6) + 1;
     ticks++;
     if (ticks >= total) {
-      clearInterval(iv);
+      clearInterval(exchRollIv);
+      exchRollIv = null;
       d1.textContent = roll1;
       d2.textContent = roll2;
       d1.classList.remove('rolling');
@@ -6951,22 +7868,15 @@ function startExchDuel() {
 function resolveExchDuel(r1, r2) {
   var player = turnOrder[currentTurnIdx];
   var resultEl = document.getElementById('exchResult');
-  if (ONLINE.enabled && !ONLINE.applyingRemote) {
-    // In online, server resolves the duel and applies the exchange.
-    var tid = exchTarget && exchTarget.id != null ? exchTarget.id : null;
-    resultEl.innerHTML = '<p style="color:var(--text-dim);font-weight:700;margin-top:.5rem">Résolution en cours…</p>';
-    onlineAction('card:exchange_resolve', { targetId: tid, round: exchRound, pickIdx: exchPickIdx }).catch(function(err) {
-      showToast(String(err.message || err), 'danger');
-      resultEl.innerHTML = '<p style="color:var(--danger);font-weight:700;margin-top:.5rem">Erreur…</p>' +
-        '<button class="btn btn-gold" onclick="closeExchange()" style="margin-top:.8rem">Fermer</button>';
-    });
-    return;
-  }
+  // Online is handled in startExchDuel (roll until server result).
+  if (ONLINE.enabled) return;
   if (r1 > r2) {
     var myPick = player.picks[exchRound][exchPickIdx];
     var targetPicks = exchTarget.picks[exchRound];
-    if (targetPicks.length > 0) {
-      var tIdx = Math.floor(Math.random() * targetPicks.length);
+    var definedIdxs = [];
+    for (var di2 = 0; di2 < (targetPicks || []).length; di2++) if (targetPicks[di2]) definedIdxs.push(di2);
+    if (definedIdxs.length > 0) {
+      var tIdx = definedIdxs[Math.floor(Math.random() * definedIdxs.length)];
       var theirPick = targetPicks[tIdx];
       player.picks[exchRound][exchPickIdx] = theirPick;
       exchTarget.picks[exchRound][tIdx] = myPick;
@@ -6985,7 +7895,309 @@ function resolveExchDuel(r1, r2) {
   renderInventory(player);
 }
 
+function showExchangeServerOutcome(data) {
+  if (!ONLINE.enabled) return;
+  var exOv = document.getElementById('exchangeOverlay');
+  if (!exOv || !exOv.classList.contains('visible')) return;
+  var ts = Number(data && data.ts) || 0;
+  var key = String(ts) + '|' + String(data && data.targetId || '') + '|' + String(data && data.round || '');
+  if (key && ONLINE.lastExchangeOverlayKey === key) return;
+  ONLINE.lastExchangeOverlayKey = key;
+
+  var d1 = document.getElementById('exchDice1');
+  var d2 = document.getElementById('exchDice2');
+  // small "bam" delay so the stop feels snappy
+  var v1 = String(data && data.roll1 != null ? data.roll1 : '—');
+  var v2 = String(data && data.roll2 != null ? data.roll2 : '—');
+  setTimeout(function() {
+    if (exchRollIv) { try { clearInterval(exchRollIv); } catch (_) {} }
+    exchRollIv = null;
+    exchAwaitingServer = false;
+    if (d1) { d1.textContent = v1; d1.classList.remove('rolling'); d1.classList.remove('bam'); void d1.offsetWidth; d1.classList.add('bam'); }
+    if (d2) { d2.textContent = v2; d2.classList.remove('rolling'); d2.classList.remove('bam'); void d2.offsetWidth; d2.classList.add('bam'); }
+  }, 180);
+  var res = document.getElementById('exchResult');
+  if (!res) return;
+  var won = Number(data && data.roll1 || 0) > Number(data && data.roll2 || 0);
+  var swapped = !!(data && data.swapped);
+  if (won && swapped) {
+    var a = data.mine || 'ta carte';
+    var b = data.theirs || 'sa carte';
+    res.innerHTML =
+      '<p style="color:var(--success);font-weight:800;font-size:1rem;margin-top:.5rem">Échange effectué !</p>' +
+      '<p style="color:var(--text-dim);font-size:.8rem">' + esc(a) + ' ↔ ' + esc(b) + '</p>' +
+      '<button class="btn btn-gold" onclick="closeExchange(true)" style="margin-top:.8rem">Continuer</button>';
+  } else if (won && !swapped) {
+    res.innerHTML =
+      '<p style="color:var(--gold);font-weight:800;font-size:1rem;margin-top:.5rem">Gagné !</p>' +
+      '<p style="color:var(--text-dim);font-size:.8rem">Mais aucun échange possible sur ce round.</p>' +
+      '<button class="btn btn-gold" onclick="closeExchange(true)" style="margin-top:.8rem">Continuer</button>';
+  } else {
+    res.innerHTML =
+      '<p style="color:var(--danger);font-weight:800;font-size:1rem;margin-top:.5rem">Raté !</p>' +
+      '<button class="btn btn-gold" onclick="closeExchange(true)" style="margin-top:.8rem">Continuer</button>';
+  }
+}
+
+function showExchangeTargetModal(casterName, data) {
+  var offered = data && data.mineObj ? data.mineObj : (data && data.mine ? { name: data.mine, image: null } : null);
+  var taken = data && data.theirsObj ? data.theirsObj : (data && data.theirs ? { name: data.theirs, image: null } : null);
+  var targetCandidate = data && data.theirsCandidateObj ? data.theirsCandidateObj : taken;
+  var won = Number(data && data.roll1 || 0) > Number(data && data.roll2 || 0);
+  var swapped = !!(data && data.swapped);
+
+  function thumbBoxHtml(e) {
+    if (e && e.image) return '<img src="' + esc(String(e.image)) + '" alt="" style="width:100%;height:100%;object-fit:cover;display:block">';
+    if (e && e.emoji) return esc(String(e.emoji));
+    return initial(e && e.name ? e.name : '');
+  }
+
+  function cardMini(e, label, tone) {
+    if (!e) return '';
+    var bd = tone === 'bad' ? 'rgba(239,68,68,.18)' : (tone === 'good' ? 'rgba(16,185,129,.14)' : 'rgba(255,255,255,.06)');
+    var br = tone === 'bad' ? 'rgba(239,68,68,.28)' : (tone === 'good' ? 'rgba(16,185,129,.26)' : 'rgba(255,255,255,.10)');
+    return '<div style="flex:1;min-width:0;background:' + bd + ';border:1px solid ' + br + ';border-radius:14px;padding:.65rem .7rem;text-align:center">' +
+      '<div style="font-size:.62rem;color:var(--text-dim);font-weight:900;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.35rem">' + esc(label) + '</div>' +
+      '<div style="display:flex;flex-direction:column;align-items:center;gap:.45rem">' +
+        '<div style="width:76px;height:76px;border-radius:18px;overflow:hidden;flex-shrink:0;background:rgba(255,255,255,.06);display:grid;place-items:center;font-size:1.35rem">' + thumbBoxHtml(e) + '</div>' +
+        '<div style="min-width:0;max-width:100%">' +
+          '<div style="font-weight:950;font-size:.95rem;line-height:1.1;word-break:break-word">' + esc(String(e.name || '')) + '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }
+
+  var title = swapped ? '🔄 Échange réussi' : (won ? '🔄 Tentative' : '🔄 Tentative ratée');
+  var sub = swapped
+    ? ('<p style="color:var(--text-dim);font-size:.82rem;margin-bottom:.9rem"><b>' + esc(casterName) + '</b> a échangé avec toi.</p>')
+    : ('<p style="color:var(--text-dim);font-size:.82rem;margin-bottom:.9rem"><b>' + esc(casterName) + '</b> a tenté de t’échanger une carte.</p>');
+
+  var body = '';
+  if (swapped) {
+    body =
+      '<div style="display:flex;gap:.55rem;align-items:stretch;justify-content:center;flex-wrap:wrap">' +
+        cardMini(taken, 'Tu perds', 'bad') +
+        '<div style="align-self:center;font-weight:1000;color:var(--text-dim);padding:.2rem .15rem">→</div>' +
+        cardMini(offered, 'Tu gagnes', 'good') +
+      '</div>';
+  } else {
+    body =
+      '<div style="display:flex;gap:.55rem;align-items:stretch;justify-content:center;flex-wrap:wrap">' +
+        cardMini(targetCandidate, 'Carte visée', 'neutral') +
+      '</div>';
+  }
+
+  openActionOverlay(
+    '<h3 style="margin-bottom:.25rem">' + title + '</h3>' +
+    sub +
+    body +
+    '<div style="margin-top:1rem;text-align:center">' +
+      '<button type="button" class="btn btn-gold" onclick="closeActionOverlay(true)">OK</button>' +
+    '</div>'
+  );
+}
+
+function showTargetCardEventModal(title, subtitle, cardObj, danger) {
+  var ao = document.getElementById('actionOverlay');
+  if (ao && ao.classList.contains('visible')) {
+    // don't clobber important overlays; fallback toast
+    var nm = cardObj && cardObj.name ? String(cardObj.name) : 'une carte';
+    showToast(title + ' — ' + nm, danger ? 'danger' : 'success');
+    return;
+  }
+  var em = (cardObj && cardObj.emoji) ? String(cardObj.emoji) : '🃏';
+  var nm2 = (cardObj && cardObj.name) ? String(cardObj.name) : '';
+  var bd = danger ? 'rgba(239,68,68,.12)' : 'rgba(59,130,246,.12)';
+  var br = danger ? 'rgba(239,68,68,.22)' : 'rgba(59,130,246,.22)';
+  openActionOverlay(
+    '<h3 style="margin-bottom:.25rem">' + esc(title) + '</h3>' +
+    (subtitle ? '<p style="color:var(--text-dim);font-size:.82rem;margin-bottom:.9rem">' + subtitle + '</p>' : '') +
+    '<div style="max-width:420px;margin:0 auto;background:' + bd + ';border:1px solid ' + br + ';border-radius:16px;padding:.8rem .85rem;text-align:center">' +
+      '<div style="font-size:2.1rem;line-height:1;margin-bottom:.45rem">' + esc(em) + '</div>' +
+      '<div style="font-weight:950;font-size:1.05rem;line-height:1.15">' + esc(nm2) + '</div>' +
+    '</div>' +
+    '<div style="margin-top:1rem;text-align:center">' +
+      '<button type="button" class="btn btn-gold" onclick="closeActionOverlay(true)">OK</button>' +
+    '</div>'
+  );
+}
+
+function queueModalAfterCardFx(key, fn) {
+  if (!key || typeof fn !== 'function') return;
+  // FX overlay hides after ~2650ms (see triggerCardPlayFx). Wait a bit more.
+  var waitMs = 2750;
+  try {
+    ONLINE.delayedModalTimers = ONLINE.delayedModalTimers || {};
+    if (ONLINE.delayedModalTimers[key]) {
+      try { clearTimeout(ONLINE.delayedModalTimers[key]); } catch (_) {}
+      delete ONLINE.delayedModalTimers[key];
+    }
+    ONLINE.delayedModalTimers[key] = setTimeout(function() {
+      try { delete ONLINE.delayedModalTimers[key]; } catch (_) {}
+      try { fn(); } catch (_) {}
+    }, waitMs);
+  } catch (_) {
+    setTimeout(function() { try { fn(); } catch (_) {} }, waitMs);
+  }
+}
+
+function showGainedCardModal(title, subtitle, cardObj) {
+  var ao = document.getElementById('actionOverlay');
+  if (ao && ao.classList.contains('visible')) {
+    var nm = cardObj && cardObj.name ? String(cardObj.name) : 'une carte';
+    showToast(title + ' — ' + nm, 'success');
+    return;
+  }
+  var em = (cardObj && cardObj.emoji) ? String(cardObj.emoji) : '🃏';
+  var nm2 = (cardObj && cardObj.name) ? String(cardObj.name) : '';
+  openActionOverlay(
+    '<h3 style="margin-bottom:.25rem">' + esc(title) + '</h3>' +
+    (subtitle ? '<p style="color:var(--text-dim);font-size:.82rem;margin-bottom:.9rem">' + subtitle + '</p>' : '') +
+    '<div style="max-width:420px;margin:0 auto;background:rgba(16,185,129,.10);border:1px solid rgba(16,185,129,.20);border-radius:16px;padding:.8rem .85rem;text-align:center">' +
+      '<div style="font-size:2.1rem;line-height:1;margin-bottom:.45rem">' + esc(em) + '</div>' +
+      '<div style="font-weight:950;font-size:1.05rem;line-height:1.15">' + esc(nm2) + '</div>' +
+    '</div>' +
+    '<div style="margin-top:1rem;text-align:center">' +
+      '<button type="button" class="btn btn-gold" onclick="closeActionOverlay(true)">OK</button>' +
+    '</div>'
+  );
+}
+
+function showGainedCardsModal(title, subtitle, cards) {
+  cards = Array.isArray(cards) ? cards.filter(Boolean) : [];
+  if (!cards.length) return;
+  var ao = document.getElementById('actionOverlay');
+  if (ao && ao.classList.contains('visible')) {
+    showToast(title + ' — ' + cards.length + ' carte(s)', 'success');
+    return;
+  }
+  var grid = '<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:.6rem;margin-top:.8rem">' +
+    cards.map(function(c) {
+      var em = (c && c.emoji) ? String(c.emoji) : '🃏';
+      var nm = (c && c.name) ? String(c.name) : '';
+      return '<div style="width:260px;max-width:100%;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.16);border-radius:14px;padding:.7rem .75rem;text-align:center">' +
+        '<div style="font-size:1.85rem;line-height:1;margin-bottom:.35rem">' + esc(em) + '</div>' +
+        '<div style="font-weight:900;font-size:.92rem;line-height:1.15">' + esc(nm) + '</div>' +
+      '</div>';
+    }).join('') +
+  '</div>';
+  openActionOverlay(
+    '<h3 style="margin-bottom:.25rem">' + esc(title) + '</h3>' +
+    (subtitle ? '<p style="color:var(--text-dim);font-size:.82rem;margin-bottom:.25rem">' + subtitle + '</p>' : '') +
+    grid +
+    '<div style="margin-top:1rem;text-align:center">' +
+      '<button type="button" class="btn btn-gold" onclick="closeActionOverlay(true)">OK</button>' +
+    '</div>'
+  );
+}
+
+function showNostalgieTargetModal(casterName, data) {
+  var ao = document.getElementById('actionOverlay');
+  if (ao && ao.classList.contains('visible')) {
+    var self = String(data && data.targetId || '') === String(ONLINE.playerId || '');
+    showToast(self ? '🕰️ Tu as remplacé une de tes cartes.' : ('🕰️ ' + casterName + ' a changé une de tes cartes.'), self ? 'success' : 'danger');
+    return;
+  }
+  var isSelfCast = String(data && data.targetId || '') === String(ONLINE.playerId || '') &&
+    String(lastActiveCardPlayerId || '') === String(ONLINE.playerId || '');
+  var oldE = data && data.oldObj ? data.oldObj : null;
+  var newE = data && data.newObj ? data.newObj : null;
+  function entCard(e, label, tone) {
+    if (!e) return '';
+    var bd = tone === 'bad' ? 'rgba(239,68,68,.12)' : 'rgba(16,185,129,.10)';
+    var br = tone === 'bad' ? 'rgba(239,68,68,.22)' : 'rgba(16,185,129,.20)';
+    return '<div style="flex:1;min-width:0;background:' + bd + ';border:1px solid ' + br + ';border-radius:14px;padding:.65rem .7rem;text-align:center">' +
+      '<div style="font-size:.62rem;color:var(--text-dim);font-weight:900;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.35rem">' + esc(label) + '</div>' +
+      '<div style="display:flex;flex-direction:column;align-items:center;gap:.45rem">' +
+        '<div style="width:76px;height:76px;border-radius:18px;overflow:hidden;flex-shrink:0;background:rgba(255,255,255,.06);display:grid;place-items:center;font-size:1.35rem">' +
+          (e.image ? '<img src="' + esc(String(e.image)) + '" alt="" style="width:100%;height:100%;object-fit:cover;display:block">' : thumbHtml(e)) +
+        '</div>' +
+        '<div style="font-weight:950;font-size:.95rem;line-height:1.1;word-break:break-word">' + esc(String(e.name || '')) + '</div>' +
+      '</div>' +
+    '</div>';
+  }
+  openActionOverlay(
+    '<h3 style="margin-bottom:.25rem">🕰️ Nostalgie</h3>' +
+    '<p style="color:var(--text-dim);font-size:.82rem;margin-bottom:.9rem">' +
+      (isSelfCast ? 'Vous avez remplacé une de vos cartes.' : ('<b>' + esc(casterName) + '</b> a remplacé une de vos cartes.')) +
+    '</p>' +
+    '<div style="display:flex;gap:.55rem;align-items:stretch;justify-content:center;flex-wrap:wrap">' +
+      entCard(oldE, 'Avant', 'bad') +
+      '<div style="align-self:center;font-weight:1000;color:var(--text-dim);padding:.2rem .15rem">→</div>' +
+      entCard(newE, 'Après', 'good') +
+    '</div>' +
+    '<div style="margin-top:1rem;text-align:center"><button type="button" class="btn btn-gold" onclick="closeActionOverlay(true)">OK</button></div>'
+  );
+}
+
+function showSabotageTargetModal(casterName, data) {
+  var ao = document.getElementById('actionOverlay');
+  if (ao && ao.classList.contains('visible')) {
+    showToast('🧨 ' + casterName + ' t’a saboté.', 'danger');
+    return;
+  }
+  var mode = String(data && data.mode || '');
+  var title = '🧨 Petit sabotage';
+  var subtitle = '';
+  var body = '';
+
+  function entThumb(e) {
+    if (!e) return '';
+    var inner = e.image
+      ? '<img src="' + esc(String(e.image)) + '" alt="" style="width:100%;height:100%;object-fit:cover;display:block">'
+      : (e.emoji ? esc(String(e.emoji)) : initial(e.name));
+    return '<div style="width:76px;height:76px;border-radius:18px;overflow:hidden;background:rgba(255,255,255,.06);display:grid;place-items:center;font-size:1.35rem;margin:0 auto .45rem">' + inner + '</div>';
+  }
+
+  if (mode === 'reroll') {
+    subtitle = '<b>' + esc(casterName) + '</b> vous a retiré 1 relance.';
+    body =
+      '<div style="max-width:420px;margin:0 auto;background:rgba(239,68,68,.10);border:1px solid rgba(239,68,68,.18);border-radius:16px;padding:.8rem .85rem;text-align:center">' +
+        '<div style="font-size:2.1rem;line-height:1;margin-bottom:.35rem">🎲</div>' +
+        '<div style="font-weight:950;font-size:1.05rem;line-height:1.15">−1 relance</div>' +
+      '</div>';
+  } else if (mode === 'explode') {
+    subtitle = '<b>' + esc(casterName) + '</b> a détruit une carte de votre main.';
+    var c = data && data.destroyedCard ? data.destroyedCard : null;
+    if (c && c.name) {
+      body =
+        '<div style="max-width:420px;margin:0 auto;background:rgba(239,68,68,.10);border:1px solid rgba(239,68,68,.18);border-radius:16px;padding:.8rem .85rem;text-align:center">' +
+          '<div style="font-size:2.1rem;line-height:1;margin-bottom:.45rem">' + esc(c.emoji || '🃏') + '</div>' +
+          '<div style="font-weight:950;font-size:1.05rem;line-height:1.15">' + esc(c.name) + '</div>' +
+        '</div>';
+    }
+  } else if (mode === 'ban') {
+    var when = String(data && data.when || '');
+    if (when === 'next_round') {
+      subtitle = '<b>' + esc(casterName) + '</b> a ciblé votre boîte : 1 carte sera enlevée au prochain round.';
+      body = '';
+    } else {
+      subtitle = '<b>' + esc(casterName) + '</b> a enlevé 1 carte de votre boîte.';
+      var e = data && data.removedEntity ? data.removedEntity : null;
+      if (e && e.name) {
+        body =
+          '<div style="max-width:420px;margin:0 auto;background:rgba(239,68,68,.10);border:1px solid rgba(239,68,68,.18);border-radius:16px;padding:.8rem .85rem;text-align:center">' +
+            entThumb(e) +
+            '<div style="font-weight:950;font-size:1.05rem;line-height:1.15">' + esc(e.name) + '</div>' +
+          '</div>';
+      }
+    }
+  } else {
+    subtitle = '<b>' + esc(casterName) + '</b> vous a saboté.';
+  }
+
+  openActionOverlay(
+    '<h3 style="margin-bottom:.25rem">' + esc(title) + '</h3>' +
+    '<p style="color:var(--text-dim);font-size:.82rem;margin-bottom:.9rem">' + subtitle + '</p>' +
+    body +
+    '<div style="margin-top:1rem;text-align:center"><button type="button" class="btn btn-gold" onclick="closeActionOverlay(true)">OK</button></div>'
+  );
+}
+
 function closeExchange(skipOnlineCancel) {
+  if (exchRollIv) { try { clearInterval(exchRollIv); } catch (_) {} }
+  exchRollIv = null;
+  exchAwaitingServer = false;
   document.getElementById('exchangeOverlay').classList.remove('visible');
   exchTarget = null;
   if (!skipOnlineCancel && ONLINE.enabled && !ONLINE.applyingRemote && pending && pending.byPid && String(pending.byPid) === String(ONLINE.playerId || '')) {
@@ -7282,11 +8494,16 @@ function showPetitSabotage(player) {
   var others = turnOrder.filter(function(p) { return p.id !== player.id; });
   if (others.length === 0) { showToast('Aucun joueur à saboter.', 'danger'); return; }
   window._sabo = { mode: null };
+  var anyReroll = others.some(function(p) { return (Number(p && p.rerollsLeft || 0) || 0) > 0; });
+  var anyHand = others.some(function(p) {
+    var hc = (p && typeof p.handCount === 'number') ? p.handCount : ((p.hand && p.hand.length) ? p.hand.length : 0);
+    return hc > 0;
+  });
   var html =
     '<h3 style="margin-bottom:.25rem">🧨 Petit sabotage</h3>' +
     '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">Choisis l\'effet</p>' +
     '<div class="choice-grid">' +
-      '<button class="choice-btn" onclick="selectSabotageMode(\'reroll\')">' +
+      '<button class="choice-btn' + (anyReroll ? '' : ' disabled') + '" onclick="selectSabotageMode(\'reroll\')">' +
         '<div class="choice-title">🎲 Retirer une relance</div>' +
         '<div class="choice-desc">Retire 1 relance à un joueur (si il en a).</div>' +
       '</button>' +
@@ -7294,7 +8511,7 @@ function showPetitSabotage(player) {
         '<div class="choice-title">🗑️ Enlever 1 carte de sa boîte</div>' +
         '<div class="choice-desc">Si il joue après toi : maintenant. Sinon : au round d\'après.</div>' +
       '</button>' +
-      '<button class="choice-btn" onclick="selectSabotageMode(\'explode\')">' +
+      '<button class="choice-btn' + (anyHand ? '' : ' disabled') + '" onclick="selectSabotageMode(\'explode\')">' +
         '<div class="choice-title">💥 Faire exploser sa carte jouable</div>' +
         '<div class="choice-desc">Détruit 1 carte jouable de sa main (aléatoire).</div>' +
       '</button>' +
@@ -7320,9 +8537,16 @@ function selectSabotageMode(mode) {
     '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">' + sub + '</p>' +
     '<div class="exch-players">' +
       others.map(function(p) {
-        return '<button class="exch-player-btn" onclick="confirmPetitSabotage(' + jsq(p.id) + ')">' +
+        var hc = (p && typeof p.handCount === 'number') ? p.handCount : ((p.hand && p.hand.length) ? p.hand.length : 0);
+        var dis = (mode === 'reroll') ? ((Number(p && p.rerollsLeft || 0) || 0) <= 0)
+          : (mode === 'explode') ? (hc <= 0)
+          : false;
+        var extra = '';
+        if (mode === 'reroll') extra = ' (' + (Number(p && p.rerollsLeft || 0) || 0) + ')';
+        if (mode === 'explode') extra = dis ? ' (vide)' : (' (🃏' + hc + ')');
+        return '<button class="exch-player-btn' + (dis ? ' disabled' : '') + '" onclick="confirmPetitSabotage(' + jsq(p.id) + ')">' +
           '<span style="width:10px;height:10px;border-radius:50%;background:' + p.color + ';display:inline-block"></span>' +
-          esc(p.name) +
+          esc(p.name) + extra +
         '</button>';
       }).join('') +
     '</div>' +
@@ -7603,7 +8827,6 @@ function showPartage(player) {
       return;
     }
     var rnd = drawCard();
-    rnd.mustPlayThisTurn = true;
     player.hand.push(rnd);
     showToast('🤝 Partage ? → carte aléatoire !', 'success');
     renderSidebar();
@@ -7638,7 +8861,6 @@ function confirmPartage(targetId) {
   if (!target) return;
   if (!target.hand || target.hand.length === 0) {
     var rndOff = drawCard();
-    rndOff.mustPlayThisTurn = true;
     player.hand.push(rndOff);
     showToast('🤝 Main vide → carte aléatoire : ' + rndOff.name, 'success');
     closeActionOverlay();
@@ -7648,9 +8870,8 @@ function confirmPartage(targetId) {
   }
   var src = target.hand[Math.floor(Math.random() * target.hand.length)];
   var copy = makeCardCopy(src);
-  copy.mustPlayThisTurn = true;
   player.hand.push(copy);
-  showToast('🤝 Copie obtenue : ' + src.name + ' (à jouer ce tour)', 'success');
+  showToast('🤝 Copie obtenue : ' + src.name, 'success');
   closeActionOverlay();
   renderSidebar();
   renderTurnCenter(player);
@@ -8136,7 +9357,6 @@ function confirmFifty() {
 
 /* ── Passive force logic ── */
 function applyPassiveForce(player, rolledEntity) {
-  if (currentRound === 0) return rolledEntity;
   var personPick = player.picks[0].length > 0 ? player.picks[0][0] : null;
 
   var hasForceBad = player.activePassives.indexOf('force_bad') >= 0;
@@ -8146,7 +9366,10 @@ function applyPassiveForce(player, rolledEntity) {
   if (Math.random() > 0.25) return rolledEntity;
 
   var wantGood;
-  if (hasForceBad) {
+  if (currentRound === 0) {
+    // Round 1 = Personne: force_good => want GOOD, force_bad => want BAD
+    wantGood = hasForceGood ? true : false;
+  } else if (hasForceBad) {
     wantGood = personPick && !personPick.good ? true : false;
   } else {
     wantGood = personPick && !personPick.good ? false : true;
@@ -8167,13 +9390,17 @@ function applyPassiveForce(player, rolledEntity) {
 
 function applyGoodBoost(player, rolledEntity) {
   if (!player || !player.goodBoost || player.goodBoost <= 0) return rolledEntity;
-  if (currentRound === 0) return rolledEntity;
   if (Math.random() > player.goodBoost) return rolledEntity;
 
-  var personPick = player.picks[0].length > 0 ? player.picks[0][0] : null;
-  if (!personPick || typeof personPick.good !== 'boolean') return rolledEntity;
-
-  var wantGood = personPick.good; // favorable alignment
+  var wantGood;
+  if (currentRound === 0) {
+    // Round 1 = Personne: "favorable" means GOOD personne.
+    wantGood = true;
+  } else {
+    var personPick = player.picks[0].length > 0 ? player.picks[0][0] : null;
+    if (!personPick || typeof personPick.good !== 'boolean') return rolledEntity;
+    wantGood = personPick.good; // favorable alignment
+  }
   var pBox = getPlayerBox(player);
   var filtered = pBox.filter(function(e) { return e.good === wantGood && e.id !== rolledEntity.id; });
   if (filtered.length === 0) return rolledEntity;
@@ -8186,11 +9413,16 @@ function applyBadLootBoost(player, rolledEntity) {
   if (!player) return rolledEntity;
   var bb = Math.min(0.98, Number(player.badLootBoost || 0) || 0);
   if (bb <= 0) return rolledEntity;
-  if (currentRound === 0) return rolledEntity;
   if (Math.random() > bb) return rolledEntity;
-  var personPick = player.picks[0].length > 0 ? player.picks[0][0] : null;
-  if (!personPick || typeof personPick.good !== 'boolean') return rolledEntity;
-  var wantUnfavorable = !personPick.good;
+  var wantUnfavorable;
+  if (currentRound === 0) {
+    // Round 1 = Personne: "unfavorable" means BAD personne.
+    wantUnfavorable = false;
+  } else {
+    var personPick = player.picks[0].length > 0 ? player.picks[0][0] : null;
+    if (!personPick || typeof personPick.good !== 'boolean') return rolledEntity;
+    wantUnfavorable = !personPick.good;
+  }
   var pBox = getPlayerBox(player);
   var filtered = pBox.filter(function(e) { return typeof e.good === 'boolean' && e.good === wantUnfavorable && e.id !== rolledEntity.id; });
   if (filtered.length === 0) return rolledEntity;
