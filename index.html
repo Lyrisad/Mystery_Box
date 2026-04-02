@@ -121,6 +121,56 @@
     .btn-min-rare { border-color: rgba(59,130,246,.5); color: #93c5fd; }
     .btn-min-rare:hover { border-color: rgba(59,130,246,.7); box-shadow: 0 0 0 4px rgba(59,130,246,.12); }
 
+    .game-roll-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      align-items: flex-end; /* bas du « Pioche » aligné avec celui de « Lancer le dé » */
+    }
+
+    /* Pioche : halo bleu quand des gratuites Loop (♾️) restent */
+    .btn.btn-min.game-pay-draw-btn--loop {
+      border-color: rgba(96, 165, 250, 0.85);
+      color: #e0f2fe;
+      box-shadow:
+        0 0 0 2px rgba(59, 130, 246, 0.45),
+        0 0 22px rgba(59, 130, 246, 0.55),
+        0 0 42px rgba(37, 99, 235, 0.25);
+    }
+    .btn.btn-min.game-pay-draw-btn--loop:hover:not(:disabled) {
+      border-color: rgba(147, 197, 253, 0.95);
+      color: #fff;
+      box-shadow:
+        0 0 0 2px rgba(96, 165, 250, 0.55),
+        0 0 28px rgba(59, 130, 246, 0.65),
+        0 0 52px rgba(37, 99, 235, 0.35);
+    }
+    .btn.btn-min.game-pay-draw-btn--loop:disabled {
+      box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.2);
+    }
+
+    /* Pioche : halo violet (Main du destin : relances bonus + pioches Rare+ garanties ce tour) */
+    .btn.btn-min.game-pay-draw-btn--main-du-destin {
+      border-color: rgba(192, 132, 252, 0.9);
+      color: #f3e8ff;
+      box-shadow:
+        0 0 0 2px rgba(168, 85, 247, 0.5),
+        0 0 24px rgba(168, 85, 247, 0.55),
+        0 0 48px rgba(126, 34, 206, 0.28);
+    }
+    .btn.btn-min.game-pay-draw-btn--main-du-destin:hover:not(:disabled) {
+      border-color: rgba(216, 180, 254, 0.95);
+      color: #fff;
+      box-shadow:
+        0 0 0 2px rgba(192, 132, 252, 0.6),
+        0 0 30px rgba(168, 85, 247, 0.7),
+        0 0 56px rgba(126, 34, 206, 0.38);
+    }
+    .btn.btn-min.game-pay-draw-btn--main-du-destin:disabled {
+      box-shadow: 0 0 0 1px rgba(168, 85, 247, 0.22);
+    }
+
     /* ── Jackpot reveal (Hearthstone-ish) ── */
     .jackpot-stage { margin: .3rem auto 1rem; display: flex; justify-content: center; align-items: flex-end; gap: 1.1rem; perspective: 1100px; }
     .jackpot-stage.is-columns { flex-direction: column; align-items: center; }
@@ -326,6 +376,21 @@
     /* ── OVERLAY ── */
     .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.75); backdrop-filter: blur(8px); z-index: 100; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .3s; }
     .overlay.visible { opacity: 1; pointer-events: all; }
+    /* Pioche / prévisualisation carte : défiler pour voir toute la description + boutons sous la carte (mobile) */
+    /* Centré comme les autres overlays ; scroll si carte + boutons dépassent le viewport */
+    #cardDrawOverlay.overlay {
+      align-items: center;
+      justify-content: center;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      padding: max(0.75rem, env(safe-area-inset-top, 0px)) max(0.75rem, env(safe-area-inset-right, 0px)) max(0.75rem, env(safe-area-inset-bottom, 0px)) max(0.75rem, env(safe-area-inset-left, 0px));
+      box-sizing: border-box;
+    }
+    #cardDrawOverlay .cd-wrap {
+      margin: auto;
+      flex-shrink: 0;
+    }
     .round-card { background: var(--surface); border: 2px solid var(--accent); border-radius: 20px; padding: 2.5rem 2rem; text-align: center; max-width: 380px; width: 90%; transform: scale(.8); transition: transform .4s cubic-bezier(.34,1.56,.64,1); box-shadow: 0 0 60px var(--accent-glow); }
     .overlay.visible .round-card { transform: scale(1); }
     .reveal-card { background: var(--surface); border: 2px solid var(--gold); border-radius: 20px; padding: 2rem 1.6rem; text-align: center; max-width: 370px; width: 90%; transform: scale(.8) translateY(30px); transition: transform .4s cubic-bezier(.34,1.56,.64,1); box-shadow: 0 0 60px var(--gold-glow); }
@@ -658,6 +723,73 @@
       80% { filter: sepia(.2); }
     }
 
+    /* ── maelstrom : gouffre argenté (palette sobre, pas d’arc-en-ciel) ── */
+    .card-fx-overlay.card-fx--maelstrom { overflow: hidden; }
+    .card-fx--maelstrom .card-fx-vignette {
+      background:
+        radial-gradient(ellipse 55% 45% at 50% 42%, rgba(148, 163, 184, .14) 0%, transparent 52%),
+        radial-gradient(ellipse 100% 80% at 50% 100%, rgba(15, 23, 42, .55) 0%, rgba(0, 0, 0, .92) 45%);
+      animation: cardFxMaelBreath 3.4s ease-in-out infinite;
+    }
+    @keyframes cardFxMaelBreath {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: .92; transform: scale(1.02); }
+    }
+    .card-fx--maelstrom .card-fx-particles {
+      opacity: .38;
+      background:
+        radial-gradient(circle at 50% 48%, transparent 0%, transparent 18%, rgba(148, 163, 184, .06) 22%, transparent 32%),
+        repeating-linear-gradient(0deg, transparent, transparent 5px, rgba(255, 255, 255, .025) 5px, rgba(255, 255, 255, .025) 6px);
+      animation: cardFxMaelDrift 5s linear infinite;
+    }
+    @keyframes cardFxMaelDrift { to { transform: translateY(-14px); } }
+    .card-fx--maelstrom .card-fx-scanlines {
+      opacity: .08;
+      mix-blend-mode: overlay;
+      animation: cardFxScan 2.4s linear infinite;
+    }
+    .card-fx--maelstrom .card-fx-ornament {
+      width: 168px;
+      height: 168px;
+      margin: -84px 0 0 -84px;
+      border-radius: 50%;
+      border: 2px solid rgba(203, 213, 225, .35);
+      background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, .12) 0%, transparent 42%),
+        radial-gradient(circle at 50% 100%, rgba(51, 65, 85, .5) 0%, rgba(15, 23, 42, .85) 65%);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, .6),
+        0 0 48px rgba(100, 116, 139, .25),
+        inset 0 0 32px rgba(0, 0, 0, .35);
+      animation: cardFxMaelRing 3s ease-in-out infinite;
+    }
+    @keyframes cardFxMaelRing {
+      0%, 100% { transform: scale(1); opacity: .88; }
+      50% { transform: scale(1.06); opacity: 1; }
+    }
+    .card-fx--maelstrom .card-fx-icon {
+      font-size: 2.75rem;
+      filter: drop-shadow(0 0 14px rgba(203, 213, 225, .45)) drop-shadow(0 2px 8px rgba(0, 0, 0, .5));
+      animation: cardFxMaelIcon 2.2s ease-in-out infinite;
+    }
+    @keyframes cardFxMaelIcon {
+      0%, 100% { transform: translateY(0) scale(1); opacity: 1; }
+      50% { transform: translateY(-4px) scale(1.03); opacity: .92; }
+    }
+    .card-fx--maelstrom .card-fx-title {
+      color: #f1f5f9;
+      letter-spacing: .32em;
+      text-shadow: 0 0 24px rgba(148, 163, 184, .35), 0 2px 12px rgba(0, 0, 0, .55);
+    }
+    .card-fx--maelstrom .card-fx-sub { color: #cbd5e1; opacity: .88; }
+    html.card-fx-chrome--maelstrom .game-layout {
+      animation: cardFxChromeMael 3.2s cubic-bezier(.4, 0, .2, 1);
+    }
+    @keyframes cardFxChromeMael {
+      0%, 100% { filter: none; transform: none; }
+      40% { filter: brightness(1.04) contrast(1.03); transform: scale(.992); }
+      70% { filter: brightness(1.02); transform: scale(1.004); }
+    }
+
     /* ── miasme ── */
     .card-fx--miasme .card-fx-vignette {
       background: radial-gradient(ellipse at 50% 80%, rgba(34, 197, 94, .18) 0%, rgba(0, 0, 0, .82) 50%, rgba(20, 83, 45, .35) 100%);
@@ -750,8 +882,8 @@
 
     /* ── Card Flip ── */
     /* Card is fixed; actions live OUTSIDE the card (no hacks). */
-    .cd-wrap { display: flex; flex-direction: column; align-items: center; gap: .65rem; }
-    .cd-scene { perspective: 800px; width: min(360px, 92vw); height: min(540px, 74vh); }
+    .cd-wrap { display: flex; flex-direction: column; align-items: center; gap: .65rem; flex-shrink: 0; width: 100%; max-width: 100%; }
+    .cd-scene { perspective: 800px; width: min(360px, 92vw); height: min(540px, 74vh); flex-shrink: 0; }
     .cd-flipper { width: 100%; height: 100%; position: relative; transition: transform .7s cubic-bezier(.4,.2,.2,1); transform-style: preserve-3d; cursor: pointer; }
     .cd-flipper.flipped { transform: rotateY(180deg); cursor: default; }
     .cd-face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem; box-sizing: border-box; }
@@ -761,7 +893,7 @@
     .cd-front-title { font-size: 1.1rem; font-weight: 800; color: var(--accent-light); margin-bottom: .3rem; }
     .cd-front-hint { font-size: .75rem; color: var(--text-dim); animation: cdBlink 1.5s ease-in-out infinite; }
     @keyframes cdBlink { 0%,100% { opacity: .5; } 50% { opacity: 1; } }
-    .cd-back { transform: rotateY(180deg); background: radial-gradient(120% 120% at 30% 0%, rgba(124,58,237,.25), transparent 55%), radial-gradient(120% 120% at 70% 0%, rgba(245,158,11,.22), transparent 55%), var(--surface); text-align: center; box-shadow: inset 0 0 0 2px rgba(255,255,255,.06), inset 0 0 0 7px rgba(0,0,0,.25); justify-content: flex-start; }
+    .cd-back { transform: rotateY(180deg); background: radial-gradient(120% 120% at 30% 0%, rgba(124,58,237,.25), transparent 55%), radial-gradient(120% 120% at 70% 0%, rgba(245,158,11,.22), transparent 55%), var(--surface); text-align: center; box-shadow: inset 0 0 0 2px rgba(255,255,255,.06), inset 0 0 0 7px rgba(0,0,0,.25); justify-content: flex-start; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 
     /* ── Playable Cards ── */
     .dc-rarity { font-size: .62rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; margin-bottom: .6rem; background: rgba(0,0,0,.35); padding: .25rem .6rem; border-radius: 999px; border: 1px solid rgba(255,255,255,.12); }
@@ -770,16 +902,14 @@
     .dc-desc { font-size: .92rem; color: var(--text-dim); margin-bottom: 0; line-height: 1.45; width: 100%; overflow: visible; }
     .dc-actions { display: flex; gap: .7rem; justify-content: center; flex-wrap: wrap; width: 100%; }
     .dc-actions-in { margin-top: auto; padding-top: .35rem; }
-    .dc-actions-out { width: min(520px, 96vw); margin-top: .15rem; }
+    .dc-actions-out { width: min(520px, 96vw); max-width: calc(100vw - 1.5rem); margin-top: .15rem; flex-shrink: 0; padding: 0 .25rem; box-sizing: border-box; }
     .dc-actions-out .btn.btn-gold { padding: .78rem 1.55rem; }
 
     /* Default (PC): buttons inside the card */
     .dc-actions-in { display: flex; }
     .dc-actions-out { display: none; }
 
-    /* Small screens: prevent card text overflow */
-    .cd-back { overflow: hidden; }
-    .dc-desc { max-height: none; padding-right: .2rem; }
+    .dc-desc { max-height: none; padding-right: .2rem; word-wrap: break-word; overflow-wrap: break-word; }
 
     @media (max-height: 720px) {
       .cd-scene { height: min(520px, 74vh); }
@@ -795,19 +925,37 @@
       .dc-emoji { font-size: 3rem; margin-bottom: .25rem; }
       .dc-desc { font-size: .82rem; line-height: 1.34; }
     }
-    @media (max-width: 420px) {
-      .cd-scene { width: min(390px, 96vw); height: min(640px, 80vh); }
-      .dc-emoji { font-size: 3.2rem; }
-      .dc-name { font-size: 1.22rem; }
-      .dc-desc { font-size: .84rem; line-height: 1.36; }
-      /* Mobile: buttons outside the card */
+    @media (max-width: 520px) {
+      /* Carte plus étroite sur téléphone ; boutons alignés sur la même largeur */
+      .cd-scene { width: min(292px, calc(100vw - 2.25rem)); height: min(500px, 58vh); }
+      .cd-face { padding: 1.05rem 0.95rem; }
+      .cd-back { overflow-y: hidden; }
+      .dc-emoji { font-size: 3.35rem; margin-bottom: .35rem; }
+      .dc-name { font-size: 1.2rem; margin-bottom: .4rem; }
+      .dc-desc {
+        font-size: .88rem;
+        line-height: 1.42;
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        text-align: left;
+      }
+      /* Mobile: boutons sous la carte (toujours visibles après scroll de l’overlay) */
       .dc-actions-in { display: none; }
-      .dc-actions-out { display: flex; }
-      .dc-actions { gap: .45rem; }
-      .dc-actions-out { margin-top: .35rem; }
-      .dc-actions-out .btn { width: 100%; }
-      /* "Jouer maintenant" a bit lower and less wide */
-      .dc-actions-out .btn.btn-gold { width: auto; min-width: 0; padding: .72rem 1.25rem; margin-top: .25rem; }
+      .dc-actions-out {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: .5rem;
+        margin-top: .5rem;
+        margin-bottom: .25rem;
+        width: min(292px, calc(100vw - 2.25rem));
+        max-width: calc(100vw - 2.25rem);
+        box-sizing: border-box;
+      }
+      .dc-actions-out .btn { width: 100%; max-width: 100%; box-sizing: border-box; }
+      .dc-actions-out .btn.btn-gold { width: 100%; max-width: 100%; padding: .82rem 1rem; margin-top: 0; }
     }
     .cd-back.rarity-common { border: 2px solid #94a3b8; }
     .rarity-common .dc-rarity { color: #94a3b8; }
@@ -1343,7 +1491,6 @@
       .game-topbar { padding: .5rem .7rem; gap: .5rem; }
       .dice-display { width: 90px; height: 90px; font-size: 2.2rem; }
       .sidebar-player { min-width: 140px; }
-      .cd-scene { width: 220px; height: 320px; }
       .cd-front-deco { font-size: 3.5rem; }
       .ho-name { font-size: 1.5rem; }
       /* Fix overflow: round1 2-col grid should stack on small screens */
@@ -1552,7 +1699,10 @@
           <div class="dice-display" id="gameDice">?</div>
           <div id="rollModPill" style="display:none"></div>
           <p class="range-info" id="gameRange"></p>
-          <button class="btn btn-gold" id="gameRollBtn" onclick="rollGameDice()">🎲 Lancer le dé</button>
+          <div class="game-roll-actions" id="gameRollActions">
+            <button type="button" class="btn btn-gold" id="gameRollBtn" onclick="rollGameDice()">🎲 Lancer le dé</button>
+            <button type="button" class="btn btn-min" id="gamePayDrawBtn" onclick="payRerollDrawPlayable()">Pioche (−1 🎲)</button>
+          </div>
           <p class="reroll-status" id="rerollStatus" style="display:none"></p>
         </div>
         <div class="section" id="gameInventory">
@@ -1791,11 +1941,11 @@ const PLAYABLE_CARDS = [
   { id: 'eliminate3', name: 'Élagage', emoji: '🗑️', rarity: 'common', type: 'active', desc: 'Avant de lancer le dé, élimine jusqu’à 3 éléments de TA boîte (personnel). Idéal pour virer des choix que tu ne veux jamais voir.' },
   { id: 'second_regard', name: 'Second regard', emoji: '👀', rarity: 'common', type: 'active', desc: 'Après ton premier loot, tu peux en révéler un 2e (sans éliminer). Tu choisis ensuite lequel garder.' },
   { id: 'petit_sabotage', name: 'Petit sabotage', emoji: '🧨', rarity: 'common', type: 'active', desc: 'Choisis un joueur : ce round, 1 élément est retiré de SA boîte (personnel, au hasard).' },
-  { id: 'pioche_sacree', name: 'Pioche sacrée', emoji: '🙏', rarity: 'common', type: 'active', desc: 'Lance 1d100, débloque des raretés selon ton score, puis choisis une carte : elle rejoint ta main et reste jusqu’à ce que tu la joues (pas perdue en fin de tour).' },
+  { id: 'pioche_sacree', name: 'Pioche sacrée', emoji: '🙏', rarity: 'rare', type: 'active', desc: 'Lance 1d100, débloque des raretés selon ton score, puis choisis une carte : elle rejoint ta main et reste jusqu’à ce que tu la joues (pas perdue en fin de tour).' },
   { id: 'above_average', name: 'Above average', emoji: '📈', rarity: 'common', type: 'active', desc: 'Lance 1d100 : si ≥ 50, choisis une carte Commune ou Rare : elle rejoint ta main et reste jusqu’à ce que tu la joues (pas perdue en fin de tour).' },
   { id: 'ticket_caisse', name: 'Ticket de caisse', emoji: '🧾', rarity: 'common', type: 'active', desc: 'Joue-la ce tour-ci : au début de ton prochain tour, tu reçois une carte Rare aléatoire en main (passive activée tout de suite si c’en est une).' },
   { id: 'pari_minable', name: 'Pari minable', emoji: '🎯', rarity: 'common', type: 'active', desc: 'Avant de lancer le dé ce tour : choisis Pair ou Impair sur le numéro affiché par le dé . Gagné : +1 relance. Perdu : −1 relance (min 0).' },
-  { id: 'reroll_back', name: 'Deuxième souffle', emoji: '🎲', rarity: 'rare', type: 'active', desc: 'Récupère des relances : si tu n’as pas encore relancé, tu passes à 2. Sinon tu reviens à 1.' },
+  { id: 'reroll_back', name: 'Deuxième souffle', emoji: '🎲', rarity: 'common', type: 'active', desc: 'Récupère des relances : si tu as au moins 1 relance restante, tu remontes à 2. Sinon tu gagnes 1 relance.' },
   { id: 'double_pioche', name: 'Double pioche', emoji: '🎴', rarity: 'rare', type: 'active', desc: 'Ce tour, tu lances 2 fois (sans éliminer) et tu choisis le meilleur résultat à garder.' },
   { id: 'premeditation', name: 'Préméditation', emoji: '🧠', rarity: 'rare', type: 'active', desc: 'Avant le dé : devine Good ou Bad sur une carte secrète de ta boîte. Raté → carte perdue. Réussi → garder le loot (fin du tour), +1 relance ou 1 Rare.' },
   { id: 'fifty', name: '50%', emoji: '⚖️', rarity: 'rare', type: 'active', desc: 'Choisis 3 Good et 3 Bad. Ton prochain loot de ce tour sera forcément dans ces 6 cartes.' },
@@ -1808,17 +1958,22 @@ const PLAYABLE_CARDS = [
   { id: 'gel', name: 'Gel', emoji: '🧊', rarity: 'epic', type: 'active', desc: 'Choisis un joueur : lors de son prochain tour, il ne peut pas jouer de cartes jouables.' },
   { id: 'miasme', name: 'Miasme', emoji: '☣️', rarity: 'epic', type: 'active', desc: 'Tous les adversaires gagnent +35% de chances (cumulable, max ~98%) de piocher un loot défavorable (Good/Bad) à chaque jet de leur tour, en plus des autres malus/bonus.' },
   { id: 'partage', name: 'Partage ?', emoji: '🤝', rarity: 'epic', type: 'active', desc: 'Copie une carte au hasard dans la main d’un adversaire (réplique prête à être jouée ce tour). Si sa main est vide ou si personne n’a de carte, tu gagnes une carte aléatoire.' },
-  { id: 'infinite_reroll', name: 'Boucle temporelle', emoji: '♾️', rarity: 'legendary', type: 'active', desc: 'Relances illimitées ce tour. Les cartes relancées NE sont pas éliminées : elles retournent dans la boîte.' },
+  { id: 'main_du_destin', name: 'Main du destin', emoji: '🖐️', rarity: 'epic', type: 'active', desc: '+2 relances bonus, 2 pioches payantes Rare+ (50/30/20%). Bonus ou relances inutilisés seront perdus à la fin du tour.' },
+  { id: 'infinite_reroll', name: 'Boucle temporelle', emoji: '♾️', rarity: 'legendary', type: 'active', desc: 'Relances illimitées ce tour (cartes relancées : retour boîte). 3 pioches « Pioche » gratuites, puis chaque pioche coûte 1 🎲 comme d’habitude.' },
   { id: 'couronne', name: 'Couronne', emoji: '👑', rarity: 'legendary', type: 'active', desc: 'Ce tour, tu choisis ton loot parmi 3 résultats tirés au hasard.' },
   { id: 'troisieme_oeil', name: 'Troisième œil', emoji: '🔎', rarity: 'legendary', type: 'active', desc: 'Ce tour uniquement, tu peux voir la main + les résultats (Personne/Action/Lieu) de tout le monde (eux ne voient rien de plus).' },
   { id: 'echange_de_corps', name: 'Échange de corps', emoji: '🧬', rarity: 'legendary', type: 'active', desc: 'Choisis un joueur : vous échangez complètement vos “places” (inventaires, main, relances…). Bouclier protège aussi de ça.' },
   { id: 'blinded', name: 'Blinded', emoji: '🕶️', rarity: 'legendary', type: 'active', desc: 'Ce round, tous les joueurs (sauf protégés) ne voient pas leurs résultats de loot. Tout reste caché jusqu’au prochain round.' },
   { id: 'flashback', name: 'FlashBack', emoji: '⏪', rarity: 'legendary', type: 'active', desc: 'Tout le monde revient au round 1 et doit recommencer à piocher, les cartes jouables ne sont pas éliminées.' },
+  { id: 'maelstrom', name: 'Maelström', emoji: '🌀', rarity: 'legendary', type: 'active', desc: 'Chaque joueur (sauf toi si tu le refuses) repioche ses résultats déjà obtenus : 1 Personne, 1 Action et 1 Lieu.' },
   { id: 'sandevistan', name: 'Sandevistan', emoji: '⏱️', rarity: 'legendary', type: 'active', desc: 'Ralentis le temps : vole au hasard 1 carte jouable dans la main de chaque adversaire (s’il en a), et tu gagnes la Bénédiction pour ce tour.' },
   { id: 'bad_luck', name: 'Malédiction', emoji: '🌑', rarity: 'passive', type: 'passive', desc: 'Ce tour, 25% de chance que ton résultat devienne défavorable (inversé selon ta Personne Good/Bad).', effect: 'force_bad' },
   { id: 'good_luck', name: 'Bénédiction', emoji: '✨', rarity: 'passive', type: 'passive', desc: 'Ce tour, 25% de chance que ton résultat devienne favorable (inversé selon ta Personne Good/Bad).', effect: 'force_good' },
   { id: 'shield', name: 'Bouclier', emoji: '🛡️', rarity: 'passive', type: 'passive', desc: 'Protection jusqu’à la fin du round : tu es immunisé contre Échange, Blinded et Échange de corps.', effect: 'shield' }
 ];
+
+/** Sous Boucle temporelle : pioches payantes sans −1 🎲 avant d’épuiser ce quota */
+const LOOP_FREE_PIOCHE_MAX = 3;
 
 const RARITY_WEIGHTS = [
   { rarity: 'common', weight: 40 },
@@ -1829,7 +1984,7 @@ const RARITY_WEIGHTS = [
 ];
 
 /** Cartes avec FX plein écran (journal / synchro online utilise lastActiveCardId) */
-var CARD_PLAY_FX_CARD_IDS = ['sandevistan', 'blinded', 'echange_de_corps', 'troisieme_oeil', 'infinite_reroll', 'couronne', 'flashback', 'miasme', 'gel'];
+var CARD_PLAY_FX_CARD_IDS = ['sandevistan', 'blinded', 'echange_de_corps', 'troisieme_oeil', 'infinite_reroll', 'couronne', 'flashback', 'maelstrom', 'miasme', 'gel'];
 var CARD_PLAY_FX_LABELS = {
   sandevistan: { icon: '⏱️', title: 'SANDEVISTAN' },
   blinded: { icon: '🕶️', title: 'BLINDED' },
@@ -1838,6 +1993,7 @@ var CARD_PLAY_FX_LABELS = {
   infinite_reroll: { icon: '♾️', title: 'BOUCLE TEMPORELLE' },
   couronne: { icon: '👑', title: 'COURONNE' },
   flashback: { icon: '⏪', title: 'FLASHBACK' },
+  maelstrom: { icon: '🌀', title: 'MAELSTRÖM' },
   miasme: { icon: '☣️', title: 'MIASME' },
   gel: { icon: '🧊', title: 'GEL' }
 };
@@ -1854,10 +2010,46 @@ function drawCard() {
   return Object.assign({}, pool[Math.floor(Math.random() * pool.length)]);
 }
 
+/** RTDB peut renvoyer les mains comme {0:…,1:…} : même logique que dans onlineApplyViewState. */
+function handArrayFromFirebase(h) {
+  if (Array.isArray(h)) return h;
+  if (h && typeof h === 'object') {
+    return Object.keys(h)
+      .filter(function(k) { return String(Number(k)) === k; })
+      .sort(function(a, b) { return Number(a) - Number(b); })
+      .map(function(k) { return h[k]; })
+      .filter(function(x) { return x != null; });
+  }
+  return [];
+}
+
 function drawRandomRareCardCopy() {
   var pool = PLAYABLE_CARDS.filter(function(c) { return c && c.rarity === 'rare'; });
   if (!pool.length) return null;
   return JSON.parse(JSON.stringify(pool[Math.floor(Math.random() * pool.length)]));
+}
+
+/** Main du destin : pioche pondérée Rare 50 % · Épique 30 % · Légendaire 20 % */
+function drawCardMainDuDestin() {
+  var r = Math.random() * 100;
+  var tier = 'legendary';
+  if (r < 50) tier = 'rare';
+  else if (r < 80) tier = 'epic';
+  var pool = PLAYABLE_CARDS.filter(function(c) { return c && c.rarity === tier; });
+  if (!pool.length) return drawCard();
+  return Object.assign({}, pool[Math.floor(Math.random() * pool.length)]);
+}
+
+function playerSpendableRerollsTotal(p) {
+  if (!p) return 0;
+  return (Number(p.rerollsLeft || 0) || 0) + (Number(p.mainDuDestinBonusRerolls || 0) || 0);
+}
+
+function consumeOneRerollFromPlayer(p) {
+  if (!p || p.infiniteReroll) return;
+  var b = Number(p.mainDuDestinBonusRerolls || 0) || 0;
+  if (b > 0) p.mainDuDestinBonusRerolls = b - 1;
+  else p.rerollsLeft = Math.max(0, (Number(p.rerollsLeft || 0) || 0) - 1);
 }
 
 const RARITY_META = {
@@ -1890,6 +2082,7 @@ let lastActiveCardPlayerId = null;
 let lastActiveCardData = null;
 let pending = null;
 let lastPassiveDraw = null;
+let lastHandGainReveal = null;
 let lastJackpotDraw = null;
 let lastTicketDraw = null;
 let lastTicketDrawBatch = null;
@@ -1928,6 +2121,7 @@ const ONLINE = {
   lastSeenPartageCasterKey: null,
   lastSeenVolMainCasterKey: null,
   lastSeenNostalgieTargetKey: null,
+  lastSeenMaelstromKey: null,
   lastSeenSandevistanCasterKey: null,
   lastSeenSandevistanVictimKey: null,
   lastSeenTicketDrawKey: null,
@@ -1953,6 +2147,7 @@ const ONLINE = {
   lastSeenGlobalPlayKey: null,
   lastSeenCardFxKey: null,
   lastSeenPassiveDrawKey: null,
+  lastSeenHandGainRevealKey: null,
   lastSeenDrawnCardId: null,
   lastSeenJackpotDrawKey: null,
   lastSeenPremedFailKey: null,
@@ -2174,12 +2369,13 @@ function onlineApplyViewState(vs) {
                 color: color,
                 clientToken: getClientToken(),
                 picks: [[],[],[]],
-                rerollsLeft: 1,
+                rerollsLeft: 2,
                 hand: [],
                 drawnCard: null,
                 activePassives: [],
                 shieldedRound: false,
                 infiniteReroll: false,
+                loopPiocheFreeLeft: 0,
                 banned: [],
                 secondLookArmed: false,
                 secondLookUsed: false,
@@ -2198,7 +2394,9 @@ function onlineApplyViewState(vs) {
                 frozenTurns: 0,
                 blindedTurns: 0,
                 rollRaw: 0,
-                rollDisplay: 0
+                rollDisplay: 0,
+                mainDuDestinBonusRerolls: 0,
+                mainDuDestinPremiumDraws: 0
               });
               return st;
             }).then(function() {
@@ -2230,7 +2428,8 @@ function onlineApplyViewState(vs) {
         if (!Array.isArray(p.banned)) p.banned = [];
         if (!Array.isArray(p.turnLog)) p.turnLog = asArray(p.turnLog);
         if (!Array.isArray(p.publicTurnLog)) p.publicTurnLog = asArray(p.publicTurnLog);
-        if (typeof p.rerollsLeft !== 'number') p.rerollsLeft = 1;
+        if (typeof p.rerollsLeft !== 'number') p.rerollsLeft = 2;
+        if (typeof p.loopPiocheFreeLeft !== 'number') p.loopPiocheFreeLeft = 0;
         if (typeof p.pendingSabotageBan !== 'number') p.pendingSabotageBan = 0;
         if (typeof p.frozenTurns !== 'number') p.frozenTurns = 0;
         if (typeof p.blindedTurns !== 'number') p.blindedTurns = 0;
@@ -2248,6 +2447,10 @@ function onlineApplyViewState(vs) {
         p.pariMinableFlash = sanitizePariMinableFlash(p.pariMinableFlash);
         if (typeof p.rollRaw !== 'number') p.rollRaw = 0;
         if (typeof p.rollDisplay !== 'number') p.rollDisplay = 0;
+        if (typeof p.mainDuDestinBonusRerolls !== 'number') p.mainDuDestinBonusRerolls = Number(p.mainDuDestinBonusRerolls || 0) || 0;
+        if (typeof p.mainDuDestinPremiumDraws !== 'number') p.mainDuDestinPremiumDraws = Number(p.mainDuDestinPremiumDraws || 0) || 0;
+        p.mainDuDestinBonusRerolls = Math.max(0, Math.floor(Number(p.mainDuDestinBonusRerolls) || 0));
+        p.mainDuDestinPremiumDraws = Math.max(0, Math.floor(Number(p.mainDuDestinPremiumDraws) || 0));
         if (!p.color) p.color = '#94a3b8';
         if (!p.name) p.name = 'Joueur';
 
@@ -2376,11 +2579,12 @@ function onlineApplyViewState(vs) {
     if (ONLINE.enabled && pending && String(vs.phase || '') === 'game') {
       var myIdPr = String(ONLINE.playerId || '');
       var byPr = String(pending.byPid || '');
-      if (byPr !== myIdPr && (pending.type === 'premeditation' || pending.type === 'premeditation_reward' || pending.type === 'pari_minable')) {
+      if (byPr !== myIdPr && (pending.type === 'premeditation' || pending.type === 'premeditation_reward' || pending.type === 'pari_minable' || pending.type === 'maelstrom_choice')) {
         pending = { type: pending.type, byPid: pending.byPid, ts: pending.ts };
       }
     }
     lastPassiveDraw = vs.lastPassiveDraw || null;
+    lastHandGainReveal = vs.lastHandGainReveal || null;
     lastJackpotDraw = vs.lastJackpotDraw || null;
     lastTicketDraw = vs.lastTicketDraw || null;
     lastTicketDrawBatch = vs.lastTicketDrawBatch || null;
@@ -2597,6 +2801,35 @@ function onlineApplyViewState(vs) {
       }
     }
 
+    if (ONLINE.enabled && vs.phase === 'game' && lastActiveCardId === 'maelstrom' && lastActiveCardData &&
+        lastActiveCardData.changesByPid && typeof lastActiveCardData.changesByPid === 'object') {
+      var mkMael = 'm|' + String(lastActiveCardData.ts || 0) + '|' + String(lastActiveCardPlayerId || '');
+      if (mkMael && ONLINE.lastSeenMaelstromKey !== mkMael) {
+        ONLINE.lastSeenMaelstromKey = mkMael;
+        var casterMa = (players || []).find(function(pp) { return pp && String(pp.id || '') === String(lastActiveCardPlayerId || ''); }) || null;
+        var cnMa = casterMa && casterMa.name ? String(casterMa.name) : 'Un joueur';
+        var myPidMa = String(ONLINE.playerId || '');
+        var myRowsMa = lastActiveCardData.changesByPid[myPidMa];
+        window.clearTimeout(ONLINE.delayedModalTimers.maelstrom);
+        ONLINE.delayedModalTimers.maelstrom = window.setTimeout(function() {
+          if (myRowsMa && myRowsMa.length) {
+            showMaelstromSelfModal(cnMa, myRowsMa, !!lastActiveCardData.includeSelf);
+          } else {
+            var iAmCasterMa = String(lastActiveCardPlayerId || '') === String(ONLINE.playerId || '');
+            if (iAmCasterMa) {
+              if (lastActiveCardData.includeSelf) {
+                showToast('🌀 Maelström : tu as choisi d’entrer dans le tourbillon.', 'success');
+              } else {
+                showToast('🌀 Maelström : les adversaires ont repioché — tu n’as pas été affecté.', 'success');
+              }
+            } else {
+              showToast('🌀 Maelström par ' + cnMa + ' — aucun de tes résultats n’a été remplacé.', 'success');
+            }
+          }
+        }, 3400);
+      }
+    }
+
     if (ONLINE.enabled) {
       if (Array.isArray(vs.reactionFeed)) {
         reactionFeed = vs.reactionFeed.slice();
@@ -2723,6 +2956,7 @@ function onlineApplyViewState(vs) {
       if (prevPhase !== 'game' || prevTurnIdx !== currentTurnIdx || prevRound !== currentRound) {
         ONLINE.lastSeenEntityId = null;
         ONLINE.lastSeenDrawnCardId = null;
+        ONLINE.lastSeenHandGainRevealKey = null;
         ONLINE.pendingHandoffKey = null;
         // Don't re-open old "active card result" modals (Above average / Pioche sacrée)
         // when the turn changes. Mark the current server key as already seen.
@@ -2751,6 +2985,8 @@ function onlineApplyViewState(vs) {
       if (currentPid && String(currentPid) !== String(ONLINE.playerId || '')) {
         document.getElementById('gameRollBtn').style.display = '';
         document.getElementById('gameRollBtn').disabled = true;
+        var payOther = document.getElementById('gamePayDrawBtn');
+        if (payOther) payOther.style.display = 'none';
         document.getElementById('rerollStatus').style.display = '';
         var curP = players.find(function(pp) { return pp && pp.id === currentPid; });
         document.getElementById('rerollStatus').textContent = 'C’est à ' + (curP ? curP.name : 'un joueur') + ' de jouer…';
@@ -2799,6 +3035,16 @@ function onlineApplyViewState(vs) {
           ONLINE.lastSeenPassiveDrawKey = pkey;
           cardDrawPending = true;
           showCardDraw(pl, lastPassiveDraw.card, { displayOnly: true, autoCloseMs: 900 });
+        }
+      }
+
+      // Pioche payante / gain en main : même animation retournement (carte déjà en main côté serveur)
+      if (ONLINE.enabled && lastHandGainReveal && String(lastHandGainReveal.pid || '') === String(ONLINE.playerId || '') && lastHandGainReveal.card && lastHandGainReveal.card.id) {
+        var hgKey = String(lastHandGainReveal.ts || 0) + '|' + String(lastHandGainReveal.card.id || '');
+        if (hgKey && ONLINE.lastSeenHandGainRevealKey !== hgKey) {
+          ONLINE.lastSeenHandGainRevealKey = hgKey;
+          cardDrawPending = true;
+          showCardDraw(pl, lastHandGainReveal.card, { alreadyInHand: true });
         }
       }
 
@@ -2965,6 +3211,7 @@ function onlineApplyViewState(vs) {
           }
           else if (pending.type === 'fifty') showFiftyPicker(mep);
           else if (pending.type === 'nostalgie') showNostalgie(mep);
+          else if (pending.type === 'maelstrom_choice') showMaelstromChoiceUI(mep);
           else if (pending.type === 'exchange') showExchange(mep);
           else if (pending.type === 'vol_main') showVolDeMain(mep);
           else if (pending.type === 'gel') showGel(mep);
@@ -3204,18 +3451,20 @@ function createRoomOnline(m) {
     lastTicketDraw: null,
     lastTicketDrawBatch: null,
     lastPremeditationReward: null,
+    lastHandGainReveal: null,
     players: [{
       id: playerId,
       name: name,
       color: color,
       clientToken: clientToken,
       picks: [[],[],[]],
-      rerollsLeft: 1,
+      rerollsLeft: 2,
       hand: [],
       drawnCard: null,
       activePassives: [],
       shieldedRound: false,
       infiniteReroll: false,
+      loopPiocheFreeLeft: 0,
       banned: [],
       secondLookArmed: false,
       secondLookUsed: false,
@@ -3234,7 +3483,9 @@ function createRoomOnline(m) {
       frozenTurns: 0,
       blindedTurns: 0,
       rollRaw: 0,
-      rollDisplay: 0
+      rollDisplay: 0,
+      mainDuDestinBonusRerolls: 0,
+      mainDuDestinPremiumDraws: 0
     }],
     turnOrder: [],
     orderPhaseIdx: 0,
@@ -3328,12 +3579,13 @@ function joinRoomOnline() {
         color: color,
         clientToken: clientToken,
         picks: [[],[],[]],
-        rerollsLeft: 1,
+        rerollsLeft: 2,
         hand: [],
         drawnCard: null,
         activePassives: [],
         shieldedRound: false,
         infiniteReroll: false,
+        loopPiocheFreeLeft: 0,
         banned: [],
         secondLookArmed: false,
         secondLookUsed: false,
@@ -3352,7 +3604,9 @@ function joinRoomOnline() {
         frozenTurns: 0,
       blindedTurns: 0,
         rollRaw: 0,
-        rollDisplay: 0
+        rollDisplay: 0,
+        mainDuDestinBonusRerolls: 0,
+        mainDuDestinPremiumDraws: 0
       });
       return ref.child('state').set(st);
     })
@@ -3476,6 +3730,7 @@ function onlineAction(action, payload) {
       st.lastTicketDraw = null;
       st.lastTicketDrawBatch = null;
       st.lastPremeditationReward = null;
+      st.lastHandGainReveal = null;
       st.publicGameLog = [];
       st.chatFeed = [];
       st.reactionFeed = [];
@@ -3484,12 +3739,13 @@ function onlineAction(action, payload) {
       (st.players || []).forEach(function(p) {
         if (!p) return;
         p.picks = [[], [], []];
-        p.rerollsLeft = 1;
+        p.rerollsLeft = 2;
         p.hand = [];
         p.drawnCard = null;
         p.activePassives = [];
         p.shieldedRound = false;
         p.infiniteReroll = false;
+        p.loopPiocheFreeLeft = 0;
         p.banned = [];
         p.secondLookArmed = false;
         p.secondLookUsed = false;
@@ -3511,6 +3767,8 @@ function onlineAction(action, payload) {
         p.rollRaw = 0;
         p.rollDisplay = 0;
         p.lastPlayableDrawRound = -1;
+        p.mainDuDestinBonusRerolls = 0;
+        p.mainDuDestinPremiumDraws = 0;
       });
       return st;
     }
@@ -3591,6 +3849,7 @@ function onlineAction(action, payload) {
       st.lastTicketDraw = null;
       st.lastTicketDrawBatch = null;
       st.lastPremeditationReward = null;
+      st.lastHandGainReveal = null;
       st.revealHands = null;
       st.revealResults = null;
       var rmStart = (typeof ROUND_META !== 'undefined' && ROUND_META[0]) ? ROUND_META[0] : null;
@@ -3675,13 +3934,14 @@ function onlineAction(action, payload) {
       st.revealResults = null;
       st.lastPassiveDraw = null;
       st.lastJackpotDraw = null;
+      st.lastHandGainReveal = null;
       st.blindedRound = null;
       st.blindedBy = null;
       st.blindedByPid = null;
       (st.players || []).forEach(function(pp) {
         if (!pp) return;
         pp.picks = [[], [], []];
-        pp.rerollsLeft = 1;
+        pp.rerollsLeft = 2;
         pp.rollRaw = 0;
         pp.rollDisplay = 0;
         pp.banned = [];
@@ -3689,6 +3949,7 @@ function onlineAction(action, payload) {
         pp.lastPlayableDrawRound = -1;
         pp.drawnCard = null;
         pp.infiniteReroll = false;
+        pp.loopPiocheFreeLeft = 0;
         pp.secondLookArmed = false;
         pp.secondLookUsed = false;
         pp.doublePiocheArmed = false;
@@ -3702,10 +3963,12 @@ function onlineAction(action, payload) {
         pp.pariMinableFlash = null;
         pp.activePassives = [];
         pp.shieldedRound = false;
+        pp.mainDuDestinBonusRerolls = 0;
+        pp.mainDuDestinPremiumDraws = 0;
       });
       syncReactionQuotaToTurn();
       publishCardPlay(st, caster, card, {
-        note: 'Retour au round 1 : inventaires Personne/Action/Lieu effacés pour tous, boîte Personne refaite, relances à 1 — chacun repioche 2 cartes sur 4.'
+        note: 'Retour au round 1 : inventaires Personne/Action/Lieu effacés pour tous, boîte Personne refaite, relances à 2 — chacun repioche 2 cartes sur 4.'
       });
     }
     function getPlayerBoxFromState(p) {
@@ -3812,6 +4075,7 @@ function onlineAction(action, payload) {
       if (!p) return;
       // Reset per-turn fields (match beginTurn intent)
       p.infiniteReroll = false;
+      p.loopPiocheFreeLeft = 0;
       p.activePassives = [];
       p.secondLookArmed = false;
       p.secondLookUsed = false;
@@ -3938,7 +4202,8 @@ function onlineAction(action, payload) {
       if (st.phase !== 'game') return st;
       if (!isMyTurn()) return st;
       if (st.currentEntity) return st;
-      if (st.pending && st.pending.type === 'pari_minable') return st;
+      var pendRoll = st.pending && st.pending.type ? String(st.pending.type) : '';
+      if (pendRoll === 'pari_minable' || pendRoll === 'round1_pick2of4' || pendRoll === 'double_pioche_choice' || pendRoll === 'maelstrom_choice') return st;
       const p = currentPlayer();
       if (!p) return st;
       const pBox = getPlayerBoxFromState(p);
@@ -3977,6 +4242,60 @@ function onlineAction(action, payload) {
       return st;
     }
 
+    if (action === 'turn:payRerollDraw') {
+      if (st.phase !== 'game') return st;
+      if (!isMyTurn()) return st;
+      if (st.currentEntity) return st;
+      const p = currentPlayer();
+      if (!p) return st;
+      if (p.frozenTurns && p.frozenTurns > 0) return st;
+      if (p.drawnCard && p.drawnCard.id) return st;
+      var pendT = st.pending && st.pending.type ? String(st.pending.type) : '';
+      if (pendT === 'pari_minable' || pendT === 'round1_pick2of4' || pendT === 'double_pioche_choice' || pendT === 'maelstrom_choice') return st;
+      var premLeft = Number(p.mainDuDestinPremiumDraws || 0) || 0;
+      var cBuy = (premLeft > 0) ? drawCardMainDuDestin() : drawCard();
+      if (!cBuy || !cBuy.id) return st;
+      var loopFreeBuy = (p.infiniteReroll && (Number(p.loopPiocheFreeLeft || 0) || 0) > 0)
+        ? (Number(p.loopPiocheFreeLeft || 0) || 0)
+        : 0;
+      if (loopFreeBuy > 0) {
+        p.loopPiocheFreeLeft = Math.max(0, loopFreeBuy - 1);
+      } else {
+        var totBuy = (Number(p.rerollsLeft || 0) || 0) + (Number(p.mainDuDestinBonusRerolls || 0) || 0);
+        if (totBuy <= 0) return st;
+        var bBuy = Number(p.mainDuDestinBonusRerolls || 0) || 0;
+        if (bBuy > 0) p.mainDuDestinBonusRerolls = bBuy - 1;
+        else p.rerollsLeft = Math.max(0, (Number(p.rerollsLeft || 0) || 0) - 1);
+      }
+      if (premLeft > 0) {
+        p.mainDuDestinPremiumDraws = Math.max(0, premLeft - 1);
+      }
+      p.hand = p.hand || [];
+      if (cBuy.type === 'passive') {
+        var passiveTsBuy = Date.now();
+        st.lastPassiveDraw = { pid: String(p.id || ''), card: cBuy, ts: passiveTsBuy };
+        applyPassiveEffect(p, cBuy);
+        pushTurnLog(p, cBuy, 'activated');
+        publishCardPlay(st, p, cBuy, { ts: passiveTsBuy, boughtWithReroll: true });
+      } else {
+        p.hand.push(cBuy);
+        pushTurnLog(p, cBuy, 'gained');
+        st.lastHandGainReveal = {
+          pid: String(p.id || ''),
+          card: JSON.parse(JSON.stringify(cBuy)),
+          ts: Date.now()
+        };
+      }
+      return st;
+    }
+
+    if (action === 'ui:clearHandGainReveal') {
+      if (!st.lastHandGainReveal) return st;
+      if (String(ONLINE.playerId || '') !== String(st.lastHandGainReveal.pid || '')) return st;
+      st.lastHandGainReveal = null;
+      return st;
+    }
+
     if (action === 'turn:double_pioche_choose') {
       if (st.phase !== 'game') return st;
       if (!isMyTurn()) return st;
@@ -3996,6 +4315,27 @@ function onlineAction(action, payload) {
 
     function commitKeepAndAdvanceTurn(st, p) {
       if (!st || !p || !st.currentEntity) return;
+      var mdBr0 = Number(p.mainDuDestinBonusRerolls || 0) || 0;
+      var mdPd0 = Number(p.mainDuDestinPremiumDraws || 0) || 0;
+      if (mdBr0 > 0 || mdPd0 > 0) {
+        p.mainDuDestinBonusRerolls = 0;
+        p.mainDuDestinPremiumDraws = 0;
+        appendPublicGameLog(st, {
+          kind: 'milestone',
+          ts: Date.now(),
+          note: (p.name || 'Joueur') + ' : bonus Main du destin non utilisé ce tour (perdu).',
+          round: Number(st.currentRound || 0) || 0,
+          turnIdx: Number(st.currentTurnIdx || 0) || 0,
+          pid: String(p.id || ''),
+          pname: p.name ? String(p.name) : '',
+          cardId: null,
+          cardName: null,
+          cardEmoji: null,
+          rarity: null,
+          targetName: null,
+          targetId: null
+        });
+      }
       p.picks = p.picks || [[],[],[]];
       const r = Number(st.currentRound || 0);
       p.picks[r] = p.picks[r] || [];
@@ -4087,6 +4427,7 @@ function onlineAction(action, payload) {
       const p = currentPlayer();
       if (!p) return st;
       if (!st.currentEntity) return st;
+      if (st.pending && String(st.pending.type || '') === 'maelstrom_choice') return st;
       commitKeepAndAdvanceTurn(st, p);
       return st;
     }
@@ -4097,11 +4438,15 @@ function onlineAction(action, payload) {
       const p = currentPlayer();
       if (!p) return st;
       if (!st.currentEntity) return st;
+      if (st.pending && String(st.pending.type || '') === 'maelstrom_choice') return st;
       p.pariMinableFlash = null;
       var isInf = !!p.infiniteReroll;
-      if (!isInf && (p.rerollsLeft || 0) <= 0) return st;
       if (!isInf) {
-        p.rerollsLeft = (p.rerollsLeft || 0) - 1;
+        var totR = (Number(p.rerollsLeft || 0) || 0) + (Number(p.mainDuDestinBonusRerolls || 0) || 0);
+        if (totR <= 0) return st;
+        var bR = Number(p.mainDuDestinBonusRerolls || 0) || 0;
+        if (bR > 0) p.mainDuDestinBonusRerolls = bR - 1;
+        else p.rerollsLeft = Math.max(0, (Number(p.rerollsLeft || 0) || 0) - 1);
       }
       // Chaos mode: Round 1 reroll adds the current person to your picks (extra),
       // then rerolls for a new result.
@@ -4233,6 +4578,12 @@ function onlineAction(action, payload) {
         publishCardPlay(st, p, card, {});
         return;
       }
+      if (card.id === 'main_du_destin') {
+        p.mainDuDestinBonusRerolls = 2;
+        p.mainDuDestinPremiumDraws = 2;
+        publishCardPlay(st, p, card, {});
+        return;
+      }
       if (card.id === 'jackpot') {
         p.hand = p.hand || [];
         var jts = Date.now();
@@ -4255,7 +4606,12 @@ function onlineAction(action, payload) {
         publishCardPlay(st, p, card, { ts: Date.now() });
         return;
       }
-      if (card.id === 'infinite_reroll') { p.infiniteReroll = true; publishCardPlay(st, p, card, {}); return; }
+      if (card.id === 'infinite_reroll') {
+        p.infiniteReroll = true;
+        p.loopPiocheFreeLeft = LOOP_FREE_PIOCHE_MAX;
+        publishCardPlay(st, p, card, {});
+        return;
+      }
       if (card.id === 'blinded') {
         // Apply to the NEXT turn of every opponent (not just the current round).
         (st.players || []).forEach(function(pp) {
@@ -4335,6 +4691,7 @@ function onlineAction(action, payload) {
       }
       if (card.id === 'fifty') { ensurePending('fifty', { card: card }); return; }
       if (card.id === 'nostalgie') { ensurePending('nostalgie', { card: card }); return; }
+      if (card.id === 'maelstrom') { ensurePending('maelstrom_choice', { card: card }); return; }
       if (card.id === 'exchange') { ensurePending('exchange', { card: card }); return; }
       if (card.id === 'vol_main') { ensurePending('vol_main', { card: card }); return; }
       if (card.id === 'gel') { ensurePending('gel', { card: card }); return; }
@@ -4573,7 +4930,7 @@ function onlineAction(action, payload) {
       if (!p) return st;
       // same as applying card effect directly (if no candidates -> random)
       var others = (st.players || []).filter(function(pp) { return pp && String(pp.id || '') !== String(p.id || ''); });
-      var anyHave = others.some(function(pp) { return pp.hand && pp.hand.length > 0; });
+      var anyHave = others.some(function(pp) { return handArrayFromFirebase(pp.hand).length > 0; });
       if (!anyHave) {
         var rnd = drawCard();
         p.hand = p.hand || [];
@@ -4610,15 +4967,17 @@ function onlineAction(action, payload) {
       if (!t3) { clearPending(); return st; }
       p.hand = p.hand || [];
       var pc6 = st.pending && st.pending.card ? st.pending.card : null;
-      var emptyHand = !Array.isArray(t3.hand) || t3.hand.length === 0;
+      var t3HandArr = handArrayFromFirebase(t3.hand);
+      var emptyHand = t3HandArr.length === 0;
       var gained = null;
+      var src = null;
       if (emptyHand) {
         var rndP = drawCard();
         p.hand.push(rndP);
         gained = rndP;
         if (pc6) publishCardPlay(st, p, pc6, { targetId: tid3, targetName: (t3 && t3.name) ? t3.name : '', randomFallback: true });
       } else {
-        var src = t3.hand[Math.floor(Math.random() * t3.hand.length)];
+        src = t3HandArr[Math.floor(Math.random() * t3HandArr.length)];
         if (src) {
           var copy3 = JSON.parse(JSON.stringify(src));
           p.hand.push(copy3);
@@ -4657,8 +5016,14 @@ function onlineAction(action, payload) {
       var removedEntity = null;
       var when = null;
       if (mode === 'reroll') {
-        var beforeR = Number(t4.rerollsLeft || 0) || 0;
-        t4.rerollsLeft = Math.max(0, beforeR - 1);
+        if (!t4.infiniteReroll) {
+          var totSab = (Number(t4.rerollsLeft || 0) || 0) + (Number(t4.mainDuDestinBonusRerolls || 0) || 0);
+          if (totSab > 0) {
+            var bSab = Number(t4.mainDuDestinBonusRerolls || 0) || 0;
+            if (bSab > 0) t4.mainDuDestinBonusRerolls = bSab - 1;
+            else t4.rerollsLeft = Math.max(0, (Number(t4.rerollsLeft || 0) || 0) - 1);
+          }
+        }
       } else if (mode === 'explode') {
         if (Array.isArray(t4.hand) && t4.hand.length) {
           var ixE = Math.floor(Math.random() * t4.hand.length);
@@ -4737,6 +5102,59 @@ function onlineAction(action, payload) {
         logPublicCardPlayed(st, pNos, pc8, { targetId: tid5, targetName: (t5 && t5.name) ? t5.name : '', note: 'round ' + String(rr + 1) });
       }
       clearPending();
+      return st;
+    }
+
+    if (action === 'card:maelstrom_resolve') {
+      if (st.phase !== 'game') return st;
+      if (!isMyTurn()) return st;
+      if (!st.pending || st.pending.type !== 'maelstrom_choice') return st;
+      const pMr = currentPlayer();
+      if (!pMr) return st;
+      var pcMael = st.pending.card;
+      if (!pcMael || pcMael.id !== 'maelstrom') { clearPending(); return st; }
+      var includeSelfMr = !!(payload && payload.includeSelf);
+      var tsMaelR = Date.now();
+      function entMaelMiniR(e) {
+        if (!e) return null;
+        return {
+          id: e.id,
+          name: e.name,
+          image: e.image || null,
+          emoji: e.emoji || null,
+          category: e.category || null,
+          good: (typeof e.good === 'boolean' ? e.good : null)
+        };
+      }
+      var changesByPidMaelR = {};
+      var skipCastMr = includeSelfMr ? '' : String(pMr.id || '');
+      (st.players || []).forEach(function(pp) {
+        if (!pp) return;
+        if (skipCastMr && String(pp.id || '') === skipCastMr) return;
+        pp.picks = pp.picks || [[], [], []];
+        var mineMr = [];
+        for (var rm = 0; rm <= 2; rm++) {
+          var arrMr = Array.isArray(pp.picks[rm]) ? pp.picks[rm] : [];
+          if (arrMr.length === 0) continue;
+          var oldMr = arrMr[0];
+          var remainMr = remainingPoolForRound(rm, oldMr && oldMr.id);
+          if (!remainMr.length) continue;
+          var neuMr = remainMr[Math.floor(Math.random() * remainMr.length)];
+          pp.picks[rm][0] = neuMr;
+          mineMr.push({ r: rm, oldObj: entMaelMiniR(oldMr), newObj: entMaelMiniR(neuMr) });
+        }
+        if (mineMr.length) changesByPidMaelR[String(pp.id || '')] = mineMr;
+      });
+      clearPending();
+      var noteMr = includeSelfMr
+        ? 'Toute la table repioche (Personne / Action / Lieu) — lanceur inclus'
+        : 'Adversaires repiochent (Personne / Action / Lieu) — lanceur épargné';
+      publishCardPlay(st, pMr, pcMael, {
+        ts: tsMaelR,
+        changesByPid: changesByPidMaelR,
+        includeSelf: includeSelfMr,
+        note: noteMr
+      });
       return st;
     }
 
@@ -4891,6 +5309,11 @@ function onlineAction(action, payload) {
         if (!Array.isArray(pp.activePassives)) pp.activePassives = [];
         if (typeof pp.shieldedRound !== 'boolean') pp.shieldedRound = !!pp.shieldedRound;
         if (typeof pp.infiniteReroll !== 'boolean') pp.infiniteReroll = !!pp.infiniteReroll;
+        // Après swap, l’autre joueur peut n’avoir jamais eu ce champ en RTDB → undefined interdit
+        if (typeof pp.loopPiocheFreeLeft !== 'number' || !isFinite(pp.loopPiocheFreeLeft)) {
+          pp.loopPiocheFreeLeft = Number(pp.loopPiocheFreeLeft || 0) || 0;
+        }
+        pp.loopPiocheFreeLeft = Math.max(0, Math.min(LOOP_FREE_PIOCHE_MAX, Math.floor(Number(pp.loopPiocheFreeLeft) || 0)));
         if (!Array.isArray(pp.banned)) pp.banned = [];
         if (typeof pp.secondLookArmed !== 'boolean') pp.secondLookArmed = !!pp.secondLookArmed;
         if (typeof pp.secondLookUsed !== 'boolean') pp.secondLookUsed = !!pp.secondLookUsed;
@@ -4917,6 +5340,10 @@ function onlineAction(action, payload) {
         if (typeof pp.rerollsLeft !== 'number') pp.rerollsLeft = Number(pp.rerollsLeft || 0) || 0;
         if (typeof pp.rollRaw !== 'number') pp.rollRaw = Number(pp.rollRaw || 0) || 0;
         if (typeof pp.rollDisplay !== 'number') pp.rollDisplay = Number(pp.rollDisplay || 0) || 0;
+        if (typeof pp.mainDuDestinBonusRerolls !== 'number') pp.mainDuDestinBonusRerolls = Number(pp.mainDuDestinBonusRerolls || 0) || 0;
+        if (typeof pp.mainDuDestinPremiumDraws !== 'number') pp.mainDuDestinPremiumDraws = Number(pp.mainDuDestinPremiumDraws || 0) || 0;
+        pp.mainDuDestinBonusRerolls = Math.max(0, Math.floor(Number(pp.mainDuDestinBonusRerolls) || 0));
+        pp.mainDuDestinPremiumDraws = Math.max(0, Math.floor(Number(pp.mainDuDestinPremiumDraws) || 0));
       }
       var swapKeys = [
         'picks',
@@ -4926,6 +5353,7 @@ function onlineAction(action, payload) {
         'activePassives',
         'shieldedRound',
         'infiniteReroll',
+        'loopPiocheFreeLeft',
         'banned',
         'secondLookArmed',
         'secondLookUsed',
@@ -4945,7 +5373,9 @@ function onlineAction(action, payload) {
         'frozenTurns',
         'blindedTurns',
         'rollRaw',
-        'rollDisplay'
+        'rollDisplay',
+        'mainDuDestinBonusRerolls',
+        'mainDuDestinPremiumDraws'
       ];
       swapKeys.forEach(function(k) {
         var tmp = p[k];
@@ -5259,11 +5689,15 @@ function triggerCardPlayFx(cardId, data) {
   } else if (id === 'troisieme_oeil') {
     subText = 'Visibilité totale : mains et loot de tous';
   } else if (id === 'infinite_reroll') {
-    subText = 'Relances illimitées · les cartes relancées restent dans la boîte';
+    subText = 'Relances illimitées · ' + LOOP_FREE_PIOCHE_MAX + ' pioches gratuites puis −1 🎲 · cartes relancées restent dans la boîte';
   } else if (id === 'couronne') {
     subText = 'Tu choisis ton loot parmi 3 tirages';
   } else if (id === 'flashback') {
     subText = 'Retour au round 1 · tout le monde repart à zéro';
+  } else if (id === 'maelstrom') {
+    subText = d.includeSelf
+      ? 'Toute la table repioche Personne · Action · Lieu'
+      : 'Adversaires repiochés Personne · Action · Lieu — lanceur épargné';
   } else if (id === 'miasme') {
     subText = 'Tes adversaires subissent +35% de loot défavorable';
   } else if (id === 'gel') {
@@ -5277,7 +5711,7 @@ function triggerCardPlayFx(cardId, data) {
   document.documentElement.classList.add('card-fx-chrome--' + id);
   ov.classList.add('visible');
   ov.setAttribute('aria-hidden', 'false');
-  var dur = id === 'flashback' ? 2900 : 2650;
+  var dur = id === 'maelstrom' ? 3400 : (id === 'flashback' ? 2900 : 2650);
   window.clearTimeout(window._cardFxTimeout);
   window._cardFxTimeout = window.setTimeout(function() {
     ov.classList.remove('visible');
@@ -5812,12 +6246,13 @@ document.getElementById('playerForm').addEventListener('submit', function(e) {
     name: name,
     color: COLORS[players.length],
     picks: [[], [], []],
-    rerollsLeft: 1,
+    rerollsLeft: 2,
     hand: [],
     drawnCard: null,
     activePassives: [],
     shieldedRound: false,
     infiniteReroll: false,
+    loopPiocheFreeLeft: 0,
     banned: [],
     secondLookArmed: false,
     secondLookUsed: false,
@@ -5833,7 +6268,9 @@ document.getElementById('playerForm').addEventListener('submit', function(e) {
     frozenTurns: 0,
       blindedTurns: 0,
     rollRaw: 0,
-    rollDisplay: 0
+    rollDisplay: 0,
+    mainDuDestinBonusRerolls: 0,
+    mainDuDestinPremiumDraws: 0
   });
   inp.value = '';
   renderSetup();
@@ -6079,11 +6516,12 @@ function goToTurnOrder() {
     return;
   }
   players.forEach(function(p) {
-    p.picks = [[],[],[]]; p.rerollsLeft = 1; p.rollRaw = 0; p.rollDisplay = 0;
+    p.picks = [[],[],[]]; p.rerollsLeft = 2; p.rollRaw = 0; p.rollDisplay = 0;
     p.hand = []; p.drawnCard = null; p.activePassives = [];
-    p.shieldedRound = false; p.infiniteReroll = false; p.banned = [];
+    p.shieldedRound = false; p.infiniteReroll = false; p.loopPiocheFreeLeft = 0; p.banned = [];
     p.secondLookArmed = false; p.secondLookUsed = false; p.doublePiocheArmed = false;
     p.curatedPoolIds = null; p.goodBoost = 0; p.goodBoostCount = 0; p.badLootBoost = 0; p.badLootBoostCount = 0; p.ticketCaisseNextRare = false; p.ticketCaisseNextRareCount = 0; p.pariMinableGuess = null; p.pariMinableFlash = null; p.frozenTurns = 0; p.pendingSabotageBan = 0;
+    p.mainDuDestinBonusRerolls = 0; p.mainDuDestinPremiumDraws = 0;
   });
 
   if (players.length <= 1) {
@@ -6275,16 +6713,18 @@ function applyFlashbackLocal(caster, card) {
   blindedBy = null;
   blindedByPid = null;
   lastPassiveDraw = null;
+  lastHandGainReveal = null;
   lastJackpotDraw = null;
   turnOrder.forEach(function(p) {
     p.picks = [[], [], []];
-    p.rerollsLeft = 1;
+    p.rerollsLeft = 2;
     p.rollRaw = 0;
     p.rollDisplay = 0;
     p.banned = [];
     p.curatedPoolIds = null;
     p.drawnCard = null;
     p.infiniteReroll = false;
+    p.loopPiocheFreeLeft = 0;
     p.secondLookArmed = false;
     p.secondLookUsed = false;
     p.doublePiocheArmed = false;
@@ -6298,6 +6738,8 @@ function applyFlashbackLocal(caster, card) {
     p.shieldedRound = false;
     p.lastPlayableDrawRound = -1;
     p.needsRound1Draft = true;
+    p.mainDuDestinBonusRerolls = 0;
+    p.mainDuDestinPremiumDraws = 0;
   });
   lastActiveCardId = card && card.id ? card.id : 'flashback';
   lastActiveCardPlayerId = caster && caster.id ? caster.id : '';
@@ -6314,6 +6756,7 @@ function beginTurn() {
   currentEntity = null;
   firstEntity = null;
   player.infiniteReroll = false;
+  player.loopPiocheFreeLeft = 0;
   player.activePassives = [];
   player.drawnCard = null;
   player.secondLookArmed = false;
@@ -6483,11 +6926,45 @@ function renderTurnCards(player) {
   }).join('') + '</div>';
 }
 
+function closeHandGainRevealOnly() {
+  document.getElementById('cardDrawOverlay').classList.remove('visible');
+  cardDrawPending = false;
+  var flipperHg = document.getElementById('cdFlipper');
+  if (flipperHg) flipperHg.classList.remove('flipped');
+  window._handGainRevealCard = null;
+  if (ONLINE.enabled && !ONLINE.applyingRemote) {
+    onlineAction('ui:clearHandGainReveal', {}).catch(function() {});
+  }
+}
+
+function closeHandGainRevealAndPlay() {
+  var cardRef = window._handGainRevealCard;
+  var playerHg = turnOrder[currentTurnIdx];
+  document.getElementById('cardDrawOverlay').classList.remove('visible');
+  cardDrawPending = false;
+  var flipperHg2 = document.getElementById('cdFlipper');
+  if (flipperHg2) flipperHg2.classList.remove('flipped');
+  window._handGainRevealCard = null;
+  if (ONLINE.enabled && !ONLINE.applyingRemote) {
+    onlineAction('ui:clearHandGainReveal', {}).catch(function() {});
+  }
+  var idxHg = -1;
+  if (playerHg && playerHg.hand && cardRef) {
+    for (var ih = playerHg.hand.length - 1; ih >= 0; ih--) {
+      if (playerHg.hand[ih] && playerHg.hand[ih].id === cardRef.id) { idxHg = ih; break; }
+    }
+  }
+  if (idxHg < 0) return;
+  playHandCard(idxHg);
+}
+
 function showCardDraw(player, card) {
-  // Optional third arg: { displayOnly: boolean, autoCloseMs: number }
+  // Optional third arg: { displayOnly, autoCloseMs, alreadyInHand }
   var opts = arguments.length >= 3 ? arguments[2] : null;
   var displayOnly = !!(opts && opts.displayOnly);
   var autoCloseMs = (opts && typeof opts.autoCloseMs === 'number') ? opts.autoCloseMs : 900;
+  var alreadyInHand = !!(opts && opts.alreadyInHand);
+  if (!alreadyInHand) window._handGainRevealCard = null;
   var flipper = document.getElementById('cdFlipper');
   var back = document.getElementById('cdBack');
   flipper.classList.remove('flipped');
@@ -6508,13 +6985,26 @@ function showCardDraw(player, card) {
   if (card.type === 'passive') {
     setActions('<div style="font-size:.8rem;color:var(--text-dim);font-weight:700">Passive — s’active automatiquement ce tour</div>');
   } else {
-    if (player.frozenTurns && player.frozenTurns > 0) {
+    if (alreadyInHand) {
+      window._handGainRevealCard = card;
+      if (player.frozenTurns && player.frozenTurns > 0) {
+        setActions(
+          '<div style="font-size:.8rem;color:var(--text-dim);font-weight:700">🧊 Gel — la carte est dans ta main</div>' +
+          '<button type="button" class="btn btn-back" onclick="closeHandGainRevealOnly()" style="margin-top:.55rem">OK</button>'
+        );
+      } else {
+        setActions(
+          '<button type="button" class="btn btn-gold" onclick="closeHandGainRevealAndPlay()">Jouer maintenant</button>' +
+          '<button type="button" class="btn btn-back" onclick="closeHandGainRevealOnly()">Fermer</button>'
+        );
+      }
+    } else if (player.frozenTurns && player.frozenTurns > 0) {
       setActions('<div style="font-size:.8rem;color:var(--text-dim);font-weight:700">🧊 Gel — tu ne peux pas jouer de cartes ce tour</div>' +
-        '<button class="btn btn-back" onclick="saveDrawnCard()">Garder pour plus tard</button>');
+        '<button type="button" class="btn btn-back" onclick="saveDrawnCard()">Garder pour plus tard</button>');
     } else {
       setActions(
-        '<button class="btn btn-gold" onclick="playDrawnCard()">Jouer maintenant</button>' +
-        '<button class="btn btn-back" onclick="saveDrawnCard()">Garder pour plus tard</button>'
+        '<button type="button" class="btn btn-gold" onclick="playDrawnCard()">Jouer maintenant</button>' +
+        '<button type="button" class="btn btn-back" onclick="saveDrawnCard()">Garder pour plus tard</button>'
       );
     }
   }
@@ -6537,8 +7027,7 @@ function showCardDraw(player, card) {
           }, autoCloseMs);
         } else {
           // Online: passive already applied server-side; just show it briefly
-          if (!displayOnly) {
-            // Backward compat: if we ever pass a passive as drawnCard, still ask server to apply
+          if (!displayOnly && !alreadyInHand) {
             applyPassiveCard(player, card);
           }
           setTimeout(function() {
@@ -6696,10 +7185,17 @@ function executeCard(player, card) {
     showGel(player);
   } else if (card.id === 'partage') {
     showPartage(player);
+  } else if (card.id === 'main_du_destin') {
+    player.mainDuDestinBonusRerolls = 2;
+    player.mainDuDestinPremiumDraws = 2;
+    showToast(card.emoji + ' Main du destin : +2 relances bonus · 2 pioches Rare+ garanties — à utiliser ce tour !', 'success');
+    renderSidebar();
+    renderTurnCenter(player);
   } else if (card.id === 'infinite_reroll') {
     player.infiniteReroll = true;
+    player.loopPiocheFreeLeft = LOOP_FREE_PIOCHE_MAX;
     triggerCardPlayFx('infinite_reroll', {});
-    showToast(card.emoji + ' Relance infinie activée !', 'success');
+    showToast(card.emoji + ' Loop : relances illimitées + ' + LOOP_FREE_PIOCHE_MAX + ' pioches gratuites !', 'success');
     renderTurnCenter(player);
   } else if (card.id === 'couronne') {
     showCouronne(player);
@@ -6746,6 +7242,15 @@ function executeCard(player, card) {
     triggerCardPlayFx('sandevistan', { stolenCount: stolenOff });
     showToast(card.emoji + ' Sandevistan ! ' + (stolenOff ? stolenOff + ' carte(s) volée(s). ' : '') + 'Bénédiction active ce tour.', 'success');
     renderTurnCenter(player);
+  } else if (card.id === 'maelstrom') {
+    if (!ONLINE.enabled) {
+      window._maelstromCtx = { player: player, card: card };
+      pending = { type: 'maelstrom_choice', byPid: String(player.id || ''), ts: Date.now(), card: JSON.parse(JSON.stringify(card)) };
+    }
+    showMaelstromChoiceUI(player);
+    renderTurnCenter(player);
+    renderSidebar();
+    return;
   } else if (card.id === 'flashback') {
     applyFlashbackLocal(player, card);
     return;
@@ -6792,9 +7297,9 @@ function previewHandCard(idx) {
   }
   showCardPreview(player.hand[idx], {
     title: 'Carte en main',
-    primaryLabel: 'Jouer maintenant',
+    primaryLabel: 'Jouer la carte',
     onPrimary: function() { playHandCard(idx); closeCardPreview(); },
-    secondaryLabel: 'Jouer plus tard',
+    secondaryLabel: 'Annuler',
     onSecondary: function() { closeCardPreview(); }
   });
 }
@@ -7372,6 +7877,7 @@ function renderTurnCenter(player) {
   btn.textContent = '🎲 Lancer le dé';
   var luckRoll = Number(player.goodBoost || 0) > 0;
   btn.classList.toggle('game-roll-btn--luck', luckRoll);
+  var payDrawBtn = document.getElementById('gamePayDrawBtn');
   var statusEl = document.getElementById('rerollStatus');
   statusEl.style.display = 'none';
   statusEl.textContent = '';
@@ -7383,6 +7889,40 @@ function renderTurnCenter(player) {
     btn.disabled = !isMyTurn;
   } else {
     btn.disabled = false;
+  }
+
+  if (payDrawBtn) {
+    var preLoot = !currentEntity;
+    var myPid = String(ONLINE.playerId || '');
+    var handViewer = player;
+    if (ONLINE.enabled) {
+      var mePd = (players || []).find(function(pp) { return pp && String(pp.id || '') === myPid; });
+      if (mePd) handViewer = mePd;
+    }
+    var hasDrawnPending = !!(handViewer && handViewer.drawnCard && handViewer.drawnCard.id);
+    var pendBlock = false;
+    if (ONLINE.enabled && pending && String(pending.byPid || '') === myPid) {
+      var ptp = String(pending.type || '');
+      pendBlock = (ptp === 'pari_minable' || ptp === 'round1_pick2of4' || ptp === 'double_pioche_choice' || ptp === 'maelstrom_choice');
+    }
+    if (!ONLINE.enabled && pending && (pending.type === 'pari_minable' || pending.type === 'maelstrom_choice')) pendBlock = true;
+    var aoPd = document.getElementById('actionOverlay');
+    var round1UiOpen = !!(aoPd && aoPd.classList.contains('visible') && document.getElementById('r1Grid'));
+    var frozenPd = !!(player.frozenTurns && player.frozenTurns > 0);
+    var loopPiocheLeft = (player.infiniteReroll && (Number(player.loopPiocheFreeLeft || 0) || 0) > 0)
+      ? (Number(player.loopPiocheFreeLeft || 0) || 0)
+      : 0;
+    var canAffordPd = !!(loopPiocheLeft > 0 || playerSpendableRerollsTotal(player) > 0);
+    var showPay = preLoot && isMyTurn && !hasDrawnPending && !pendBlock && !frozenPd && !round1UiOpen;
+    payDrawBtn.style.display = showPay ? '' : 'none';
+    payDrawBtn.disabled = !canAffordPd || !showPay;
+    payDrawBtn.style.opacity = (!canAffordPd && showPay && isMyTurn) ? '0.5' : '';
+    payDrawBtn.textContent = loopPiocheLeft > 0
+      ? ('Pioche (♾️ ×' + loopPiocheLeft + ')')
+      : 'Pioche (−1 🎲)';
+    payDrawBtn.classList.toggle('game-pay-draw-btn--loop', loopPiocheLeft > 0);
+    var mddHalo = ((Number(player.mainDuDestinBonusRerolls || 0) || 0) > 0 || (Number(player.mainDuDestinPremiumDraws || 0) || 0) > 0);
+    payDrawBtn.classList.toggle('game-pay-draw-btn--main-du-destin', loopPiocheLeft <= 0 && mddHalo);
   }
 
   var handArea = document.getElementById('handArea');
@@ -7445,7 +7985,12 @@ function renderTurnCenter(player) {
     statusLines.push('C’est au tour de ' + esc(player.name) + '…');
   }
   if (player.infiniteReroll) {
-    statusLines.push('♾️ Relance infinie active !');
+    var lpFree = Number(player.loopPiocheFreeLeft || 0) || 0;
+    if (lpFree > 0) {
+      statusLines.push('♾️ Loop : relances illimitées · ' + lpFree + ' pioche' + (lpFree > 1 ? 's' : '') + ' gratuite' + (lpFree > 1 ? 's' : '') + ' (bouton bleu), puis −1 🎲.');
+    } else {
+      statusLines.push('♾️ Loop : relances illimitées · pioche : −1 🎲.');
+    }
   } else if ((player.blindedTurns && player.blindedTurns > 0) && !player.shieldedRound) {
     statusLines.push('🕶️ Blinded : ton loot est caché pour ce tour');
   } else if (player.frozenTurns && player.frozenTurns > 0) {
@@ -7453,6 +7998,11 @@ function renderTurnCenter(player) {
   }
   if (player.pariMinableGuess === 'pair' || player.pariMinableGuess === 'impair') {
     statusLines.push('🎯 Pari minable : ' + (player.pariMinableGuess === 'pair' ? 'Pair' : 'Impair') + ' — lance le dé (+1 ou −1 relance).');
+  }
+  var mddbSt = Number(player.mainDuDestinBonusRerolls || 0) || 0;
+  var mddpSt = Number(player.mainDuDestinPremiumDraws || 0) || 0;
+  if (mddbSt > 0 || mddpSt > 0) {
+    statusLines.push('🖐️ Main du destin : ' + mddbSt + ' relance(s) bonus · ' + mddpSt + ' pioche(s) Rare+ garantie(s) (expire fin de tour).');
   }
   var ticketViewer = ONLINE.enabled ? me : player;
   var tkCnt = 0;
@@ -7591,7 +8141,8 @@ function renderSidebar() {
       fxIcons += '<span class="sb-fx-icon sb-fx-pari" title="Pari minable : ' + (p.pariMinableGuess === 'pair' ? 'Pair' : 'Impair') + ' — lance le dé">🎯</span>';
     }
 
-    var rerollsHtml = '<div class="sb-empty" style="font-style:normal">🎲 Relances : <b>' + (p.rerollsLeft || 0) + '</b></div>';
+    var rrSb = p.infiniteReroll ? (Number(p.rerollsLeft || 0) || 0) : playerSpendableRerollsTotal(p);
+    var rerollsHtml = '<div class="sb-empty" style="font-style:normal">🎲 Relances : <b>' + rrSb + '</b></div>';
 
     return '<div class="' + cls + '">' +
       '<div class="sb-header">' +
@@ -8130,6 +8681,170 @@ function showNostalgieTargetModal(casterName, data) {
   );
 }
 
+function showMaelstromSelfModal(casterName, rows, tableWide) {
+  var ao = document.getElementById('actionOverlay');
+  if (ao && ao.classList.contains('visible')) {
+    showToast('🌀 Maelström : tes résultats ont été remplacés.', 'success');
+    return;
+  }
+  var introSelf = tableWide
+    ? '<b>' + esc(casterName) + '</b> a invoqué le Maelström sur toute la table. Voici tes nouveaux tirages.'
+    : '<b>' + esc(casterName) + '</b> a invoqué le Maelström — voici tes nouveaux tirages.';
+  function entCardMael(e, label, tone) {
+    if (!e) return '';
+    var bd = tone === 'bad' ? 'rgba(239,68,68,.12)' : 'rgba(16,185,129,.10)';
+    var br = tone === 'bad' ? 'rgba(239,68,68,.22)' : 'rgba(16,185,129,.20)';
+    return '<div style="flex:1;min-width:120px;max-width:200px;background:' + bd + ';border:1px solid ' + br + ';border-radius:14px;padding:.55rem .6rem;text-align:center">' +
+      '<div style="font-size:.58rem;color:var(--text-dim);font-weight:900;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.3rem">' + esc(label) + '</div>' +
+      '<div style="display:flex;flex-direction:column;align-items:center;gap:.35rem">' +
+        '<div style="width:64px;height:64px;border-radius:14px;overflow:hidden;flex-shrink:0;background:rgba(255,255,255,.06);display:grid;place-items:center;font-size:1.1rem">' +
+          (e.image ? '<img src="' + esc(String(e.image)) + '" alt="" style="width:100%;height:100%;object-fit:cover;display:block">' : thumbHtml(e)) +
+        '</div>' +
+        '<div style="font-weight:850;font-size:.82rem;line-height:1.1;word-break:break-word">' + esc(String(e.name || '')) + '</div>' +
+      '</div>' +
+    '</div>';
+  }
+  var body = (rows || []).map(function(it) {
+    var rm = ROUND_META[it.r] || { emoji: '', name: '' };
+    return '<div style="margin-bottom:1.1rem">' +
+      '<div style="font-size:.72rem;color:var(--text-dim);font-weight:900;margin-bottom:.45rem">' + esc(rm.emoji + ' ' + rm.name) + '</div>' +
+      '<div style="display:flex;gap:.45rem;align-items:center;justify-content:center;flex-wrap:wrap">' +
+        entCardMael(it.oldObj, 'Avant', 'bad') +
+        '<div style="font-weight:1000;color:var(--text-dim);padding:.2rem">→</div>' +
+        entCardMael(it.newObj, 'Après', 'good') +
+      '</div></div>';
+  }).join('');
+  openActionOverlay(
+    '<h3 style="margin-bottom:.25rem">🌀 Maelström</h3>' +
+    '<p style="color:var(--text-dim);font-size:.82rem;margin-bottom:.85rem">' +
+      introSelf +
+    '</p>' +
+    body +
+    '<div style="margin-top:1rem;text-align:center"><button type="button" class="btn btn-gold" onclick="closeActionOverlay(true)">OK</button></div>'
+  );
+}
+
+function showMaelstromTableModal(casterName, changesByPid, tableWide) {
+  var pids = Object.keys(changesByPid || {});
+  if (!pids.length) {
+    openActionOverlay(
+      '<h3 style="margin-bottom:.25rem">🌀 Maelström</h3>' +
+      '<p style="color:var(--text-dim);font-size:.82rem;margin-bottom:.9rem">' +
+        (tableWide
+          ? 'Aucun joueur n’avait de résultat à remplacer (Personne / Action / Lieu), ou tout était figé.'
+          : 'Aucun adversaire n’avait de résultat à remplacer (Personne / Action / Lieu).') +
+      '</p>' +
+      '<div style="text-align:center"><button type="button" class="btn btn-gold" onclick="closeActionOverlay(true)">OK</button></div>'
+    );
+    return;
+  }
+  var blocks = pids.map(function(pid) {
+    var pl = turnOrder.find(function(x) { return x && String(x.id) === pid; });
+    var name = pl && pl.name ? pl.name : 'Joueur';
+    var list = changesByPid[pid] || [];
+    var inner = list.map(function(it) {
+      var rm = ROUND_META[it.r] || { emoji: '', name: '' };
+      var o = it.oldObj && it.oldObj.name ? it.oldObj.name : '—';
+      var n = it.newObj && it.newObj.name ? it.newObj.name : '—';
+      return '<div style="font-size:.8rem;margin:.3rem 0;padding:.5rem .55rem;background:rgba(255,255,255,.06);border-radius:10px;border:1px solid rgba(255,255,255,.08)">' +
+        '<span style="font-weight:900;opacity:.85">' + esc(rm.emoji + ' ' + rm.name) + '</span><br>' +
+        '<span style="color:var(--text-dim)">' + esc(o) + '</span> → <span style="font-weight:800">' + esc(n) + '</span></div>';
+    }).join('');
+    return '<div style="margin-bottom:1.05rem"><div style="font-weight:950;color:var(--gold);margin-bottom:.35rem;font-size:.92rem">' + esc(name) + '</div>' + inner + '</div>';
+  }).join('');
+  var recapIntro = tableWide
+    ? '<b>' + esc(casterName) + '</b> a brassé toute la table (lanceur inclus). Détail des remplacements :'
+    : '<b>' + esc(casterName) + '</b> a relancé les sorts des adversaires (le lanceur n’est pas affecté).';
+  openActionOverlay(
+    '<h3 style="margin-bottom:.25rem">🌀 Maelström</h3>' +
+    '<p style="color:var(--text-dim);font-size:.82rem;margin-bottom:.85rem">' + recapIntro + '</p>' +
+    '<div style="max-height:min(58vh,420px);overflow-y:auto;padding-right:.25rem">' + blocks + '</div>' +
+    '<div style="text-align:center;margin-top:1rem"><button type="button" class="btn btn-gold" onclick="closeActionOverlay(true)">OK</button></div>'
+  );
+}
+
+function showMaelstromChoiceUI(_player) {
+  var html =
+    '<h3 style="margin-bottom:.25rem">🌀 Maelström</h3>' +
+    '<p style="color:var(--text-dim);font-size:.82rem;margin-bottom:.85rem">Tu invoques le tourbillon. Veux-tu <b>y entrer</b> toi aussi (repioche comme tout le monde) ? Sinon, seuls tes adversaires sont brassés.</p>' +
+    '<div class="choice-grid is-two" style="margin-bottom:.55rem;margin-top:.35rem">' +
+    '<button type="button" class="choice-btn" onclick="confirmMaelstromChoice(true)">Oui — je plonge aussi</button>' +
+    '<button type="button" class="choice-btn" onclick="confirmMaelstromChoice(false)">Non — je reste à l’écart</button>' +
+    '</div>' +
+    '<div style="text-align:center;margin-top:.85rem">' +
+    '<button type="button" class="btn btn-back" onclick="closeActionOverlay()">Annuler — la carte revient en main</button>' +
+    '</div>';
+  openActionOverlay(html);
+}
+
+function confirmMaelstromChoice(includeSelf) {
+  if (ONLINE.enabled && !ONLINE.applyingRemote) {
+    closeActionOverlay(true);
+    onlineAction('card:maelstrom_resolve', { includeSelf: !!includeSelf }).catch(function(err) { showToast(String(err.message || err), 'danger'); });
+    return;
+  }
+  var ctx = window._maelstromCtx;
+  if (!ctx || !ctx.player || !ctx.card) return;
+  closeActionOverlay(true);
+  window._maelstromCtx = null;
+  pending = null;
+  applyMaelstromFinishOffline(ctx.player, ctx.card, !!includeSelf);
+}
+
+function applyMaelstromEffectLocal(playerList, excludeCasterId) {
+  function entLoc(e) {
+    if (!e) return null;
+    return {
+      id: e.id,
+      name: e.name,
+      image: e.image || null,
+      emoji: e.emoji || null,
+      category: e.category || null,
+      good: (typeof e.good === 'boolean' ? e.good : null)
+    };
+  }
+  var changesByPid = {};
+  var skipId = excludeCasterId != null ? String(excludeCasterId) : '';
+  playerList.forEach(function(pp) {
+    if (!pp) return;
+    if (skipId && String(pp.id || '') === skipId) return;
+    pp.picks = pp.picks || [[], [], []];
+    var mine = [];
+    for (var r = 0; r <= 2; r++) {
+      var arr = Array.isArray(pp.picks[r]) ? pp.picks[r] : [];
+      if (arr.length === 0) continue;
+      var old = arr[0];
+      var remain = remainingPoolForRound(r, old && old.id);
+      if (!remain.length) continue;
+      var neu = remain[Math.floor(Math.random() * remain.length)];
+      pp.picks[r][0] = neu;
+      mine.push({ r: r, oldObj: entLoc(old), newObj: entLoc(neu) });
+    }
+    if (mine.length) changesByPid[String(pp.id || '')] = mine;
+  });
+  return changesByPid;
+}
+
+function applyMaelstromFinishOffline(caster, card, includeSelf) {
+  var skipId = includeSelf ? null : (caster && caster.id);
+  var ch = applyMaelstromEffectLocal(turnOrder, skipId);
+  var ts0 = Date.now();
+  lastActiveCardId = 'maelstrom';
+  lastActiveCardPlayerId = String(caster && caster.id || '');
+  lastActiveCardData = { ts: ts0, changesByPid: ch, includeSelf: !!includeSelf };
+  triggerCardPlayFx('maelstrom', { includeSelf: !!includeSelf });
+  var cn = caster && caster.name ? String(caster.name) : 'Un joueur';
+  showToast(card.emoji + ' Maelström ! ' + (includeSelf ? 'Toute la table est brassée.' : 'Les adversaires sont brassés — tu es épargné.'), 'success');
+  renderSidebar();
+  renderInventory(turnOrder[currentTurnIdx]);
+  renderTurnCenter(turnOrder[currentTurnIdx]);
+  renderTurnCards(turnOrder[currentTurnIdx]);
+  window.clearTimeout(window._maelstromModalTimeout);
+  window._maelstromModalTimeout = window.setTimeout(function() {
+    showMaelstromTableModal(cn, ch, !!includeSelf);
+  }, 3400);
+}
+
 function showSabotageTargetModal(casterName, data) {
   var ao = document.getElementById('actionOverlay');
   if (ao && ao.classList.contains('visible')) {
@@ -8219,7 +8934,8 @@ function closeActionOverlay(skipOnlineCancel) {
     showToast(pending.type === 'premeditation_reward' ? 'Choisis une récompense Préméditation.' : 'Tu dois résoudre la carte (pas d’annulation).', 'danger');
     return;
   }
-  if (!ONLINE.enabled && !skipOnlineCancel && pending && pending.type === 'pari_minable' && pending.card) {
+  if (!ONLINE.enabled && !skipOnlineCancel && pending && pending.card &&
+      (pending.type === 'pari_minable' || pending.type === 'maelstrom_choice')) {
     var plPm = turnOrder[currentTurnIdx];
     if (plPm && String(plPm.id || '') === String(pending.byPid || '')) {
       plPm.hand = plPm.hand || [];
@@ -8227,6 +8943,7 @@ function closeActionOverlay(skipOnlineCancel) {
       if (plPm.turnLog && plPm.turnLog.length && plPm.turnLog[0] && plPm.turnLog[0].id === pending.card.id) plPm.turnLog.shift();
     }
     pending = null;
+    window._maelstromCtx = null;
   }
   document.getElementById('actionOverlay').classList.remove('visible');
   document.getElementById('actionContent').innerHTML = '';
@@ -8494,7 +9211,7 @@ function showPetitSabotage(player) {
   var others = turnOrder.filter(function(p) { return p.id !== player.id; });
   if (others.length === 0) { showToast('Aucun joueur à saboter.', 'danger'); return; }
   window._sabo = { mode: null };
-  var anyReroll = others.some(function(p) { return (Number(p && p.rerollsLeft || 0) || 0) > 0; });
+  var anyReroll = others.some(function(p) { return !p.infiniteReroll && playerSpendableRerollsTotal(p) > 0; });
   var anyHand = others.some(function(p) {
     var hc = (p && typeof p.handCount === 'number') ? p.handCount : ((p.hand && p.hand.length) ? p.hand.length : 0);
     return hc > 0;
@@ -8538,11 +9255,11 @@ function selectSabotageMode(mode) {
     '<div class="exch-players">' +
       others.map(function(p) {
         var hc = (p && typeof p.handCount === 'number') ? p.handCount : ((p.hand && p.hand.length) ? p.hand.length : 0);
-        var dis = (mode === 'reroll') ? ((Number(p && p.rerollsLeft || 0) || 0) <= 0)
+        var dis = (mode === 'reroll') ? (p.infiniteReroll || playerSpendableRerollsTotal(p) <= 0)
           : (mode === 'explode') ? (hc <= 0)
           : false;
         var extra = '';
-        if (mode === 'reroll') extra = ' (' + (Number(p && p.rerollsLeft || 0) || 0) + ')';
+        if (mode === 'reroll') extra = ' (' + (p.infiniteReroll ? '∞' : playerSpendableRerollsTotal(p)) + ')';
         if (mode === 'explode') extra = dis ? ' (vide)' : (' (🃏' + hc + ')');
         return '<button class="exch-player-btn' + (dis ? ' disabled' : '') + '" onclick="confirmPetitSabotage(' + jsq(p.id) + ')">' +
           '<span style="width:10px;height:10px;border-radius:50%;background:' + p.color + ';display:inline-block"></span>' +
@@ -8568,10 +9285,10 @@ function confirmPetitSabotage(targetId) {
   if (!target) return;
 
   if (mode === 'reroll') {
-    if ((target.rerollsLeft || 0) <= 0) {
+    if (target.infiniteReroll || playerSpendableRerollsTotal(target) <= 0) {
       showToast('🎲 ' + target.name + ' n\'a plus de relance.', 'danger');
     } else {
-      target.rerollsLeft = Math.max(0, target.rerollsLeft - 1);
+      consumeOneRerollFromPlayer(target);
       showToast('🎲 ' + target.name + ' perd 1 relance !', 'danger');
     }
   } else if (mode === 'explode') {
@@ -8813,16 +9530,15 @@ function confirmGel(targetId) {
 
 /* ── Partage ? ── */
 function showPartage(player) {
-  if (ONLINE.enabled && !ONLINE.applyingRemote) {
-    // Server already opened pending.type === 'partage' when the card was played.
-  }
   var candidates = turnOrder.filter(function(p) { return p.id !== player.id; });
   var anyHave = candidates.some(function(p) {
     var hc = (p && typeof p.handCount === 'number') ? p.handCount : ((p.hand && p.hand.length) ? p.hand.length : 0);
     return hc > 0;
   });
   if (!anyHave) {
-    if (ONLINE.enabled && !ONLINE.applyingRemote) {
+    // Toujours passer par le serveur en ligne (même pendant onlineApplyViewState : applyingRemote était true
+    // et on tombait dans le fallback offline qui ne persistait pas).
+    if (ONLINE.enabled) {
       onlineAction('card:partage_start', {}).catch(function(err) { showToast(String(err.message || err), 'danger'); });
       return;
     }
@@ -9430,6 +10146,95 @@ function applyBadLootBoost(player, rolledEntity) {
   return filtered[Math.floor(Math.random() * filtered.length)];
 }
 
+function payRerollDrawPlayable() {
+  var player = turnOrder[currentTurnIdx];
+  if (!player) return;
+  if (currentEntity) {
+    showToast('Ce n’est plus le moment (déjà un résultat de loot).', 'danger');
+    return;
+  }
+  if (cardDrawPending) {
+    showToast('Résous d’abord la carte jouable', 'danger');
+    return;
+  }
+  var aoPd = document.getElementById('actionOverlay');
+  if (aoPd && aoPd.classList.contains('visible') && document.getElementById('r1Grid')) {
+    showToast('Termine d’abord ton choix Round 1.', 'danger');
+    return;
+  }
+  if (ONLINE.enabled && !ONLINE.applyingRemote) {
+    if (pending && pending.type === 'pari_minable' && String(pending.byPid || '') === String(ONLINE.playerId || '')) {
+      showToast('Choisis Pair ou Impair (Pari minable) avant.', 'danger');
+      return;
+    }
+    if (pending && (pending.type === 'round1_pick2of4' || pending.type === 'double_pioche_choice' || pending.type === 'maelstrom_choice') && String(pending.byPid || '') === String(ONLINE.playerId || '')) {
+      showToast(pending.type === 'maelstrom_choice' ? 'Choisis d’abord si tu entres dans le Maelström.' : 'Termine d’abord ton choix en cours.', 'danger');
+      return;
+    }
+    var meP = (players || []).find(function(pp) { return pp && String(pp.id || '') === String(ONLINE.playerId || ''); });
+    if (meP && meP.drawnCard && meP.drawnCard.id) {
+      showToast('Résous d’abord la carte jouable', 'danger');
+      return;
+    }
+    if (player.frozenTurns && player.frozenTurns > 0) {
+      showToast('🧊 Gel : action impossible ce tour.', 'danger');
+      return;
+    }
+    onlineAction('turn:payRerollDraw', {}).catch(function(err) { showToast(String(err.message || err), 'danger'); });
+    return;
+  }
+  if (pending && pending.type === 'pari_minable') {
+    showToast('Choisis Pair ou Impair (Pari minable) avant.', 'danger');
+    return;
+  }
+  if (pending && pending.type === 'maelstrom_choice') {
+    showToast('Choisis d’abord si tu entres dans le Maelström.', 'danger');
+    return;
+  }
+  if (isAnimating) return;
+  if (player.frozenTurns && player.frozenTurns > 0) {
+    showToast('🧊 Gel : action impossible ce tour.', 'danger');
+    return;
+  }
+  if (player.drawnCard && player.drawnCard.id) {
+    showToast('Résous d’abord la carte jouable', 'danger');
+    return;
+  }
+  var loopFreeAvail = (player.infiniteReroll && (Number(player.loopPiocheFreeLeft || 0) || 0) > 0)
+    ? (Number(player.loopPiocheFreeLeft || 0) || 0)
+    : 0;
+  if (loopFreeAvail <= 0 && playerSpendableRerollsTotal(player) <= 0) {
+    showToast('Pas assez de relances.', 'danger');
+    return;
+  }
+  var premP = Number(player.mainDuDestinPremiumDraws || 0) || 0;
+  var cP = (premP > 0) ? drawCardMainDuDestin() : drawCard();
+  if (!cP || !cP.id) {
+    showToast('Impossible de piocher.', 'danger');
+    return;
+  }
+  if (loopFreeAvail > 0) {
+    player.loopPiocheFreeLeft = Math.max(0, loopFreeAvail - 1);
+  } else {
+    consumeOneRerollFromPlayer(player);
+  }
+  if (premP > 0) {
+    player.mainDuDestinPremiumDraws = Math.max(0, premP - 1);
+  }
+  player.hand = player.hand || [];
+  if (cP.type === 'passive') {
+    cardDrawPending = true;
+    showCardDraw(player, cP);
+  } else {
+    player.drawnCard = cP;
+    cardDrawPending = true;
+    showCardDraw(player, cP);
+  }
+  renderSidebar();
+  renderTurnCenter(player);
+  renderTurnCards(player);
+}
+
 /* ── Roll the dice (first roll) ── */
 function rollGameDice() {
   if (ONLINE.enabled && !ONLINE.applyingRemote) {
@@ -9442,6 +10247,10 @@ function rollGameDice() {
       showToast('Choisis Pair ou Impair (Pari minable) avant de lancer.', 'danger');
       return;
     }
+    if (pending && pending.type === 'maelstrom_choice' && String(pending.byPid || '') === String(ONLINE.playerId || '')) {
+      showToast('Choisis d’abord si tu entres dans le Maelström.', 'danger');
+      return;
+    }
     // Dice animation (client-side) + server roll (authoritative)
     var player = turnOrder[currentTurnIdx];
     var pBox = getPlayerBox(player);
@@ -9451,6 +10260,8 @@ function rollGameDice() {
     var diceEl = document.getElementById('gameDice');
     diceEl.classList.add('rolling');
     document.getElementById('gameRollBtn').style.display = 'none';
+    var payHide = document.getElementById('gamePayDrawBtn');
+    if (payHide) payHide.style.display = 'none';
 
     var n = pBox.length;
     var ticks = 0;
@@ -9462,6 +10273,8 @@ function rollGameDice() {
         clearInterval(iv);
         diceEl.classList.remove('rolling');
         document.getElementById('gameRollBtn').style.display = '';
+        var payShow = document.getElementById('gamePayDrawBtn');
+        if (payShow) payShow.style.display = '';
         onlineAction('turn:roll', {}).catch(function(err) { showToast(String(err.message || err), 'danger'); });
       }
     }, 45);
@@ -9473,9 +10286,15 @@ function rollGameDice() {
     showToast('Choisis Pair ou Impair (Pari minable) avant de lancer.', 'danger');
     return;
   }
+  if (pending && pending.type === 'maelstrom_choice') {
+    showToast('Choisis d’abord si tu entres dans le Maelström.', 'danger');
+    return;
+  }
   if (isAnimating || pBox.length === 0 || cardDrawPending) return;
   isAnimating = true;
   document.getElementById('gameRollBtn').style.display = 'none';
+  var payHideOff = document.getElementById('gamePayDrawBtn');
+  if (payHideOff) payHideOff.style.display = 'none';
 
   var diceEl = document.getElementById('gameDice');
   diceEl.classList.add('rolling');
@@ -9589,16 +10408,17 @@ function showReveal(isReroll) {
 
   label.textContent = (isReroll && (mode === 'chaos' && currentRound === 0)) ? 'En plus : ' : roundLabel;
   var pBox = getPlayerBox(player);
-  var canReroll = pBox.length >= 2 && (player.infiniteReroll || player.rerollsLeft > 0);
+  var rrTotReveal = playerSpendableRerollsTotal(player);
+  var canReroll = pBox.length >= 2 && (player.infiniteReroll || rrTotReveal > 0);
   var rerollBtn = '';
   var secondLookBtn = '';
   if (canReroll) {
     if (player.infiniteReroll) {
         rerollBtn = '<button class="btn btn-min btn-min-lg btn-min-success" onclick="rerollEntity()">↻ Relancer</button>';
     } else if (mode === 'chaos' && currentRound === 0) {
-        rerollBtn = '<button class="btn btn-min btn-min-lg btn-min-success" onclick="rerollEntity()">↻ Relancer · ' + player.rerollsLeft + '</button>';
+        rerollBtn = '<button class="btn btn-min btn-min-lg btn-min-success" onclick="rerollEntity()">↻ Relancer · ' + rrTotReveal + '</button>';
     } else {
-        rerollBtn = '<button class="btn btn-min btn-min-lg btn-min-danger" onclick="rerollEntity()">↻ Relancer · ' + player.rerollsLeft + '</button>';
+        rerollBtn = '<button class="btn btn-min btn-min-lg btn-min-danger" onclick="rerollEntity()">↻ Relancer · ' + rrTotReveal + '</button>';
     }
   }
   if (!blindActive && player.secondLookArmed && !player.secondLookUsed && pBox.length >= 2) {
@@ -9613,9 +10433,17 @@ function showReveal(isReroll) {
 /* ── Keep the entity ── */
 function keepEntity() {
   if (ONLINE.enabled && !ONLINE.applyingRemote) {
+    if (pending && pending.type === 'maelstrom_choice' && String(pending.byPid || '') === String(ONLINE.playerId || '')) {
+      showToast('Choisis d’abord si tu entres dans le Maelström.', 'danger');
+      return;
+    }
     // Close immediately; server will advance state
     closeReveal();
     onlineAction('turn:keep', {}).catch(function(err) { showToast(String(err.message || err), 'danger'); });
+    return;
+  }
+  if (pending && pending.type === 'maelstrom_choice') {
+    showToast('Choisis d’abord si tu entres dans le Maelström.', 'danger');
     return;
   }
   var player = turnOrder[currentTurnIdx];
@@ -9645,10 +10473,18 @@ function keepEntity() {
 /* ── Reroll ── */
 function rerollEntity() {
   if (ONLINE.enabled && !ONLINE.applyingRemote) {
+    if (pending && pending.type === 'maelstrom_choice' && String(pending.byPid || '') === String(ONLINE.playerId || '')) {
+      showToast('Choisis d’abord si tu entres dans le Maelström.', 'danger');
+      return;
+    }
     closeReveal();
     // Optimistic animation while waiting for RTDB update
     startOnlineGameRollAnim('reroll');
     onlineAction('turn:reroll', {}).catch(function(err) { showToast(String(err.message || err), 'danger'); });
+    return;
+  }
+  if (pending && pending.type === 'maelstrom_choice') {
+    showToast('Choisis d’abord si tu entres dans le Maelström.', 'danger');
     return;
   }
   var player = turnOrder[currentTurnIdx];
@@ -9664,8 +10500,8 @@ function rerollEntity() {
     return;
   }
 
-  if (player.rerollsLeft <= 0) return;
-  player.rerollsLeft--;
+  if (!player.infiniteReroll && playerSpendableRerollsTotal(player) <= 0) return;
+  if (!player.infiniteReroll) consumeOneRerollFromPlayer(player);
 
   if (mode === 'chaos' && currentRound === 0) {
     player.picks[currentRound].push(currentEntity);
@@ -9710,6 +10546,15 @@ function nextTurn() {
     prevPlayer.hand = prevPlayer.hand.filter(function(c) { return !(c && c.mustPlayThisTurn && String(c.id || '') !== 'partage'); });
     var removed = before - prevPlayer.hand.length;
     if (removed > 0) showToast('⏳ ' + removed + ' carte(s) non jouée(s) : perdues', 'danger');
+  }
+  if (prevPlayer) {
+    var mdB = Number(prevPlayer.mainDuDestinBonusRerolls || 0) || 0;
+    var mdP = Number(prevPlayer.mainDuDestinPremiumDraws || 0) || 0;
+    if (mdB > 0 || mdP > 0) {
+      prevPlayer.mainDuDestinBonusRerolls = 0;
+      prevPlayer.mainDuDestinPremiumDraws = 0;
+      showToast('✋ Main du destin : bonus de tour non utilisé — perdu.', 'danger');
+    }
   }
 
   currentTurnIdx++;
