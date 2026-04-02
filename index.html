@@ -1370,11 +1370,32 @@
     .exchange-card { background: var(--surface); border: 2px solid #a855f7; border-radius: 20px; padding: 1.5rem; text-align: center; max-width: 450px; width: 95%; transform: scale(.8); transition: transform .4s cubic-bezier(.34,1.56,.64,1); }
     .overlay.visible .exchange-card { transform: scale(1); }
     .exch-players { display: flex; gap: .5rem; flex-wrap: wrap; justify-content: center; margin: 1rem 0; }
-    .exch-player-btn { background: var(--surface-2); border: 2px solid rgba(255,255,255,.08); border-radius: 12px; padding: .6rem .9rem; cursor: pointer; font-family: inherit; color: var(--text); font-size: .8rem; font-weight: 600; display: flex; align-items: center; gap: .35rem; transition: all .2s; }
+    .exch-player-btn { background: var(--surface-2); border: 2px solid rgba(255,255,255,.08); border-radius: 12px; padding: .6rem .9rem; cursor: pointer; font-family: inherit; color: var(--text); font-size: .8rem; font-weight: 600; display: flex; align-items: center; gap: .4rem; transition: all .2s; }
     .exch-player-btn:hover { border-color: #a855f7; }
+    .exch-player-btn.shielded:hover { border-color: rgba(56, 189, 248, 0.5); }
+    .exch-player-btn.disabled:hover { border-color: rgba(255, 255, 255, 0.08); }
     .exch-player-btn.selected { border-color: #a855f7; background: rgba(168,85,247,.1); }
-    .exch-player-btn.shielded { opacity: .35; pointer-events: none; }
+    .exch-player-btn.shielded {
+      pointer-events: none;
+      cursor: not-allowed;
+      border-color: rgba(56, 189, 248, 0.45);
+      background: rgba(14, 165, 233, 0.09);
+      box-shadow: inset 0 0 0 1px rgba(56, 189, 248, 0.12);
+    }
+    .exch-player-btn.shielded .exch-player-dot { opacity: 0.4; filter: grayscale(0.85); }
+    .exch-shield-ico {
+      font-size: 1.2rem;
+      line-height: 1;
+      flex-shrink: 0;
+      filter: drop-shadow(0 0 8px rgba(56, 189, 232, 0.55));
+    }
+    .exch-player-btn.shielded .exch-player-name-shielded {
+      color: var(--text-dim);
+      opacity: 0.5;
+      font-weight: 500;
+    }
     .exch-player-btn.disabled { opacity: .38; pointer-events: none; filter: grayscale(.25); }
+    .exch-player-btn.disabled .exch-player-name-muted { color: var(--text-dim); opacity: 0.72; font-weight: 500; }
     .exch-picks { display: flex; gap: .4rem; flex-wrap: wrap; justify-content: center; margin: .8rem 0; }
     .exch-pick-btn { background: var(--surface-2); border: 2px solid rgba(255,255,255,.08); border-radius: 8px; padding: .4rem .6rem; cursor: pointer; font-family: inherit; color: var(--text); font-size: .72rem; font-weight: 600; transition: all .2s; }
     .exch-pick-btn:hover { border-color: #a855f7; }
@@ -1945,7 +1966,7 @@ const PLAYABLE_CARDS = [
   { id: 'above_average', name: 'Above average', emoji: '📈', rarity: 'common', type: 'active', desc: 'Lance 1d100 : si ≥ 50, choisis une carte Commune ou Rare : elle rejoint ta main et reste jusqu’à ce que tu la joues (pas perdue en fin de tour).' },
   { id: 'ticket_caisse', name: 'Ticket de caisse', emoji: '🧾', rarity: 'common', type: 'active', desc: 'Joue-la ce tour-ci : au début de ton prochain tour, tu reçois une carte Rare aléatoire en main (passive activée tout de suite si c’en est une).' },
   { id: 'pari_minable', name: 'Pari minable', emoji: '🎯', rarity: 'common', type: 'active', desc: 'Avant de lancer le dé ce tour : choisis Pair ou Impair sur le numéro affiché par le dé . Gagné : +1 relance. Perdu : −1 relance (min 0).' },
-  { id: 'reroll_back', name: 'Deuxième souffle', emoji: '🎲', rarity: 'common', type: 'active', desc: 'Récupère des relances : si tu as au moins 1 relance restante, tu remontes à 2. Sinon tu gagnes 1 relance.' },
+  { id: 'reroll_back', name: 'Deuxième souffle', emoji: '🎲', rarity: 'common', type: 'active', desc: '+1 relance pour ce tour, sans plafond (cumulable : plusieurs cartes / effets s’additionnent).' },
   { id: 'double_pioche', name: 'Double pioche', emoji: '🎴', rarity: 'rare', type: 'active', desc: 'Ce tour, tu lances 2 fois (sans éliminer) et tu choisis le meilleur résultat à garder.' },
   { id: 'premeditation', name: 'Préméditation', emoji: '🧠', rarity: 'rare', type: 'active', desc: 'Avant le dé : devine Good ou Bad sur une carte secrète de ta boîte. Raté → carte perdue. Réussi → garder le loot (fin du tour), +1 relance ou 1 Rare.' },
   { id: 'fifty', name: '50%', emoji: '⚖️', rarity: 'rare', type: 'active', desc: 'Choisis 3 Good et 3 Bad. Ton prochain loot de ce tour sera forcément dans ces 6 cartes.' },
@@ -1969,7 +1990,7 @@ const PLAYABLE_CARDS = [
   { id: 'sandevistan', name: 'Sandevistan', emoji: '⏱️', rarity: 'legendary', type: 'active', desc: 'Ralentis le temps : vole au hasard 1 carte jouable dans la main de chaque adversaire (s’il en a), et tu gagnes la Bénédiction pour ce tour.' },
   { id: 'bad_luck', name: 'Malédiction', emoji: '🌑', rarity: 'passive', type: 'passive', desc: 'Ce tour, 25% de chance que ton résultat devienne défavorable (inversé selon ta Personne Good/Bad).', effect: 'force_bad' },
   { id: 'good_luck', name: 'Bénédiction', emoji: '✨', rarity: 'passive', type: 'passive', desc: 'Ce tour, 25% de chance que ton résultat devienne favorable (inversé selon ta Personne Good/Bad).', effect: 'force_good' },
-  { id: 'shield', name: 'Bouclier', emoji: '🛡️', rarity: 'passive', type: 'passive', desc: 'Protection jusqu’à la fin du round : tu es immunisé contre Échange, Blinded et Échange de corps.', effect: 'shield' }
+  { id: 'shield', name: 'Bouclier', emoji: '🛡️', rarity: 'passive', type: 'passive', desc: 'Dès l’activation jusqu’au début de ton prochain tour : immunisé contre les cartes qui te ciblent ou t’affectent — Blinded, Échange, Échange de corps, Bas les masques, Gel, Vol de main, Petit sabotage, Miasme, Sandevistan, Partage ? (vol de ta main), Nostalgie (si un adversaire te vise).', effect: 'shield' }
 ];
 
 /** Sous Boucle temporelle : pioches payantes sans −1 🎲 avant d’épuiser ce quota */
@@ -2067,6 +2088,8 @@ let box = [];
 let turnOrder = [];
 let currentTurnIdx = 0;
 let currentRound = 0;
+/** Compteur de tours (offline) : expire le bouclier au début du prochain tour du porteur */
+let shieldTurnSeqOffline = 0;
 let currentEntity = null;
 let firstEntity = null;
 let hasRerolled = false;
@@ -3508,7 +3531,8 @@ function createRoomOnline(m) {
     chatFeed: [],
     reactionFeed: [],
     reactionTurnKey: '0:0',
-    reactionTurnCounts: {}
+    reactionTurnCounts: {},
+    shieldTurnSeq: 0
   };
 
   ref.set({ createdAt: Date.now(), lastActiveAt: Date.now(), hostId: playerId, state: state })
@@ -3718,6 +3742,7 @@ function onlineAction(action, payload) {
       st.firstEntity = null;
       st.hasRerolled = false;
       st.turnSetupPid = null;
+      st.shieldTurnSeq = 0;
       st.pending = null;
       st.blindedRound = null;
       st.blindedBy = null;
@@ -3744,6 +3769,7 @@ function onlineAction(action, payload) {
         p.drawnCard = null;
         p.activePassives = [];
         p.shieldedRound = false;
+        p.shieldExpiresAtSeq = null;
         p.infiniteReroll = false;
         p.loopPiocheFreeLeft = 0;
         p.banned = [];
@@ -3840,6 +3866,7 @@ function onlineAction(action, payload) {
       st.firstEntity = null;
       st.hasRerolled = false;
       st.turnSetupPid = null;
+      st.shieldTurnSeq = 0;
       st.pending = null;
       st.lastActiveCardId = null;
       st.lastActiveCardPlayerId = null;
@@ -3930,6 +3957,7 @@ function onlineAction(action, payload) {
       resetTurnFlags();
       st.pending = null;
       st.turnSetupPid = null;
+      st.shieldTurnSeq = 0;
       st.revealHands = null;
       st.revealResults = null;
       st.lastPassiveDraw = null;
@@ -3963,6 +3991,7 @@ function onlineAction(action, payload) {
         pp.pariMinableFlash = null;
         pp.activePassives = [];
         pp.shieldedRound = false;
+        pp.shieldExpiresAtSeq = null;
         pp.mainDuDestinBonusRerolls = 0;
         pp.mainDuDestinPremiumDraws = 0;
       });
@@ -4067,10 +4096,32 @@ function onlineAction(action, payload) {
       logPublicCardPlayed(st, player, card, {});
     }
 
+    function refundPendingInteractiveCard() {
+      var pen = st.pending;
+      var plR = currentPlayer();
+      if (pen && pen.card && plR) {
+        plR.hand = plR.hand || [];
+        plR.hand.push(pen.card);
+        if (plR.turnLog && plR.turnLog.length && plR.turnLog[0] && pen.card.id && plR.turnLog[0].id === pen.card.id) plR.turnLog.shift();
+      }
+      clearPending();
+    }
+
     function ensureTurnSetup() {
       const pid = currentPid();
       if (!pid) return;
       if (st.turnSetupPid === pid) return;
+      if (typeof st.shieldTurnSeq !== 'number') st.shieldTurnSeq = 0;
+      st.shieldTurnSeq++;
+      (st.players || []).forEach(function(pp) {
+        if (!pp || !pp.shieldedRound) return;
+        var expS = pp.shieldExpiresAtSeq;
+        if (typeof expS === 'number' && st.shieldTurnSeq >= expS) {
+          pp.shieldedRound = false;
+          pp.shieldExpiresAtSeq = null;
+          if (Array.isArray(pp.activePassives)) pp.activePassives = pp.activePassives.filter(function(x) { return x !== 'shield'; });
+        }
+      });
       const p = currentPlayer();
       if (!p) return;
       // Reset per-turn fields (match beginTurn intent)
@@ -4083,6 +4134,7 @@ function onlineAction(action, payload) {
       p.curatedPoolIds = null;
       p.goodBoost = 0;
       p.turnLog = [];
+      if (p.shieldedRound) p.activePassives.push('shield');
       // IMPORTANT: do not decrement frozenTurns at start of the turn.
       // Frozen means "can't play cards during your next turn", so we decrement at end of that turn.
       resetTurnFlags();
@@ -4393,7 +4445,7 @@ function onlineAction(action, payload) {
           targetId: null
         });
         st.currentTurnIdx = 0;
-        (st.players || []).forEach(function(pp) { if (!pp) return; pp.banned = []; pp.shieldedRound = false; pp.curatedPoolIds = null; });
+        (st.players || []).forEach(function(pp) { if (!pp) return; pp.banned = []; pp.curatedPoolIds = null; });
         (st.players || []).forEach(function(pp) { if (pp) pp.lastPlayableDrawRound = -1; });
         if (Number(st.currentRound) === 1) {
           st.box = ACTIONS.map(function(a, i) { return { id: 'a_' + i, name: a.name, image: null, emoji: a.emoji, category: 'action', good: !!a.good }; });
@@ -4491,7 +4543,14 @@ function onlineAction(action, payload) {
       p.activePassives = p.activePassives || [];
       if (card.effect === 'force_bad') p.activePassives.push('force_bad');
       if (card.effect === 'force_good') p.activePassives.push('force_good');
-      if (card.effect === 'shield') { p.shieldedRound = true; p.activePassives.push('shield'); }
+      if (card.effect === 'shield') {
+        p.shieldedRound = true;
+        p.activePassives.push('shield');
+        var nShP = (st.players || []).filter(function(x) { return x; }).length;
+        var seqNow = (typeof st.shieldTurnSeq === 'number' ? st.shieldTurnSeq : 0);
+        if (seqNow < 1) seqNow = 1;
+        p.shieldExpiresAtSeq = seqNow + nShP;
+      }
     }
 
     function rarityAllowedForPiocheSacree(score) {
@@ -4550,7 +4609,7 @@ function onlineAction(action, payload) {
         return;
       }
       if (card.id === 'reroll_back') {
-        p.rerollsLeft = (p.rerollsLeft >= 1) ? 2 : 1;
+        p.rerollsLeft = (Number(p.rerollsLeft || 0) || 0) + 1;
         publishCardPlay(st, p, card, {});
         return;
       }
@@ -4570,6 +4629,7 @@ function onlineAction(action, payload) {
         (st.players || []).forEach(function(pp) {
           if (!pp) return;
           if (String(pp.id || '') === String(p.id || '')) return;
+          if (pp.shieldedRound) return;
           if (typeof pp.badLootBoostCount !== 'number') pp.badLootBoostCount = Number(pp.badLootBoostCount || 0) || 0;
           pp.badLootBoostCount = (Number(pp.badLootBoostCount) || 0) + 1;
           var prev = Number(pp.badLootBoost || 0) || 0;
@@ -4634,6 +4694,7 @@ function onlineAction(action, payload) {
         (st.players || []).forEach(function(pp) {
           if (!pp) return;
           if (String(pp.id || '') === String(p.id || '')) return;
+          if (pp.shieldedRound) return;
           if (!Array.isArray(pp.hand) || pp.hand.length === 0) return;
           var ix = Math.floor(Math.random() * pp.hand.length);
           var stc = pp.hand.splice(ix, 1)[0];
@@ -4881,6 +4942,7 @@ function onlineAction(action, payload) {
       var tid = payload && payload.targetId ? String(payload.targetId) : '';
       var t = (st.players || []).find(function(pp) { return pp && String(pp.id || '') === tid; }) || null;
       if (!t) return st;
+      if (t.shieldedRound) { refundPendingInteractiveCard(); return st; }
       t.frozenTurns = Math.max(Number(t.frozenTurns || 0) || 0, 1);
       var pc4 = st.pending && st.pending.card ? st.pending.card : null;
       if (pc4 && pGel) {
@@ -4900,6 +4962,7 @@ function onlineAction(action, payload) {
       const p = currentPlayer();
       var tid2 = payload && payload.targetId ? String(payload.targetId) : '';
       var t2 = (st.players || []).find(function(pp) { return pp && String(pp.id || '') === tid2; }) || null;
+      if (t2 && t2.shieldedRound) { refundPendingInteractiveCard(); return st; }
       if (!p || !t2 || !Array.isArray(t2.hand) || t2.hand.length === 0) { clearPending(); return st; }
       var idx2 = Math.floor(Math.random() * t2.hand.length);
       var stolen = t2.hand.splice(idx2, 1)[0];
@@ -4930,7 +4993,8 @@ function onlineAction(action, payload) {
       if (!p) return st;
       // same as applying card effect directly (if no candidates -> random)
       var others = (st.players || []).filter(function(pp) { return pp && String(pp.id || '') !== String(p.id || ''); });
-      var anyHave = others.some(function(pp) { return handArrayFromFirebase(pp.hand).length > 0; });
+      var othersVuln = others.filter(function(pp) { return pp && !pp.shieldedRound; });
+      var anyHave = othersVuln.some(function(pp) { return handArrayFromFirebase(pp.hand).length > 0; });
       if (!anyHave) {
         var rnd = drawCard();
         p.hand = p.hand || [];
@@ -4965,6 +5029,7 @@ function onlineAction(action, payload) {
       var tid3 = payload && payload.targetId ? String(payload.targetId) : '';
       var t3 = (st.players || []).find(function(pp) { return pp && String(pp.id || '') === tid3; }) || null;
       if (!t3) { clearPending(); return st; }
+      if (t3.shieldedRound) { refundPendingInteractiveCard(); return st; }
       p.hand = p.hand || [];
       var pc6 = st.pending && st.pending.card ? st.pending.card : null;
       var t3HandArr = handArrayFromFirebase(t3.hand);
@@ -5012,6 +5077,7 @@ function onlineAction(action, payload) {
       var tid4 = payload && payload.targetId ? String(payload.targetId) : '';
       var t4 = (st.players || []).find(function(pp) { return pp && String(pp.id || '') === tid4; }) || null;
       if (!p || !t4) { clearPending(); return st; }
+      if (t4.shieldedRound) { refundPendingInteractiveCard(); return st; }
       var destroyedCard = null;
       var removedEntity = null;
       var when = null;
@@ -5078,6 +5144,7 @@ function onlineAction(action, payload) {
       var rr = Number(payload && payload.round);
       var pi = Number(payload && payload.pickIdx);
       if (!t5 || !(rr >= 0 && rr <= 2)) { clearPending(); return st; }
+      if (t5.shieldedRound && String(tid5) !== String(currentPid() || '')) { refundPendingInteractiveCard(); return st; }
       if (!t5.picks || !Array.isArray(t5.picks[rr]) || !(pi >= 0 && pi < t5.picks[rr].length)) { clearPending(); return st; }
       var old = t5.picks[rr][pi];
       var remain = remainingPoolForRound(rr, old && old.id);
@@ -5167,7 +5234,8 @@ function onlineAction(action, payload) {
       var t6 = (st.players || []).find(function(pp) { return pp && String(pp.id || '') === tid6; }) || null;
       var rr2 = Number(payload && payload.round);
       var pi2 = Number(payload && payload.pickIdx);
-      if (!p || !t6 || t6.shieldedRound) { clearPending(); return st; }
+      if (!p || !t6) { clearPending(); return st; }
+      if (t6.shieldedRound) { refundPendingInteractiveCard(); return st; }
       if (!p.picks || !Array.isArray(p.picks[rr2]) || !(pi2 >= 0 && pi2 < p.picks[rr2].length)) { clearPending(); return st; }
       var roll1 = Math.floor(Math.random() * 6) + 1;
       var roll2 = Math.floor(Math.random() * 6) + 1;
@@ -5352,6 +5420,7 @@ function onlineAction(action, payload) {
         'drawnCard',
         'activePassives',
         'shieldedRound',
+        'shieldExpiresAtSeq',
         'infiniteReroll',
         'loopPiocheFreeLeft',
         'banned',
@@ -5428,7 +5497,8 @@ function onlineAction(action, payload) {
       const p = currentPlayer();
       var tidM = payload && payload.targetId ? String(payload.targetId) : '';
       var tM = (st.players || []).find(function(pp) { return pp && String(pp.id || '') === tidM; }) || null;
-      if (!p || !tM || tM.shieldedRound) { clearPending(); return st; }
+      if (!p || !tM) { clearPending(); return st; }
+      if (tM.shieldedRound) { refundPendingInteractiveCard(); return st; }
       st.revealResults = { pid: String(p.id || ''), targetId: String(tM.id || ''), round: Number(st.currentRound || 0) || 0, turnIdx: Number(st.currentTurnIdx || 0) || 0, ts: Date.now() };
       var pcM = st.pending && st.pending.card ? st.pending.card : null;
       if (pcM) {
@@ -6518,7 +6588,7 @@ function goToTurnOrder() {
   players.forEach(function(p) {
     p.picks = [[],[],[]]; p.rerollsLeft = 2; p.rollRaw = 0; p.rollDisplay = 0;
     p.hand = []; p.drawnCard = null; p.activePassives = [];
-    p.shieldedRound = false; p.infiniteReroll = false; p.loopPiocheFreeLeft = 0; p.banned = [];
+    p.shieldedRound = false; p.shieldExpiresAtSeq = null; p.infiniteReroll = false; p.loopPiocheFreeLeft = 0; p.banned = [];
     p.secondLookArmed = false; p.secondLookUsed = false; p.doublePiocheArmed = false;
     p.curatedPoolIds = null; p.goodBoost = 0; p.goodBoostCount = 0; p.badLootBoost = 0; p.badLootBoostCount = 0; p.ticketCaisseNextRare = false; p.ticketCaisseNextRareCount = 0; p.pariMinableGuess = null; p.pariMinableFlash = null; p.frozenTurns = 0; p.pendingSabotageBan = 0;
     p.mainDuDestinBonusRerolls = 0; p.mainDuDestinPremiumDraws = 0;
@@ -6636,6 +6706,7 @@ function startGame() {
     onlineAction('host:startGame', {}).catch(function(err) { showToast(String(err.message || err), 'danger'); });
     return;
   }
+  shieldTurnSeqOffline = 0;
   currentRound = 0;
   hasRerolled = false;
   currentEntity = null;
@@ -6681,7 +6752,6 @@ function showRoundTransition() {
         }
         p.pendingSabotageBan = 0;
       });
-      turnOrder.forEach(function(p) { p.shieldedRound = false; });
       blindedRound = null;
       blindedBy = null;
       blindedByPid = null;
@@ -6736,6 +6806,7 @@ function applyFlashbackLocal(caster, card) {
     p.pariMinableFlash = null;
     p.activePassives = [];
     p.shieldedRound = false;
+    p.shieldExpiresAtSeq = null;
     p.lastPlayableDrawRound = -1;
     p.needsRound1Draft = true;
     p.mainDuDestinBonusRerolls = 0;
@@ -6751,6 +6822,17 @@ function applyFlashbackLocal(caster, card) {
 }
 
 function beginTurn() {
+  if (typeof shieldTurnSeqOffline !== 'number') shieldTurnSeqOffline = 0;
+  shieldTurnSeqOffline++;
+  turnOrder.forEach(function(pp) {
+    if (!pp || !pp.shieldedRound) return;
+    var exOf = pp.shieldExpiresAtSeq;
+    if (typeof exOf === 'number' && shieldTurnSeqOffline >= exOf) {
+      pp.shieldedRound = false;
+      pp.shieldExpiresAtSeq = null;
+      if (Array.isArray(pp.activePassives)) pp.activePassives = pp.activePassives.filter(function(x) { return x !== 'shield'; });
+    }
+  });
   var player = turnOrder[currentTurnIdx];
   hasRerolled = false;
   currentEntity = null;
@@ -6767,6 +6849,7 @@ function beginTurn() {
   player.goodBoostCount = 0;
   player.badLootBoostCount = 0;
   player.turnLog = [];
+  if (player.shieldedRound) player.activePassives.push('shield');
   // IMPORTANT: do not decrement frozenTurns at start of the turn.
   // Frozen means "can't play cards during your next turn", so we decrement at end of that turn.
 
@@ -7061,6 +7144,10 @@ function applyPassiveCard(player, card) {
   } else if (card.effect === 'shield') {
     player.shieldedRound = true;
     player.activePassives.push('shield');
+    var nShOf = turnOrder.filter(Boolean).length;
+    var seqLo = shieldTurnSeqOffline;
+    if (seqLo < 1) seqLo = 1;
+    player.shieldExpiresAtSeq = seqLo + nShOf;
     showToast(card.emoji + ' Bouclier activé !', 'success');
   }
   // If it was the freshly drawn card, clear it.
@@ -7139,9 +7226,8 @@ function executeCard(player, card) {
     }
     showPariMinable(player);
   } else if (card.id === 'reroll_back') {
-    // If you haven't used any reroll yet, you go to 2. If you've already used it, you go back to 1.
-    player.rerollsLeft = (player.rerollsLeft >= 1) ? 2 : 1;
-    showToast(card.emoji + ' Relance récupérée ! (' + player.rerollsLeft + ')', 'success');
+    player.rerollsLeft = (Number(player.rerollsLeft || 0) || 0) + 1;
+    showToast(card.emoji + ' +1 relance — total : ' + player.rerollsLeft + ' 🎲', 'success');
     renderTurnCenter(player);
   } else if (card.id === 'double_pioche') {
     player.doublePiocheArmed = true;
@@ -7165,6 +7251,7 @@ function executeCard(player, card) {
   } else if (card.id === 'miasme') {
     turnOrder.forEach(function(pp) {
       if (!pp || pp.id === player.id) return;
+      if (pp.shieldedRound) return;
       if (typeof pp.badLootBoostCount !== 'number') pp.badLootBoostCount = Number(pp.badLootBoostCount || 0) || 0;
       pp.badLootBoostCount = (Number(pp.badLootBoostCount) || 0) + 1;
       var prev = Number(pp.badLootBoost || 0) || 0;
@@ -7225,6 +7312,7 @@ function executeCard(player, card) {
     var stolenOff = 0;
     turnOrder.forEach(function(pp) {
       if (!pp || pp.id === player.id) return;
+      if (pp.shieldedRound) return;
       if (!pp.hand || !pp.hand.length) return;
       var j = Math.floor(Math.random() * pp.hand.length);
       var st0 = pp.hand.splice(j, 1)[0];
@@ -8295,17 +8383,17 @@ function showExchange(player) {
 function renderExchangeStep1(player) {
   var others = turnOrder.filter(function(p) { return p.id !== player.id; });
   var html = '<div style="font-size:2rem;margin-bottom:.3rem">🔄</div>' +
-    '<h3 style="margin-bottom:.5rem">Choisis un adversaire</h3>';
+    '<h3 style="margin-bottom:.35rem">Choisis un adversaire</h3>' +
+    '<p style="color:var(--text-dim);font-size:.78rem;margin:0 0 .65rem">🛡️ = protégé, grisé, non sélectionnable</p>';
   if (others.every(function(p) { return p.shieldedRound; })) {
     html += '<p style="color:var(--text-dim);font-size:.82rem;margin:1rem 0">Tous les adversaires sont protégés par un bouclier !</p>' +
       '<button class="btn btn-back" onclick="closeExchange()">Annuler</button>';
   } else {
     html += '<div class="exch-players">' + others.map(function(p) {
-      var cls = 'exch-player-btn' + (p.shieldedRound ? ' shielded' : '');
-      return '<button class="' + cls + '" onclick="selectExchTarget(' + jsq(p.id) + ')">' +
-        '<span style="width:10px;height:10px;border-radius:50%;background:' + p.color + ';display:inline-block"></span>' +
-        esc(p.name) + (p.shieldedRound ? ' 🛡️' : '') +
-      '</button>';
+      return htmlExchPlayerBtn(p, {
+        shielded: !!p.shieldedRound,
+        onclick: p.shieldedRound ? '' : ('selectExchTarget(' + jsq(p.id) + ')')
+      });
     }).join('') + '</div>';
   }
   document.getElementById('exchangeContent').innerHTML = html;
@@ -9248,6 +9336,7 @@ function selectSabotageMode(mode) {
   var sub = (mode === 'reroll') ? 'Choisis un joueur'
     : (mode === 'ban') ? 'Choisis un joueur'
     : 'Choisis un joueur';
+  sub += ' — 🛡️ = protégé (grisé, non cliquable).';
 
   var html =
     '<h3 style="margin-bottom:.25rem">' + title + '</h3>' +
@@ -9255,16 +9344,24 @@ function selectSabotageMode(mode) {
     '<div class="exch-players">' +
       others.map(function(p) {
         var hc = (p && typeof p.handCount === 'number') ? p.handCount : ((p.hand && p.hand.length) ? p.hand.length : 0);
-        var dis = (mode === 'reroll') ? (p.infiniteReroll || playerSpendableRerollsTotal(p) <= 0)
+        var sh = !!p.shieldedRound;
+        var disOther = (mode === 'reroll') ? (p.infiniteReroll || playerSpendableRerollsTotal(p) <= 0)
           : (mode === 'explode') ? (hc <= 0)
           : false;
         var extra = '';
         if (mode === 'reroll') extra = ' (' + (p.infiniteReroll ? '∞' : playerSpendableRerollsTotal(p)) + ')';
-        if (mode === 'explode') extra = dis ? ' (vide)' : (' (🃏' + hc + ')');
-        return '<button class="exch-player-btn' + (dis ? ' disabled' : '') + '" onclick="confirmPetitSabotage(' + jsq(p.id) + ')">' +
-          '<span style="width:10px;height:10px;border-radius:50%;background:' + p.color + ';display:inline-block"></span>' +
-          esc(p.name) + extra +
-        '</button>';
+        if (mode === 'explode') {
+          if (sh) extra = '';
+          else if (hc <= 0) extra = ' (vide)';
+          else extra = ' (🃏' + hc + ')';
+        }
+        var cant = sh || disOther;
+        return htmlExchPlayerBtn(p, {
+          shielded: sh,
+          disabled: !sh && disOther,
+          onclick: cant ? '' : ('confirmPetitSabotage(' + jsq(p.id) + ')'),
+          suffix: extra
+        });
       }).join('') +
     '</div>' +
     '<button class="btn btn-back" onclick="showPetitSabotage(turnOrder[currentTurnIdx])">← Retour</button>';
@@ -9283,6 +9380,14 @@ function confirmPetitSabotage(targetId) {
 
   var target = turnOrder.find(function(p) { return String(p && p.id || '') === String(targetId || ''); });
   if (!target) return;
+  if (target.shieldedRound) {
+    showToast('🛡️ Bouclier : ' + target.name + ' est immunisé.', 'danger');
+    refundJustPlayedCard(player, 'petit_sabotage');
+    closeActionOverlay();
+    renderSidebar();
+    renderTurnCenter(player);
+    return;
+  }
 
   if (mode === 'reroll') {
     if (target.infiniteReroll || playerSpendableRerollsTotal(target) <= 0) {
@@ -9348,13 +9453,15 @@ function showNostalgie(player) {
   window._nost = { attackerId: player.id, targetId: null, round: null, pickIdx: null };
   var html =
     '<h3 style="margin-bottom:.25rem">🕰️ Nostalgie</h3>' +
-    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">Choisis le joueur à forcer (toi inclus)</p>' +
+    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">Choisis le joueur — adversaire 🛡️ = intouchable (grisé) ; toi toujours ok</p>' +
     '<div class="exch-players">' +
       turnOrder.map(function(p) {
-        return '<button class="exch-player-btn" onclick="selectNostalgieTarget(' + jsq(p.id) + ')">' +
-          '<span style="width:10px;height:10px;border-radius:50%;background:' + p.color + ';display:inline-block"></span>' +
-          esc(p.name) +
-        '</button>';
+        var selfN = p.id === player.id;
+        var shN = !!p.shieldedRound && !selfN;
+        return htmlExchPlayerBtn(p, {
+          shielded: shN,
+          onclick: shN ? '' : ('selectNostalgieTarget(' + jsq(p.id) + ')')
+        });
       }).join('') +
     '</div>' +
     '<button class="btn btn-back" onclick="closeActionOverlay()">Annuler</button>';
@@ -9365,6 +9472,15 @@ function selectNostalgieTarget(targetId) {
   window._nost.targetId = targetId;
   var target = turnOrder.find(function(p) { return p.id === targetId; });
   if (!target) return;
+  var attackerN = turnOrder[currentTurnIdx];
+  if (target.shieldedRound && attackerN && target.id !== attackerN.id) {
+    showToast('🛡️ Bouclier : ' + target.name + ' est immunisé.', 'danger');
+    refundJustPlayedCard(attackerN, 'nostalgie');
+    closeActionOverlay();
+    renderSidebar();
+    renderTurnCenter(attackerN);
+    return;
+  }
 
   var pc = target && Array.isArray(target.pickCounts) ? target.pickCounts : null;
   function countForRound(r) {
@@ -9493,17 +9609,48 @@ function applyJackpot(player) {
   renderTurnCenter(player);
 }
 
+/* ── Remet en main une carte « jouée » (ex. cible bouclier) ── */
+function refundJustPlayedCard(player, cardId) {
+  if (!player || !cardId) return;
+  var def = PLAYABLE_CARDS.find(function(c) { return c && c.id === cardId; });
+  if (!def) return;
+  player.hand = player.hand || [];
+  player.hand.push(JSON.parse(JSON.stringify(def)));
+  if (player.turnLog && player.turnLog.length && player.turnLog[0] && player.turnLog[0].id === cardId) player.turnLog.shift();
+}
+
+/** Bouton joueur pour choix de cible (sorts) : pastille couleur, 🛡️ si bouclier, nom atténué / non cliquable. */
+function htmlExchPlayerBtn(p, opts) {
+  opts = opts || {};
+  var sh = !!opts.shielded;
+  var disOnly = !!opts.disabled;
+  var dis = disOnly || sh;
+  var cls = 'exch-player-btn';
+  if (sh) cls += ' shielded';
+  else if (disOnly) cls += ' disabled';
+  var dot = '<span class="exch-player-dot" style="width:10px;height:10px;border-radius:50%;background:' + p.color + ';display:inline-block;flex-shrink:0"></span>';
+  var shieldMark = sh ? '<span class="exch-shield-ico" aria-hidden="true" title="Bouclier">🛡️</span>' : '';
+  var nameMod = sh ? ' exch-player-name-shielded' : (disOnly ? ' exch-player-name-muted' : '');
+  var nameSpan = '<span class="exch-player-name' + nameMod + '">' + esc(p.name) + '</span>';
+  var tail = opts.suffix || '';
+  var attrs = 'type="button" class="' + cls + '"';
+  if (dis) attrs += ' disabled';
+  if (!dis && opts.onclick) attrs += ' onclick="' + opts.onclick + '"';
+  return '<button ' + attrs + '>' + dot + shieldMark + nameSpan + tail + '</button>';
+}
+
 /* ── Gel ── */
 function showGel(player) {
   var html =
     '<h3 style="margin-bottom:.25rem">🧊 Gel</h3>' +
-    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">Choisis un joueur</p>' +
+    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">Choisis un joueur — 🛡️ = protégé, grisé, non sélectionnable</p>' +
     '<div class="exch-players">' +
       turnOrder.map(function(p) {
-        return '<button class="exch-player-btn" onclick="confirmGel(' + jsq(p.id) + ')">' +
-          '<span style="width:10px;height:10px;border-radius:50%;background:' + p.color + ';display:inline-block"></span>' +
-          esc(p.name) +
-        '</button>';
+        var shG = !!p.shieldedRound;
+        return htmlExchPlayerBtn(p, {
+          shielded: shG,
+          onclick: shG ? '' : ('confirmGel(' + jsq(p.id) + ')')
+        });
       }).join('') +
     '</div>' +
     '<button class="btn btn-back" onclick="closeActionOverlay()">Annuler</button>';
@@ -9519,6 +9666,14 @@ function confirmGel(targetId) {
   }
   var target = turnOrder.find(function(p) { return p.id === targetId; });
   if (!target) return;
+  if (target.shieldedRound) {
+    showToast('🛡️ Bouclier : ' + target.name + ' est immunisé.', 'danger');
+    refundJustPlayedCard(attacker, 'gel');
+    closeActionOverlay();
+    renderSidebar();
+    renderTurnCenter(attacker);
+    return;
+  }
   target.frozenTurns = Math.max(target.frozenTurns || 0, 1);
   triggerCardPlayFx('gel', { targetName: target.name });
   showToast('🧊 ' + target.name + ' est gelé pour son prochain tour !', 'danger');
@@ -9531,7 +9686,8 @@ function confirmGel(targetId) {
 /* ── Partage ? ── */
 function showPartage(player) {
   var candidates = turnOrder.filter(function(p) { return p.id !== player.id; });
-  var anyHave = candidates.some(function(p) {
+  var vulnPart = candidates.filter(function(p) { return p && !p.shieldedRound; });
+  var anyHave = vulnPart.some(function(p) {
     var hc = (p && typeof p.handCount === 'number') ? p.handCount : ((p.hand && p.hand.length) ? p.hand.length : 0);
     return hc > 0;
   });
@@ -9551,15 +9707,17 @@ function showPartage(player) {
   }
   var html =
     '<h3 style="margin-bottom:.25rem">🤝 Partage ?</h3>' +
-    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">Choisis un adversaire : on copie une carte au hasard. Main vide → carte aléatoire.</p>' +
+    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">Choisis un adversaire — 🛡️ = main intouchable (grisé). Main vide → carte aléatoire.</p>' +
     '<div class="exch-players">' +
       candidates.map(function(p) {
         var hc = (p && typeof p.handCount === 'number') ? p.handCount : ((p.hand && p.hand.length) ? p.hand.length : 0);
-        var label = esc(p.name) + (hc ? ' (🃏' + hc + ')' : ' (vide → aléatoire)');
-        return '<button class="exch-player-btn" onclick="confirmPartage(' + jsq(p.id) + ')">' +
-          '<span style="width:10px;height:10px;border-radius:50%;background:' + p.color + ';display:inline-block"></span>' +
-          label +
-        '</button>';
+        var shP = !!p.shieldedRound;
+        var suf = (hc ? ' (🃏' + hc + ')' : ' (vide → aléatoire)');
+        return htmlExchPlayerBtn(p, {
+          shielded: shP,
+          onclick: shP ? '' : ('confirmPartage(' + jsq(p.id) + ')'),
+          suffix: suf
+        });
       }).join('') +
     '</div>' +
     '<button class="btn btn-back" onclick="closeActionOverlay()">Annuler</button>';
@@ -9575,6 +9733,14 @@ function confirmPartage(targetId) {
   }
   var target = turnOrder.find(function(p) { return p.id === targetId; });
   if (!target) return;
+  if (target.shieldedRound) {
+    showToast('🛡️ Bouclier : impossible de copier la main de ' + target.name + '.', 'danger');
+    refundJustPlayedCard(player, 'partage');
+    closeActionOverlay();
+    renderSidebar();
+    renderTurnCenter(player);
+    return;
+  }
   if (!target.hand || target.hand.length === 0) {
     var rndOff = drawCard();
     player.hand.push(rndOff);
@@ -9813,14 +9979,13 @@ function showEchangeDeCorps(player) {
   var others = turnOrder.filter(function(p) { return p.id !== player.id; });
   var html =
     '<h3 style="margin-bottom:.25rem">🧬 Échange de corps</h3>' +
-    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">Choisis un joueur (Bouclier protège)</p>' +
+    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">Choisis un joueur — 🛡️ = protégé, grisé, non sélectionnable</p>' +
     '<div class="exch-players">' +
       others.map(function(p) {
-        var cls = 'exch-player-btn' + (p.shieldedRound ? ' shielded' : '');
-        return '<button class="' + cls + '" onclick="confirmEchangeDeCorps(' + jsq(p.id) + ')">' +
-          '<span style="width:10px;height:10px;border-radius:50%;background:' + p.color + ';display:inline-block"></span>' +
-          esc(p.name) + (p.shieldedRound ? ' 🛡️' : '') +
-        '</button>';
+        return htmlExchPlayerBtn(p, {
+          shielded: !!p.shieldedRound,
+          onclick: p.shieldedRound ? '' : ('confirmEchangeDeCorps(' + jsq(p.id) + ')')
+        });
       }).join('') +
     '</div>' +
     '<button class="btn btn-back" onclick="closeActionOverlay()">Annuler</button>';
@@ -9866,13 +10031,13 @@ function showBasLesMasques(player) {
   var others = turnOrder.filter(function(p) { return p && p.id !== player.id; });
   var html =
     '<h3 style="margin-bottom:.25rem">🎭 Bas les masques</h3>' +
-    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">Choisis un joueur : tu vois ses résultats (pas sa main) pendant <b>ce tour</b>.</p>' +
+    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">Choisis un joueur : tu vois ses résultats (pas sa main) pendant <b>ce tour</b>. 🛡️ = intouchable.</p>' +
     '<div class="exch-players">' +
       others.map(function(p) {
-        return '<button class="exch-player-btn" onclick="confirmBasLesMasques(' + jsq(p.id) + ')">' +
-          '<span style="width:10px;height:10px;border-radius:50%;background:' + p.color + ';display:inline-block"></span>' +
-          esc(p.name) +
-        '</button>';
+        return htmlExchPlayerBtn(p, {
+          shielded: !!p.shieldedRound,
+          onclick: p.shieldedRound ? '' : ('confirmBasLesMasques(' + jsq(p.id) + ')')
+        });
       }).join('') +
     '</div>' +
     '<button class="btn btn-back" onclick="closeActionOverlay()">Annuler</button>';
@@ -9896,14 +10061,16 @@ function showVolDeMain(player) {
   if (others.length === 0) { showToast('Aucun joueur.', 'danger'); return; }
   var html =
     '<h3 style="margin-bottom:.25rem">🃏 Vol de main</h3>' +
-    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">Choisis un joueur</p>' +
+    '<p style="color:var(--text-dim);font-size:.8rem;margin-bottom:.8rem">Choisis un joueur — 🛡️ = protégé, grisé, non sélectionnable</p>' +
     '<div class="exch-players">' +
       others.map(function(p) {
         var hc = (p && typeof p.handCount === 'number') ? p.handCount : ((p.hand && p.hand.length) ? p.hand.length : 0);
-        return '<button class="exch-player-btn" onclick="confirmVolDeMain(' + jsq(p.id) + ')">' +
-          '<span style="width:10px;height:10px;border-radius:50%;background:' + p.color + ';display:inline-block"></span>' +
-          esc(p.name) + (hc ? ' (🃏' + hc + ')' : ' (vide)') +
-        '</button>';
+        var shV = !!p.shieldedRound;
+        return htmlExchPlayerBtn(p, {
+          shielded: shV,
+          onclick: shV ? '' : ('confirmVolDeMain(' + jsq(p.id) + ')'),
+          suffix: (hc ? ' (🃏' + hc + ')' : ' (vide)')
+        });
       }).join('') +
     '</div>' +
     '<button class="btn btn-back" onclick="closeActionOverlay()">Annuler</button>';
@@ -9919,6 +10086,14 @@ function confirmVolDeMain(targetId) {
   }
   var target = turnOrder.find(function(p) { return p.id === targetId; });
   if (!target) return;
+  if (target.shieldedRound) {
+    showToast('🛡️ Bouclier : impossible de voler à ' + target.name + '.', 'danger');
+    refundJustPlayedCard(player, 'vol_main');
+    closeActionOverlay();
+    renderSidebar();
+    renderTurnCenter(player);
+    return;
+  }
   if (!target.hand || target.hand.length === 0) {
     showToast('Main vide…', 'danger');
     closeActionOverlay();
