@@ -846,6 +846,31 @@
 
     /* ── SUMMARY ── */
     .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1.2rem; }
+    #summaryFooterActions .btn {
+      font-size: .95rem;
+      font-weight: 600;
+      padding: .85rem 1.8rem;
+      min-height: 3rem;
+      box-sizing: border-box;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #summaryFooterActions:has(.btn:nth-child(2)) .btn {
+      flex: 1 1 0;
+      min-width: 0;
+      max-width: 22rem;
+    }
+    .summary-podium { margin: 0 0 1.75rem; padding: 1rem 1.1rem 1.2rem; background: var(--surface-2); border-radius: 16px; border: 1px solid rgba(255,255,255,.08); }
+    .summary-podium h2 { font-size: 1.05rem; font-weight: 900; margin: 0 0 .35rem; text-align: center; }
+    .summary-podium > p.summary-podium-rule { font-size: .72rem; color: var(--text-dim); text-align: center; margin: 0 0 .85rem; line-height: 1.4; }
+    .summary-podium-winner { text-align: center; font-size: .88rem; font-weight: 800; margin-bottom: .75rem; color: #fbbf24; text-shadow: 0 0 20px rgba(245, 158, 11, .2); }
+    .summary-podium-list { display: flex; flex-direction: column; gap: .45rem; max-width: 520px; margin: 0 auto; }
+    .summary-podium-item { display: flex; align-items: center; gap: .55rem; background: var(--surface); border-radius: 12px; padding: .55rem .65rem; border: 1px solid rgba(255,255,255,.06); font-size: .82rem; }
+    .summary-podium-medal { font-size: 1.25rem; line-height: 1; width: 1.6rem; text-align: center; flex-shrink: 0; }
+    .summary-podium-item-body { min-width: 0; flex: 1; }
+    .summary-podium-item-name { font-weight: 800; display: flex; align-items: center; gap: .35rem; }
+    .summary-podium-item-combo { font-size: .68rem; color: var(--text-dim); margin-top: .12rem; line-height: 1.25; }
     .summary-player { background: var(--surface); border-radius: 16px; padding: 1.3rem; border-top: 3px solid; }
     .sp-name { font-size: 1rem; font-weight: 700; margin-bottom: .2rem; display: flex; align-items: center; gap: .4rem; }
     .sp-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
@@ -1789,11 +1814,10 @@
       <h1>Récapitulatif</h1>
       <p id="summarySubtitle">Voici ce que chacun a obtenu</p>
     </header>
+    <div class="summary-podium" id="summaryPodium" style="display:none"></div>
     <div class="summary-grid" id="summaryGrid"></div>
     <div class="summary-journal-wrap" id="summaryJournalWrap" style="display:none"></div>
-    <div style="text-align:center;margin-top:2rem;">
-      <button class="btn btn-gold" onclick="(ONLINE.enabled ? restartOnlineRoomGame() : newGame())">🔄 Nouvelle partie</button>
-    </div>
+    <div id="summaryFooterActions" style="text-align:center;margin-top:2rem;display:flex;flex-wrap:wrap;justify-content:center;gap:.75rem;align-items:center"></div>
   </div>
 </div>
 
@@ -1931,7 +1955,7 @@ const LOCATIONS = [
   { name: 'Lit king size avec pétales de rose', emoji: '🌹', good: true },
   { name: 'Villa avec piscine à débordement', emoji: '🏖️', good: true },
   { name: 'Dans un McDonald\'s bondé', emoji: '🍟', good: false },
-  { name: 'Dans le salon chez tes parents (ils regardent la télé)', emoji: '🛋️', good: false },
+  { name: 'Dans le salon chez tes parents pendant qu\'ils regardent la télé', emoji: '🛋️', good: false },
   { name: 'Sur le capot au parking Leclerc', emoji: '🚗', good: false },
   { name: 'Dans le vomi de ton pote qui a trop bu', emoji: '🤮', good: false },
   { name: 'Dans le lit de tes parents pendant qu\'ils dorment à côté', emoji: '😰', good: false },
@@ -10743,47 +10767,123 @@ function nextTurn() {
 /* ═══════════════════════════════════════
    SUMMARY
    ═══════════════════════════════════════ */
-function getComboLabel(player) {
+/** Rangs combo : 1 = meilleur … 6 = incomplet (pas de podium théorique). */
+function getComboInfo(player) {
   var person = player.picks[0].length > 0 ? player.picks[0][0] : null;
   var action = player.picks[1].length > 0 ? player.picks[1][0] : null;
   var location = player.picks[2].length > 0 ? player.picks[2][0] : null;
-  if (!person || !action || !location) return null;
+  if (!person || !action || !location) {
+    return { text: 'Incomplet', cls: 'sp-combo-mixed', rank: 6, kind: 'incomplete' };
+  }
 
   var actionFav = person.good === action.good;
   var locationFav = person.good === location.good;
 
   if (actionFav && locationFav) {
     return person.good
-      ? { text: 'Combo de rêve !', cls: 'sp-combo-good' }
-      : { text: 'Combo maudit !', cls: 'sp-combo-bad' };
-  } else if (!actionFav && !locationFav) {
-    return person.good
-      ? { text: 'Catastrophe totale !', cls: 'sp-combo-bad' }
-      : { text: 'Chance inouïe !', cls: 'sp-combo-good' };
+      ? { text: 'Combo de rêve !', cls: 'sp-combo-good', rank: 1, kind: 'dream' }
+      : { text: 'Combo maudit !', cls: 'sp-combo-bad', rank: 5, kind: 'cursed' };
   }
-  return { text: 'Combo mitigé...', cls: 'sp-combo-mixed' };
+  if (!actionFav && !locationFav) {
+    return person.good
+      ? { text: 'Catastrophe totale !', cls: 'sp-combo-bad', rank: 4, kind: 'disaster' }
+      : { text: 'Chance inouïe !', cls: 'sp-combo-good', rank: 2, kind: 'lucky' };
+  }
+  return { text: 'Combo mitigé...', cls: 'sp-combo-mixed', rank: 3, kind: 'mixed' };
+}
+
+function getComboLabel(player) {
+  var info = getComboInfo(player);
+  if (info && info.kind === 'incomplete') return null;
+  if (!info) return null;
+  return { text: info.text, cls: info.cls };
+}
+
+function buildComboStandings(players) {
+  var rows = (players || []).map(function(p) {
+    var info = getComboInfo(p);
+    return { player: p, info: info, rank: info ? info.rank : 6 };
+  });
+  rows.sort(function(a, b) {
+    if (a.rank !== b.rank) return a.rank - b.rank;
+    return String(a.player.name || '').localeCompare(String(b.player.name || ''), 'fr', { sensitivity: 'base' });
+  });
+  var uniq = [];
+  rows.forEach(function(row) {
+    if (uniq.length === 0 || uniq[uniq.length - 1] !== row.rank) uniq.push(row.rank);
+  });
+  var rankToPlace = {};
+  uniq.forEach(function(rk, i) {
+    rankToPlace[rk] = i + 1;
+  });
+  rows.forEach(function(row) {
+    row.place = rankToPlace[row.rank];
+  });
+  return rows;
+}
+
+function podiumMedalForPlace(place) {
+  if (place === 1) return '🥇';
+  if (place === 2) return '🥈';
+  if (place === 3) return '🥉';
+  return '#' + place;
+}
+
+function renderSummaryPodiumHtml(players) {
+  var rows = buildComboStandings(players);
+  if (!rows.length) return '';
+
+  var firstPlace = rows.filter(function(r) { return r.place === 1; });
+  var winnerLine = '';
+  if (firstPlace.length === 1) {
+    winnerLine = '<div class="summary-podium-winner">🏆 Victoire combo : ' + esc(firstPlace[0].player.name) + '</div>';
+  } else if (firstPlace.length > 1) {
+    winnerLine = '<div class="summary-podium-winner">🏆 Ex æquo : ' +
+      firstPlace.map(function(r) { return esc(r.player.name); }).join(' · ') + '</div>';
+  }
+
+  var list = rows.map(function(r) {
+    var p = r.player;
+    var medal = podiumMedalForPlace(r.place);
+    var comboText = r.info ? r.info.text : '—';
+    return '<div class="summary-podium-item">' +
+      '<span class="summary-podium-medal">' + medal + '</span>' +
+      '<div class="summary-podium-item-body">' +
+        '<div class="summary-podium-item-name"><span class="sp-dot" style="background:' + p.color + '"></span>' + esc(p.name) + '</div>' +
+        '<div class="summary-podium-item-combo">' + esc(comboText) + '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  return '<h2>Podium des combos</h2>' +
+    '<p class="summary-podium-rule">Classement selon Personne + Action + Lieu (alignement <span class="gb-tag gb-tag-good" style="font-size:.55rem">Good</span> / <span class="gb-tag gb-tag-bad" style="font-size:.55rem">Bad</span>) : ' +
+    '<b>Combo de rêve</b> &gt; <b>Chance inouïe</b> &gt; <b>Combo mitigé</b> &gt; <b>Catastrophe totale</b> &gt; <b>Combo maudit</b> &gt; incomplet.</p>' +
+    winnerLine +
+    '<div class="summary-podium-list">' + list + '</div>';
 }
 
 function endGame() {
   showScreen('screenSummary');
   spawnConfetti();
-  document.getElementById('summarySubtitle').textContent = 'Le destin a parlé !';
+  document.getElementById('summarySubtitle').textContent = 'Le destin a parlé — victoire combo + détail par joueur ci-dessous.';
 
-  // Host-only: allow resetting the room back to lobby (online)
-  var existing = document.getElementById('summaryHostActions');
-  if (existing) existing.remove();
-  if (ONLINE.enabled && onlineIsHost()) {
-    var hostActions = document.createElement('div');
-    hostActions.id = 'summaryHostActions';
-    hostActions.style.margin = '1rem 0 1.5rem';
-    hostActions.style.display = 'flex';
-    hostActions.style.justifyContent = 'center';
-    hostActions.style.gap = '.10rem';
-    hostActions.innerHTML =
-      '<button class="btn btn-gold" style="padding:.6rem 1rem" onclick="restartOnlineRoomGame()">🔄 Relancer une game</button>' +
-      '<button class="btn btn-danger-fill" style="padding:.6rem 1rem" onclick="endOnlineRoomGame()">⛔ Terminer la partie</button>';
-    var grid = document.getElementById('summaryGrid');
-    if (grid && grid.parentNode) grid.parentNode.insertBefore(hostActions, grid);
+  var podiumEl = document.getElementById('summaryPodium');
+  if (podiumEl) {
+    var podiumHtml = renderSummaryPodiumHtml(turnOrder);
+    podiumEl.innerHTML = podiumHtml;
+    podiumEl.style.display = podiumHtml ? 'block' : 'none';
+  }
+
+  var legacyHost = document.getElementById('summaryHostActions');
+  if (legacyHost) legacyHost.remove();
+
+  var summaryFoot = document.getElementById('summaryFooterActions');
+  if (summaryFoot) {
+    var footHtml = '<button type="button" class="btn btn-gold" onclick="(ONLINE.enabled ? restartOnlineRoomGame() : newGame())">🔄 Nouvelle partie</button>';
+    if (ONLINE.enabled && onlineIsHost()) {
+      footHtml += '<button type="button" class="btn btn-danger-fill" onclick="endOnlineRoomGame()">⛔ Terminer la partie</button>';
+    }
+    summaryFoot.innerHTML = footHtml;
   }
 
   var jw = document.getElementById('summaryJournalWrap');
