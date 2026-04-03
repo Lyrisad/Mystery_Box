@@ -171,6 +171,27 @@
       box-shadow: 0 0 0 1px rgba(168, 85, 247, 0.22);
     }
 
+    /* Pioche : halo ambre (Triple appât : gratuites restantes) */
+    .btn.btn-min.game-pay-draw-btn--tentation {
+      border-color: rgba(245, 158, 11, 0.88);
+      color: #fffbeb;
+      box-shadow:
+        0 0 0 2px rgba(217, 119, 6, 0.45),
+        0 0 22px rgba(245, 158, 11, 0.45),
+        0 0 40px rgba(180, 83, 9, 0.22);
+    }
+    .btn.btn-min.game-pay-draw-btn--tentation:hover:not(:disabled) {
+      border-color: rgba(252, 211, 77, 0.95);
+      color: #fff;
+      box-shadow:
+        0 0 0 2px rgba(245, 158, 11, 0.55),
+        0 0 28px rgba(245, 158, 11, 0.55),
+        0 0 52px rgba(180, 83, 9, 0.32);
+    }
+    .btn.btn-min.game-pay-draw-btn--tentation:disabled {
+      box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.22);
+    }
+
     /* ── Jackpot reveal (Hearthstone-ish) ── */
     .jackpot-stage { margin: .3rem auto 1rem; display: flex; justify-content: center; align-items: flex-end; gap: 1.1rem; perspective: 1100px; }
     .jackpot-stage.is-columns { flex-direction: column; align-items: center; }
@@ -291,6 +312,10 @@
 
     /* ── GAME ── */
     .game-topbar { background: var(--surface); border-bottom: 1px solid rgba(255,255,255,.06); padding: .65rem 1.5rem; display: flex; align-items: center; gap: .7rem; position: sticky; top: 0; z-index: 10; flex-wrap: wrap; }
+    .topbar-fs-btn { flex-shrink: 0; }
+    @media (max-width: 640px) {
+      .topbar-fs-btn { display: none; }
+    }
     .topbar-players { display: flex; gap: .35rem; flex: 1; }
     .topbar-pip { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-size: .72rem; font-weight: 800; color: #fff; opacity: .3; transition: opacity .3s, transform .3s; }
     .topbar-pip.active { opacity: 1; transform: scale(1.15); box-shadow: 0 0 10px rgba(255,255,255,.2); }
@@ -1988,7 +2013,7 @@ const PLAYABLE_CARDS = [
   { id: 'petit_sabotage', name: 'Petit sabotage', emoji: '🧨', rarity: 'common', type: 'active', desc: 'Choisis un joueur : ce round, 1 élément est retiré de SA boîte (personnel, au hasard).' },
   { id: 'pioche_sacree', name: 'Pioche sacrée', emoji: '🙏', rarity: 'rare', type: 'active', desc: 'Lance 1d100, débloque des raretés selon ton score, puis choisis une carte : elle rejoint ta main et reste jusqu’à ce que tu la joues (pas perdue en fin de tour).' },
   { id: 'above_average', name: 'Above average', emoji: '📈', rarity: 'common', type: 'active', desc: 'Lance 1d100 : si ≥ 50, choisis une carte Commune ou Rare : elle rejoint ta main et reste jusqu’à ce que tu la joues (pas perdue en fin de tour).' },
-  { id: 'ticket_caisse', name: 'Ticket de caisse', emoji: '🧾', rarity: 'common', type: 'active', desc: 'Joue-la ce tour-ci : au début de ton prochain tour, tu reçois une carte Rare aléatoire en main (passive activée tout de suite si c’en est une).' },
+  { id: 'ticket_caisse', name: 'Ticket de caisse', emoji: '🧾', rarity: 'common', type: 'active', desc: 'Ce tour : une carte Rare aléatoire tout de suite au dernier round (Lieu) ; sinon au début de ton prochain tour. Passives s’activent immédiatement. Plusieurs tickets joués se cumulent (plusieurs Rare).' },
   { id: 'pari_minable', name: 'Pari minable', emoji: '🎯', rarity: 'common', type: 'active', desc: 'Avant de lancer le dé ce tour : choisis Pair ou Impair sur le numéro affiché par le dé . Gagné : +1 relance. Perdu : −1 relance (min 0).' },
   { id: 'reroll_back', name: 'Deuxième souffle', emoji: '🎲', rarity: 'common', type: 'active', desc: '+1 relance pour ce tour, sans plafond (cumulable : plusieurs cartes / effets s’additionnent).' },
   { id: 'double_pioche', name: 'Double pioche', emoji: '🎴', rarity: 'rare', type: 'active', desc: 'Ce tour, tu lances 2 fois (sans éliminer) et tu choisis le meilleur résultat à garder.' },
@@ -2004,6 +2029,7 @@ const PLAYABLE_CARDS = [
   { id: 'miasme', name: 'Miasme', emoji: '☣️', rarity: 'epic', type: 'active', desc: 'Tous les adversaires gagnent +35% de chances (cumulable, max ~98%) de piocher un loot défavorable (Good/Bad) à chaque jet de leur tour, en plus des autres malus/bonus.' },
   { id: 'partage', name: 'Partage ?', emoji: '🤝', rarity: 'epic', type: 'active', desc: 'Copie une carte au hasard dans la main d’un adversaire (réplique prête à être jouée ce tour). Si sa main est vide ou si personne n’a de carte, tu gagnes une carte aléatoire.' },
   { id: 'main_du_destin', name: 'Main du destin', emoji: '🖐️', rarity: 'epic', type: 'active', desc: '+2 relances bonus, 2 pioches payantes Rare+ (50/30/20%). Bonus ou relances inutilisés seront perdus à la fin du tour.' },
+  { id: 'triple_appat', name: 'Triple appât', emoji: '🪤', rarity: 'epic', type: 'active', desc: 'Ce tour : 3 pioches dans le paquet sans dépenser de 🎲. Chaque pioche +15% de chance de loot défavorable au jet de dé (comme un malus de tableau, selon ta Personne). Ce bonus de pioche expire à la fin de ton tour ; le malus sur le loot disparaît dès que tu gardes ta carte Personne / Action / Lieu ce tour.' },
   { id: 'infinite_reroll', name: 'Boucle temporelle', emoji: '♾️', rarity: 'legendary', type: 'active', desc: 'Relances illimitées ce tour (cartes relancées : retour boîte). 3 pioches « Pioche » gratuites, puis chaque pioche coûte 1 🎲 comme d’habitude.' },
   { id: 'couronne', name: 'Couronne', emoji: '👑', rarity: 'legendary', type: 'active', desc: 'Ce tour, tu choisis ton loot parmi 3 résultats tirés au hasard.' },
   { id: 'troisieme_oeil', name: 'Troisième œil', emoji: '🔎', rarity: 'legendary', type: 'active', desc: 'Ce tour uniquement, tu peux voir la main + les résultats (Personne/Action/Lieu) de tout le monde (eux ne voient rien de plus).' },
@@ -2019,6 +2045,9 @@ const PLAYABLE_CARDS = [
 
 /** Sous Boucle temporelle : pioches payantes sans −1 🎲 avant d’épuiser ce quota */
 const LOOP_FREE_PIOCHE_MAX = 3;
+/** Triple appât : pioches gratuites puis +15% loot défavorable par pioche (malus levé au « Garder ») */
+const TRIPLE_APPAT_PIOCHE_FREE = 3;
+const TRIPLE_APPAT_BAD_PER_PIOCHE = 0.15;
 
 const RARITY_WEIGHTS = [
   { rarity: 'common', weight: 40 },
@@ -2423,6 +2452,8 @@ function onlineApplyViewState(vs) {
                 shieldedRound: false,
                 infiniteReroll: false,
                 loopPiocheFreeLeft: 0,
+                tentationPiocheFreeLeft: 0,
+                tentationLootBadBonus: 0,
                 banned: [],
                 secondLookArmed: false,
                 secondLookUsed: false,
@@ -2477,6 +2508,10 @@ function onlineApplyViewState(vs) {
         if (!Array.isArray(p.publicTurnLog)) p.publicTurnLog = asArray(p.publicTurnLog);
         if (typeof p.rerollsLeft !== 'number') p.rerollsLeft = 2;
         if (typeof p.loopPiocheFreeLeft !== 'number') p.loopPiocheFreeLeft = 0;
+        if (typeof p.tentationPiocheFreeLeft !== 'number') p.tentationPiocheFreeLeft = Number(p.tentationPiocheFreeLeft || 0) || 0;
+        p.tentationPiocheFreeLeft = Math.max(0, Math.min(TRIPLE_APPAT_PIOCHE_FREE, Math.floor(Number(p.tentationPiocheFreeLeft) || 0)));
+        if (typeof p.tentationLootBadBonus !== 'number') p.tentationLootBadBonus = Number(p.tentationLootBadBonus || 0) || 0;
+        p.tentationLootBadBonus = Math.max(0, Math.min(0.98, p.tentationLootBadBonus));
         if (typeof p.pendingSabotageBan !== 'number') p.pendingSabotageBan = 0;
         if (typeof p.frozenTurns !== 'number') p.frozenTurns = 0;
         if (typeof p.blindedTurns !== 'number') p.blindedTurns = 0;
@@ -3512,6 +3547,8 @@ function createRoomOnline(m) {
       shieldedRound: false,
       infiniteReroll: false,
       loopPiocheFreeLeft: 0,
+      tentationPiocheFreeLeft: 0,
+      tentationLootBadBonus: 0,
       banned: [],
       secondLookArmed: false,
       secondLookUsed: false,
@@ -3634,6 +3671,8 @@ function joinRoomOnline() {
         shieldedRound: false,
         infiniteReroll: false,
         loopPiocheFreeLeft: 0,
+        tentationPiocheFreeLeft: 0,
+        tentationLootBadBonus: 0,
         banned: [],
         secondLookArmed: false,
         secondLookUsed: false,
@@ -3726,7 +3765,9 @@ function onlineAction(action, payload) {
       return filtered[Math.floor(Math.random() * filtered.length)];
     }
     function applyBadLootBoostServerTx(player, rolledEntity) {
-      var bb = Math.min(0.98, Number(player.badLootBoost || 0) || 0);
+      var bbBase = Math.min(0.98, Number(player.badLootBoost || 0) || 0);
+      var bbTent = Math.min(0.98, Number(player.tentationLootBadBonus || 0) || 0);
+      var bb = Math.min(0.98, bbBase + bbTent);
       if (bb <= 0) return rolledEntity;
       if (Math.random() > bb) return rolledEntity;
       var roundNum = Number(st.currentRound || 0) || 0;
@@ -3796,6 +3837,8 @@ function onlineAction(action, payload) {
         p.shieldExpiresAtSeq = null;
         p.infiniteReroll = false;
         p.loopPiocheFreeLeft = 0;
+        p.tentationPiocheFreeLeft = 0;
+        p.tentationLootBadBonus = 0;
         p.banned = [];
         p.secondLookArmed = false;
         p.secondLookUsed = false;
@@ -4002,6 +4045,8 @@ function onlineAction(action, payload) {
         pp.drawnCard = null;
         pp.infiniteReroll = false;
         pp.loopPiocheFreeLeft = 0;
+        pp.tentationPiocheFreeLeft = 0;
+        pp.tentationLootBadBonus = 0;
         pp.secondLookArmed = false;
         pp.secondLookUsed = false;
         pp.doublePiocheArmed = false;
@@ -4151,6 +4196,8 @@ function onlineAction(action, payload) {
       // Reset per-turn fields (match beginTurn intent)
       p.infiniteReroll = false;
       p.loopPiocheFreeLeft = 0;
+      p.tentationPiocheFreeLeft = 0;
+      p.tentationLootBadBonus = 0;
       p.activePassives = [];
       p.secondLookArmed = false;
       p.secondLookUsed = false;
@@ -4337,11 +4384,17 @@ function onlineAction(action, payload) {
       if (loopFreeBuy > 0) {
         p.loopPiocheFreeLeft = Math.max(0, loopFreeBuy - 1);
       } else {
-        var totBuy = (Number(p.rerollsLeft || 0) || 0) + (Number(p.mainDuDestinBonusRerolls || 0) || 0);
-        if (totBuy <= 0) return st;
-        var bBuy = Number(p.mainDuDestinBonusRerolls || 0) || 0;
-        if (bBuy > 0) p.mainDuDestinBonusRerolls = bBuy - 1;
-        else p.rerollsLeft = Math.max(0, (Number(p.rerollsLeft || 0) || 0) - 1);
+        var tentFreeBuy = Number(p.tentationPiocheFreeLeft || 0) || 0;
+        if (tentFreeBuy > 0) {
+          p.tentationPiocheFreeLeft = Math.max(0, tentFreeBuy - 1);
+          p.tentationLootBadBonus = Math.min(0.98, (Number(p.tentationLootBadBonus || 0) || 0) + TRIPLE_APPAT_BAD_PER_PIOCHE);
+        } else {
+          var totBuy = (Number(p.rerollsLeft || 0) || 0) + (Number(p.mainDuDestinBonusRerolls || 0) || 0);
+          if (totBuy <= 0) return st;
+          var bBuy = Number(p.mainDuDestinBonusRerolls || 0) || 0;
+          if (bBuy > 0) p.mainDuDestinBonusRerolls = bBuy - 1;
+          else p.rerollsLeft = Math.max(0, (Number(p.rerollsLeft || 0) || 0) - 1);
+        }
       }
       if (premLeft > 0) {
         p.mainDuDestinPremiumDraws = Math.max(0, premLeft - 1);
@@ -4423,6 +4476,8 @@ function onlineAction(action, payload) {
       }
       p.badLootBoost = 0;
       p.badLootBoostCount = 0;
+      p.tentationLootBadBonus = 0;
+      p.tentationPiocheFreeLeft = 0;
       p.pariMinableGuess = null;
       p.pariMinableFlash = null;
       if (p.frozenTurns && p.frozenTurns > 0) p.frozenTurns--;
@@ -4668,6 +4723,12 @@ function onlineAction(action, payload) {
         publishCardPlay(st, p, card, {});
         return;
       }
+      if (card.id === 'triple_appat') {
+        p.tentationPiocheFreeLeft = TRIPLE_APPAT_PIOCHE_FREE;
+        p.tentationLootBadBonus = 0;
+        publishCardPlay(st, p, card, {});
+        return;
+      }
       if (card.id === 'jackpot') {
         p.hand = p.hand || [];
         var jts = Date.now();
@@ -4752,6 +4813,30 @@ function onlineAction(action, payload) {
       if (card.id === 'bas_les_masques') { ensurePending('bas_les_masques', { card: card }); return; }
 
       if (card.id === 'ticket_caisse') {
+        var ticketLastRound = Number(st.currentRound || 0) >= 2;
+        if (ticketLastRound) {
+          p.hand = p.hand || [];
+          var tkTsNow = Date.now();
+          var tkCardsNow = [];
+          var rareTkNow = drawRandomRareCardCopy();
+          if (rareTkNow) {
+            tkCardsNow.push(rareTkNow);
+            if (rareTkNow.type === 'passive') {
+              applyPassiveEffect(p, rareTkNow);
+              pushTurnLog(p, rareTkNow, 'activated');
+              st.lastPassiveDraw = { pid: String(p.id || ''), card: rareTkNow, ts: tkTsNow };
+            } else {
+              p.hand.push(rareTkNow);
+              pushTurnLog(p, rareTkNow, 'gained');
+            }
+          }
+          if (tkCardsNow.length) {
+            st.lastTicketDraw = { pid: String(p.id || ''), card: tkCardsNow[tkCardsNow.length - 1], ts: tkTsNow, passive: (tkCardsNow[tkCardsNow.length - 1] && tkCardsNow[tkCardsNow.length - 1].type === 'passive') };
+            st.lastTicketDrawBatch = { pid: String(p.id || ''), cards: tkCardsNow, ts: tkTsNow };
+          }
+          publishCardPlay(st, p, card, {});
+          return;
+        }
         p.ticketCaisseNextRare = false;
         if (typeof p.ticketCaisseNextRareCount !== 'number') p.ticketCaisseNextRareCount = Number(p.ticketCaisseNextRareCount || 0) || 0;
         p.ticketCaisseNextRareCount = (Number(p.ticketCaisseNextRareCount) || 0) + 1;
@@ -5406,6 +5491,12 @@ function onlineAction(action, payload) {
           pp.loopPiocheFreeLeft = Number(pp.loopPiocheFreeLeft || 0) || 0;
         }
         pp.loopPiocheFreeLeft = Math.max(0, Math.min(LOOP_FREE_PIOCHE_MAX, Math.floor(Number(pp.loopPiocheFreeLeft) || 0)));
+        if (typeof pp.tentationPiocheFreeLeft !== 'number' || !isFinite(pp.tentationPiocheFreeLeft)) {
+          pp.tentationPiocheFreeLeft = Number(pp.tentationPiocheFreeLeft || 0) || 0;
+        }
+        pp.tentationPiocheFreeLeft = Math.max(0, Math.min(TRIPLE_APPAT_PIOCHE_FREE, Math.floor(Number(pp.tentationPiocheFreeLeft) || 0)));
+        if (typeof pp.tentationLootBadBonus !== 'number') pp.tentationLootBadBonus = Number(pp.tentationLootBadBonus || 0) || 0;
+        pp.tentationLootBadBonus = Math.max(0, Math.min(0.98, pp.tentationLootBadBonus));
         if (!Array.isArray(pp.banned)) pp.banned = [];
         if (typeof pp.secondLookArmed !== 'boolean') pp.secondLookArmed = !!pp.secondLookArmed;
         if (typeof pp.secondLookUsed !== 'boolean') pp.secondLookUsed = !!pp.secondLookUsed;
@@ -5447,6 +5538,8 @@ function onlineAction(action, payload) {
         'shieldExpiresAtSeq',
         'infiniteReroll',
         'loopPiocheFreeLeft',
+        'tentationPiocheFreeLeft',
+        'tentationLootBadBonus',
         'banned',
         'secondLookArmed',
         'secondLookUsed',
@@ -5834,12 +5927,52 @@ function initial(s) {
   return s.charAt(0).toUpperCase();
 }
 
+var _gameFsOneShotHandler = null;
+
+function unbindGameFullscreenOneShot() {
+  var gs = document.getElementById('screenGame');
+  if (gs && _gameFsOneShotHandler) {
+    gs.removeEventListener('pointerdown', _gameFsOneShotHandler, true);
+    _gameFsOneShotHandler = null;
+  }
+}
+
+function tryAutoEnterGameFullscreen() {
+  if (typeof window.matchMedia === 'function' && window.matchMedia('(max-width: 640px)').matches) return;
+  if (gameFullscreenActive()) return;
+  var root = document.documentElement;
+  if (root.requestFullscreen) root.requestFullscreen().catch(function() {});
+  else if (root.webkitRequestFullscreen) root.webkitRequestFullscreen();
+}
+
+function bindGameFullscreenOneShot() {
+  var gs = document.getElementById('screenGame');
+  if (!gs || _gameFsOneShotHandler) return;
+  _gameFsOneShotHandler = function() {
+    if (gameFullscreenActive()) return;
+    tryAutoEnterGameFullscreen();
+    unbindGameFullscreenOneShot();
+  };
+  gs.addEventListener('pointerdown', _gameFsOneShotHandler, true);
+}
+
+function scheduleGameFullscreenAfterGameShow() {
+  requestAnimationFrame(function() {
+    requestAnimationFrame(function() {
+      tryAutoEnterGameFullscreen();
+      if (!gameFullscreenActive()) bindGameFullscreenOneShot();
+    });
+  });
+}
+
 function showScreen(id) {
   const next = document.getElementById(id);
   if (!next) return;
   if (next.classList.contains('active')) return; // avoid flicker/re-animate on polling
+  if (id !== 'screenGame') unbindGameFullscreenOneShot();
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   next.classList.add('active');
+  if (id === 'screenGame') scheduleGameFullscreenAfterGameShow();
 }
 
 function showToast(msg, type) {
@@ -6347,6 +6480,8 @@ document.getElementById('playerForm').addEventListener('submit', function(e) {
     shieldedRound: false,
     infiniteReroll: false,
     loopPiocheFreeLeft: 0,
+    tentationPiocheFreeLeft: 0,
+    tentationLootBadBonus: 0,
     banned: [],
     secondLookArmed: false,
     secondLookUsed: false,
@@ -6612,7 +6747,7 @@ function goToTurnOrder() {
   players.forEach(function(p) {
     p.picks = [[],[],[]]; p.rerollsLeft = 2; p.rollRaw = 0; p.rollDisplay = 0;
     p.hand = []; p.drawnCard = null; p.activePassives = [];
-    p.shieldedRound = false; p.shieldExpiresAtSeq = null; p.infiniteReroll = false; p.loopPiocheFreeLeft = 0; p.banned = [];
+    p.shieldedRound = false; p.shieldExpiresAtSeq = null; p.infiniteReroll = false; p.loopPiocheFreeLeft = 0; p.tentationPiocheFreeLeft = 0; p.tentationLootBadBonus = 0; p.banned = [];
     p.secondLookArmed = false; p.secondLookUsed = false; p.doublePiocheArmed = false;
     p.curatedPoolIds = null; p.goodBoost = 0; p.goodBoostCount = 0; p.badLootBoost = 0; p.badLootBoostCount = 0; p.ticketCaisseNextRare = false; p.ticketCaisseNextRareCount = 0; p.pariMinableGuess = null; p.pariMinableFlash = null; p.frozenTurns = 0; p.pendingSabotageBan = 0;
     p.mainDuDestinBonusRerolls = 0; p.mainDuDestinPremiumDraws = 0;
@@ -6819,6 +6954,8 @@ function applyFlashbackLocal(caster, card) {
     p.drawnCard = null;
     p.infiniteReroll = false;
     p.loopPiocheFreeLeft = 0;
+    p.tentationPiocheFreeLeft = 0;
+    p.tentationLootBadBonus = 0;
     p.secondLookArmed = false;
     p.secondLookUsed = false;
     p.doublePiocheArmed = false;
@@ -6863,6 +7000,8 @@ function beginTurn() {
   firstEntity = null;
   player.infiniteReroll = false;
   player.loopPiocheFreeLeft = 0;
+  player.tentationPiocheFreeLeft = 0;
+  player.tentationLootBadBonus = 0;
   player.activePassives = [];
   player.drawnCard = null;
   player.secondLookArmed = false;
@@ -7239,11 +7378,28 @@ function executeCard(player, card) {
   } else if (card.id === 'above_average') {
     showAboveAverage(player);
   } else if (card.id === 'ticket_caisse') {
-    player.ticketCaisseNextRare = false;
-    if (typeof player.ticketCaisseNextRareCount !== 'number') player.ticketCaisseNextRareCount = Number(player.ticketCaisseNextRareCount || 0) || 0;
-    player.ticketCaisseNextRareCount = (Number(player.ticketCaisseNextRareCount) || 0) + 1;
-    showToast(card.emoji + ' Rare aléatoire au prochain tour !', 'success');
-    renderTurnCenter(player);
+    if (currentRound >= 2) {
+      player.hand = player.hand || [];
+      var rareTcNow = drawRandomRareCardCopy();
+      if (rareTcNow) {
+        if (rareTcNow.type === 'passive') {
+          applyPassiveCard(player, rareTcNow);
+          showToast('🧾 Ticket de caisse : « ' + rareTcNow.name + ' » !', 'success');
+        } else {
+          player.hand.push(rareTcNow);
+          addTurnLog(player, rareTcNow, 'drawn');
+          showGainedCardModal('🧾 Ticket de caisse', 'Carte obtenue', rareTcNow);
+        }
+      }
+      renderSidebar();
+      renderTurnCenter(player);
+    } else {
+      player.ticketCaisseNextRare = false;
+      if (typeof player.ticketCaisseNextRareCount !== 'number') player.ticketCaisseNextRareCount = Number(player.ticketCaisseNextRareCount || 0) || 0;
+      player.ticketCaisseNextRareCount = (Number(player.ticketCaisseNextRareCount) || 0) + 1;
+      showToast(card.emoji + ' Rare aléatoire au prochain tour !', 'success');
+      renderTurnCenter(player);
+    }
   } else if (card.id === 'pari_minable') {
     if (!ONLINE.enabled) {
       pending = { type: 'pari_minable', byPid: String(player.id || ''), ts: Date.now(), card: JSON.parse(JSON.stringify(card)) };
@@ -7300,6 +7456,12 @@ function executeCard(player, card) {
     player.mainDuDestinBonusRerolls = 2;
     player.mainDuDestinPremiumDraws = 2;
     showToast(card.emoji + ' Main du destin : +2 relances bonus · 2 pioches Rare+ garanties — à utiliser ce tour !', 'success');
+    renderSidebar();
+    renderTurnCenter(player);
+  } else if (card.id === 'triple_appat') {
+    player.tentationPiocheFreeLeft = TRIPLE_APPAT_PIOCHE_FREE;
+    player.tentationLootBadBonus = 0;
+    showToast(card.emoji + ' 3 pioches gratuites — chaque pioche +15% de loot défavorable jusqu’à ce que tu gardes ton résultat.', 'success');
     renderSidebar();
     renderTurnCenter(player);
   } else if (card.id === 'infinite_reroll') {
@@ -7918,10 +8080,32 @@ function downloadPublicGameLog() {
   showToast('Fichier téléchargé.', 'success');
 }
 
+function gameFullscreenActive() {
+  return !!(document.fullscreenElement || document.webkitFullscreenElement);
+}
+
+function toggleGameFullscreen() {
+  var root = document.documentElement;
+  if (gameFullscreenActive()) {
+    if (document.exitFullscreen) document.exitFullscreen().catch(function() {});
+    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+    return;
+  }
+  if (root.requestFullscreen) root.requestFullscreen().catch(function() { showToast('Plein écran refusé par le navigateur.', 'danger'); });
+  else if (root.webkitRequestFullscreen) root.webkitRequestFullscreen();
+  else showToast('Plein écran non supporté sur ce navigateur.', 'danger');
+}
+
 function renderTopbar() {
   var rm = ROUND_META[currentRound];
   var hostBtn = '';
   var journalBtn = '';
+  var fsBtn = '';
+  if (gameFullscreenActive()) {
+    fsBtn = '<button type="button" class="btn btn-back topbar-fs-btn" style="padding:.45rem .6rem;font-size:.72rem" title="Repasser en mode fenêtré (Échap)" onclick="toggleGameFullscreen()">🗗 Fenêtré</button>';
+  } else {
+    fsBtn = '<button type="button" class="btn btn-back topbar-fs-btn" style="padding:.45rem .6rem;font-size:.72rem" title="Plein écran" onclick="toggleGameFullscreen()">🖥 Plein écran</button>';
+  }
   if (ONLINE.enabled) {
     journalBtn = '<button type="button" class="btn btn-back" style="padding:.45rem .65rem;font-size:.72rem" onclick="openPublicGameJournal()">📜 Journal</button>';
   }
@@ -7931,6 +8115,7 @@ function renderTopbar() {
   document.getElementById('gameTopbar').innerHTML =
     '<span class="mode-badge mode-badge-' + mode + '">' + (mode === 'normal' ? '🎲 Normal' : '🔥 Chaos') + '</span>' +
     '<span class="mode-badge" style="background:rgba(255,255,255,.08);color:var(--text)">' + rm.emoji + ' R' + (currentRound + 1) + '/3</span>' +
+    fsBtn +
     journalBtn +
     '<div class="topbar-players">' +
     turnOrder.map(function(p, i) {
@@ -7972,13 +8157,16 @@ function renderTurnCenter(player) {
     pill.className = '';
     pill.textContent = '';
     var gb = Number(player.goodBoost || 0) || 0;
-    var bb = Math.min(0.98, Number(player.badLootBoost || 0) || 0);
-    if (gb > 0 || bb > 0) {
+    var bbMia = Math.min(0.98, Number(player.badLootBoost || 0) || 0);
+    var bbTent = Math.min(0.98, Number(player.tentationLootBadBonus || 0) || 0);
+    var bbCombo = Math.min(0.98, bbMia + bbTent);
+    if (gb > 0 || bbCombo > 0) {
       var parts = [];
       if (gb > 0) parts.push('🍀 +' + Math.round(gb * 100) + '% favorable');
-      if (bb > 0) parts.push('☣️ +' + Math.round(bb * 100) + '% défavorable');
+      if (bbMia > 0) parts.push('☣️ +' + Math.round(bbMia * 100) + '% défavorable');
+      if (bbTent > 0) parts.push('🪤 +' + Math.round(bbTent * 100) + '% défavorable (appât)');
       pill.textContent = parts.join(' · ');
-      pill.className = (bb > 0 && gb <= 0) ? 'is-malus' : (gb > 0 && bb <= 0 ? 'is-bonus' : '');
+      pill.className = (bbCombo > 0 && gb <= 0) ? 'is-malus' : (gb > 0 && bbCombo <= 0 ? 'is-bonus' : '');
       pill.style.display = '';
     }
   }
@@ -8024,17 +8212,21 @@ function renderTurnCenter(player) {
     var loopPiocheLeft = (player.infiniteReroll && (Number(player.loopPiocheFreeLeft || 0) || 0) > 0)
       ? (Number(player.loopPiocheFreeLeft || 0) || 0)
       : 0;
-    var canAffordPd = !!(loopPiocheLeft > 0 || playerSpendableRerollsTotal(player) > 0);
+    var tentPiocheLeft = (Number(player.tentationPiocheFreeLeft || 0) || 0) > 0
+      ? (Number(player.tentationPiocheFreeLeft || 0) || 0)
+      : 0;
+    var canAffordPd = !!(loopPiocheLeft > 0 || tentPiocheLeft > 0 || playerSpendableRerollsTotal(player) > 0);
     var showPay = preLoot && isMyTurn && !hasDrawnPending && !pendBlock && !frozenPd && !round1UiOpen;
     payDrawBtn.style.display = showPay ? '' : 'none';
     payDrawBtn.disabled = !canAffordPd || !showPay;
     payDrawBtn.style.opacity = (!canAffordPd && showPay && isMyTurn) ? '0.5' : '';
     payDrawBtn.textContent = loopPiocheLeft > 0
       ? ('Pioche (♾️ ×' + loopPiocheLeft + ')')
-      : 'Pioche (−1 🎲)';
+      : (tentPiocheLeft > 0 ? ('Pioche (🪤 ×' + tentPiocheLeft + ')') : 'Pioche (−1 🎲)');
     payDrawBtn.classList.toggle('game-pay-draw-btn--loop', loopPiocheLeft > 0);
+    payDrawBtn.classList.toggle('game-pay-draw-btn--tentation', loopPiocheLeft <= 0 && tentPiocheLeft > 0);
     var mddHalo = ((Number(player.mainDuDestinBonusRerolls || 0) || 0) > 0 || (Number(player.mainDuDestinPremiumDraws || 0) || 0) > 0);
-    payDrawBtn.classList.toggle('game-pay-draw-btn--main-du-destin', loopPiocheLeft <= 0 && mddHalo);
+    payDrawBtn.classList.toggle('game-pay-draw-btn--main-du-destin', loopPiocheLeft <= 0 && tentPiocheLeft <= 0 && mddHalo);
   }
 
   var handArea = document.getElementById('handArea');
@@ -8115,6 +8307,11 @@ function renderTurnCenter(player) {
   var mddpSt = Number(player.mainDuDestinPremiumDraws || 0) || 0;
   if (mddbSt > 0 || mddpSt > 0) {
     statusLines.push('🖐️ Main du destin : ' + mddbSt + ' relance(s) bonus · ' + mddpSt + ' pioche(s) Rare+ garantie(s) (expire fin de tour).');
+  }
+  var tentFreeSt = Number(player.tentationPiocheFreeLeft || 0) || 0;
+  var tentBadSt = Math.min(0.98, Number(player.tentationLootBadBonus || 0) || 0);
+  if (tentFreeSt > 0 || tentBadSt > 0) {
+    statusLines.push('🪤 Triple appât : ' + tentFreeSt + ' pioche' + (tentFreeSt !== 1 ? 's' : '') + ' gratuite' + (tentFreeSt !== 1 ? 's' : '') + (tentBadSt > 0 ? (' · +' + Math.round(tentBadSt * 100) + '% loot défavorable jusqu’à « Garder »') : '') + '.');
   }
   var ticketViewer = ONLINE.enabled ? me : player;
   var tkCnt = 0;
@@ -10326,7 +10523,9 @@ function applyGoodBoost(player, rolledEntity) {
 
 function applyBadLootBoost(player, rolledEntity) {
   if (!player) return rolledEntity;
-  var bb = Math.min(0.98, Number(player.badLootBoost || 0) || 0);
+  var bbBase = Math.min(0.98, Number(player.badLootBoost || 0) || 0);
+  var bbTent = Math.min(0.98, Number(player.tentationLootBadBonus || 0) || 0);
+  var bb = Math.min(0.98, bbBase + bbTent);
   if (bb <= 0) return rolledEntity;
   if (Math.random() > bb) return rolledEntity;
   var wantUnfavorable;
@@ -10341,7 +10540,7 @@ function applyBadLootBoost(player, rolledEntity) {
   var pBox = getPlayerBox(player);
   var filtered = pBox.filter(function(e) { return typeof e.good === 'boolean' && e.good === wantUnfavorable && e.id !== rolledEntity.id; });
   if (filtered.length === 0) return rolledEntity;
-  showToast('☣️ Miasme…', 'danger');
+  showToast(bbTent > 0 && bbBase <= 0 ? '🪤 Triple appât…' : '☣️ Miasme…', 'danger');
   return filtered[Math.floor(Math.random() * filtered.length)];
 }
 
@@ -10402,7 +10601,8 @@ function payRerollDrawPlayable() {
   var loopFreeAvail = (player.infiniteReroll && (Number(player.loopPiocheFreeLeft || 0) || 0) > 0)
     ? (Number(player.loopPiocheFreeLeft || 0) || 0)
     : 0;
-  if (loopFreeAvail <= 0 && playerSpendableRerollsTotal(player) <= 0) {
+  var tentAvailChk = Number(player.tentationPiocheFreeLeft || 0) || 0;
+  if (loopFreeAvail <= 0 && tentAvailChk <= 0 && playerSpendableRerollsTotal(player) <= 0) {
     showToast('Pas assez de relances.', 'danger');
     return;
   }
@@ -10415,7 +10615,13 @@ function payRerollDrawPlayable() {
   if (loopFreeAvail > 0) {
     player.loopPiocheFreeLeft = Math.max(0, loopFreeAvail - 1);
   } else {
-    consumeOneRerollFromPlayer(player);
+    var tentAvail = Number(player.tentationPiocheFreeLeft || 0) || 0;
+    if (tentAvail > 0) {
+      player.tentationPiocheFreeLeft = Math.max(0, tentAvail - 1);
+      player.tentationLootBadBonus = Math.min(0.98, (Number(player.tentationLootBadBonus || 0) || 0) + TRIPLE_APPAT_BAD_PER_PIOCHE);
+    } else {
+      consumeOneRerollFromPlayer(player);
+    }
   }
   if (premP > 0) {
     player.mainDuDestinPremiumDraws = Math.max(0, premP - 1);
@@ -10653,6 +10859,9 @@ function keepEntity() {
   if (player.frozenTurns && player.frozenTurns > 0) player.frozenTurns--;
   if (player.blindedTurns && player.blindedTurns > 0) player.blindedTurns--;
   player.badLootBoost = 0;
+  player.badLootBoostCount = 0;
+  player.tentationLootBadBonus = 0;
+  player.tentationPiocheFreeLeft = 0;
   player.pariMinableFlash = null;
 
   showToast(currentEntity.name + ' → inventaire de ' + player.name, 'success');
@@ -11035,6 +11244,15 @@ function newGame() {
   document.addEventListener('scroll', hide, true);
   document.addEventListener('click', hide, true);
   window.addEventListener('blur', hide);
+})();
+
+(function initGameFullscreenSync() {
+  function onFsChange() {
+    var gs = document.getElementById('screenGame');
+    if (gs && gs.classList.contains('active') && typeof renderTopbar === 'function') renderTopbar();
+  }
+  document.addEventListener('fullscreenchange', onFsChange);
+  document.addEventListener('webkitfullscreenchange', onFsChange);
 })();
 </script>
 </body>
